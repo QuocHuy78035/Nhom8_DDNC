@@ -1,9 +1,9 @@
 const nodemailer = require("nodemailer");
 
 class Email {
-  constructor({ email, resetToken }) {
+  constructor({ email, OTP }) {
     this.email = email;
-    this.resetToken = resetToken;
+    this.OTP = OTP;
   }
   async sendEmail() {
     const transporter = nodemailer.createTransport({
@@ -18,13 +18,12 @@ class Email {
     return await transporter.sendMail({
       from: process.env.AUTH_EMAIL, // sender address
       to: this.email, // list of receivers
-      subject: "Password Reset ✅", // Subject line
-      html: `<p>We heard that you lost the password. </p>
-            <p>Don't worry, use the link below to reset it.</p>
-            <p>This link <b>expires in 10 minutes</b>. Press
-            <a href=${
-              "http://localhost:3058/api/v1/resetPassword/" + this.resetToken
-            }>here<a/> to proceed.</p>`, // html body
+      subject: "Verify OTP ✅", // Subject line
+      html: `
+            <h3>Verify OTP ✅</h3>
+            <p>Welcome!</p>
+            <p>Here is your verification code: ${this.OTP} </p>
+            <p>Please use this code to complete the authentication process.</p>`, // html body
     });
   }
 }

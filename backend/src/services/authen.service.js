@@ -12,21 +12,18 @@ const KeyTokenService = require("./keytoken.service");
 const { createTokenPair } = require("../auth/authUtils");
 const { Types } = require("mongoose");
 const Email = require("../utils/email");
+const generateOTPConfig = require("../utils/generateOTP.config");
+const EXPIRES_TIME = 10 * 60 * 1000;
 
 class AuthenService {
   static resetPassword = async ({
     body: { password, passwordConfirm },
     params,
   }) => {
-    if (password !== passwordConfirm) {
-      throw new AuthFailureError("Passwords do not match! Please try again!");
-    }
-
     const passwordResetToken = crypto
       .createHash("sha256")
       .update(params.token)
       .digest("hex");
-
     const user = await userModel.findOne({
       passwordResetToken,
       passwordResetExpires: { $gt: Date.now() },
@@ -35,8 +32,13 @@ class AuthenService {
       throw new BadRequestError("Your token is invalid or has expired.");
     }
 
+    if (password !== passwordConfirm) {
+      throw new AuthFailureError("Passwords do not match! Please try again!");
+    }
+
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
+
     user.password = password;
     await user.save({ validateBeforeSave: false });
 
@@ -66,27 +68,58 @@ class AuthenService {
       },
     };
   };
-  static forgotPassword = async ({ email }) => {
-    const user = await userModel.findOne({ email });
+  static verifyOTP = async ({ email, OTP }) => {
+    const user = await userModel.findOne({
+      email,
+      OTPExpires: { $gt: Date.now() },
+    });
     if (!user) {
-      throw new BadRequestError("There is no user with email address!");
+      throw new BadRequestError(
+        "There is no user with email address or OTP has expired!"
+      );
     }
 
+    if (user.OTP !== OTP) {
+      throw new AuthFailureError(
+        "Your entered OTP is invalid! Please try again!"
+      );
+    }
+
+    user.OTP = undefined;
+    user.OTPExpires = undefined;
+    await user.save({ validateBeforeSave: false });
     const resetToken = crypto.randomBytes(32).toString("hex");
 
     const passwordResetToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
-    const passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10p hiệu lực
+    const passwordResetExpires = Date.now() + EXPIRES_TIME; // 10p hiệu lực
 
     await userModel.findOneAndUpdate(
       { _id: new Types.ObjectId(user._id) },
       { passwordResetToken, passwordResetExpires },
       { new: true }
     );
+    return {
+      message: "Verify OTP successfully!",
+      metadata: {
+        resetURL: `http://localhost:${process.env.PORT}/api/v1/resetPassword/${resetToken}`,
+      },
+    };
+  };
+  static forgotPassword = async ({ email }) => {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      throw new BadRequestError("There is no user with email address!");
+    }
+
+    const OTP = generateOTPConfig(4);
+    user.OTP = OTP;
+    user.OTPExpires = Date.now() + EXPIRES_TIME;
+    await user.save({ validateBeforeSave: false });
     try {
-      await new Email({ email, resetToken }).sendEmail();
+      await new Email({ email, OTP }).sendEmail();
     } catch (error) {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
@@ -96,11 +129,9 @@ class AuthenService {
         "There was an error sending the email. Try again later!"
       );
     }
+
     return {
-      message: "Token sent to email!",
-      metadata: {
-        url: `http://localhost:3058/api/v1/resetPassword/${resetToken}`,
-      },
+      message: "OTP sent to email!",
     };
   };
   static logOut = async (keyStore) => {

@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
+    OTP: String,
+    OTPExpires: Date,
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );

@@ -8,6 +8,10 @@ class AuthenController {
     const result = await AuthenService.resetPassword(req);
     return new OK(result).send(res);
   };
+  verifyOTP = async (req, res, next) => {
+    const result = await AuthenService.verifyOTP(req.body);
+    return new OK(result).send(res);
+  };
   forgotPassword = async (req, res, next) => {
     const result = await AuthenService.forgotPassword(req.body);
     return new OK(result).send(res);
