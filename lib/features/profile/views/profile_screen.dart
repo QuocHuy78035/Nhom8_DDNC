@@ -13,8 +13,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileController profileController = ProfileController();
 
-  logoutUser() {
+  logoutUser() async{
+    String message = await profileController.logoutUser();
     profileController.logOut(context);
+    debugPrint(message);
   }
 
   @override

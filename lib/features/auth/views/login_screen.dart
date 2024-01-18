@@ -1,4 +1,5 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
+import 'package:ddnangcao_project/features/auth/views/forgot_pass_screen.dart';
 import 'package:ddnangcao_project/features/auth/views/register_screen.dart';
 import 'package:ddnangcao_project/features/main/views/navbar_custom.dart';
 import 'package:ddnangcao_project/widgets/base_button.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import '../widgets/facebook_button.dart';
 import '../widgets/google_button.dart';
 import '../widgets/text_navigator.dart';
+import '../widgets/title_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -78,13 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Distance(
                     height: GetSize.distance * 6,
                   ),
-                  const Text(
-                    "Login",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const TitleScreen(title: "Login",),
                   const Distance(
                     height: GetSize.distance * 3,
                   ),
@@ -121,7 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     isPass: true,
                   ),
                   TextNavigator(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()));
+                    },
                     title: "Forgot password?",
                   ),
                   const Distance(
@@ -201,6 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 
 class Line extends StatelessWidget {
   final double width;
