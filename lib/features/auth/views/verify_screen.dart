@@ -1,5 +1,6 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
 import 'package:ddnangcao_project/features/auth/views/reset_pass_screen.dart';
+import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
@@ -10,6 +11,7 @@ import '../widgets/title_screen.dart';
 
 class VerifyScreen extends StatefulWidget {
   final String email;
+
   const VerifyScreen({super.key, required this.email});
 
   @override
@@ -22,22 +24,30 @@ class _VerifyScreenState extends State<VerifyScreen> {
   bool _onEditing = true;
   late String _code;
 
-  void confirmVerifyCode() async{
+  void confirmVerifyCode() async {
     setState(() {
       isLoading = true;
     });
-    if(_onEditing == true){
-      ShowSnackBar().showSnackBar("Please enter full verify code", ColorLib.primaryColor, ColorLib.whiteColor, context);
-    }else{
+    if (_onEditing == true) {
+      ShowSnackBar().showSnackBar(GlobalVariable.enterFullVerifyCode,
+          ColorLib.primaryColor, ColorLib.whiteColor, context);
+    } else {
       List<String> message = await authController.verify(widget.email, _code);
       setState(() {
         isLoading = false;
       });
-      if(message[0] == "Verify OTP successfully!"){
-        print("very ${message[1]}");
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResetPassScreen(token: message[1],)));
-      }else{
-        ShowSnackBar().showSnackBar(message[0], ColorLib.primaryColor, ColorLib.whiteColor, context);
+      if (message[0] == GlobalVariable.verifySuc) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResetPassScreen(
+              token: message[1],
+            ),
+          ),
+        );
+      } else {
+        ShowSnackBar().showSnackBar(
+            message[0], ColorLib.primaryColor, ColorLib.whiteColor, context);
       }
     }
   }
@@ -49,7 +59,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: GetSize.symmetricPadding * 2,),
+              horizontal: GetSize.symmetricPadding * 2,
+            ),
             child: Form(
               //key: _formKey,
               child: Column(
@@ -69,7 +80,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
                   ),
                   Center(
                     child: VerificationCode(
-                      textStyle: const TextStyle(fontSize: 21.0, color: ColorLib.primaryColor),
+                      textStyle: const TextStyle(
+                          fontSize: 21.0, color: ColorLib.primaryColor),
                       underlineColor: ColorLib.blackColor,
                       keyboardType: TextInputType.number,
                       length: 4,
@@ -95,19 +107,16 @@ class _VerifyScreenState extends State<VerifyScreen> {
                     child: BaseButton(
                       onPressed: () async {
                         confirmVerifyCode();
-                        print(_onEditing);
-                        print(_code);
-                        print(AuthController.resetUrl);
                       },
                       titleRow: isLoading
                           ? const CircularProgressIndicator()
                           : const Text(
-                        "Confirm",
-                        style: TextStyle(
-                          color: ColorLib.whiteColor,
-                          fontSize: 20,
-                        ),
-                      ),
+                              "Confirm",
+                              style: TextStyle(
+                                color: ColorLib.whiteColor,
+                                fontSize: 20,
+                              ),
+                            ),
                     ),
                   )
                 ],

@@ -1,4 +1,5 @@
 
+import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/widgets/base_button.dart';
 import 'package:ddnangcao_project/widgets/base_input.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
@@ -53,17 +54,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() {
         isLoading = false;
       });
-      if (message == "Sign up successfully!") {
+      if (message == GlobalVariable.signUpSuc) {
         showSnackBar(message, Colors.green, Colors.black);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const LoginScreen()));
       } else {
         showSnackBar(message, ColorLib.primaryColor, Colors.white);
       }
-      print('success');
     } else {
       showSnackBar(
-          "Please fill all fields", ColorLib.primaryColor, Colors.white);
+          GlobalVariable.fillAllField, ColorLib.primaryColor, Colors.white);
     }
   }
 
@@ -100,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your full name";
+                        return GlobalVariable.enterFullName;
                       }
                       return null;
                     },
@@ -116,9 +116,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your email";
+                        return GlobalVariable.enterEmail;
                       } else if (value.isVailEmail() == false) {
-                        return "Invalid email";
+                        return GlobalVariable.emailValidator;
                       }
                       return null;
                     },
@@ -134,7 +134,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your password";
+                        return GlobalVariable.enterPass;
+                      }else if(value.length < 8){
+                        return GlobalVariable.passValidator;
                       }
                       return null;
                     },
@@ -151,7 +153,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your password confirm";
+                        return GlobalVariable.enterPassConfirm;
+                      }else if(value.length < 8){
+                        return GlobalVariable.passValidator;
                       }
                       return null;
                     },

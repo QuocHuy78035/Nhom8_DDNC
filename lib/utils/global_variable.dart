@@ -1,3 +1,18 @@
 class GlobalVariable{
   static const String apiUrl = "http://10.0.2.2:8000/api/v1";
+  static const String emailValidator = "Email not valid";
+  static const String passValidator = "Password required than 8 character";
+  static const String fillAllField = "Please fill all field";
+  static const String enterEmail = "Please enter your email";
+  static const String enterFullName = "Please enter your full name";
+  static const String enterPass = "Please enter your password";
+  static const String enterPassConfirm = "Please enter your password confirm";
+  static const String enterFullVerifyCode = "Please enter verify code";
+  static const String resetPassTitle = "Please enter your email address to request a password reset";
+
+
+  static const String loginSuc = "Log in successfully!";
+  static const String signUpSuc = "Sign up successfully!";
+  static const String resetPassSuc = "Reset Password Successfully!";
+  static const String verifySuc = "Verify OTP successfully!";
 }

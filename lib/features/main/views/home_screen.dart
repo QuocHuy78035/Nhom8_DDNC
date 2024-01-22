@@ -2,7 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -106,11 +105,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                // SizedBox(
-                //   width: MediaQuery.of(context).size.width,
-                //   child: Image.asset("assets/images/banners/Banner.png"),
-                // ),
-
                 CarouselSlider(
                   items: myBanner,
                   options: CarouselOptions(

@@ -2,6 +2,7 @@ import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart
 import 'package:ddnangcao_project/features/auth/views/verify_screen.dart';
 import 'package:ddnangcao_project/features/auth/widgets/title_screen.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
+import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:ddnangcao_project/utils/validator/email_validator.dart';
@@ -52,6 +53,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: GetSize.symmetricPadding * 2),
@@ -80,9 +82,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your email";
+                        return GlobalVariable.enterEmail;
                       } else if (value.isVailEmail() == false) {
-                        return "Email is not valid";
+                        return GlobalVariable.emailValidator;
                       }
                       return null;
                     },

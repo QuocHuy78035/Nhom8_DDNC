@@ -9,6 +9,7 @@ import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:ddnangcao_project/utils/validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
+import '../../../utils/global_variable.dart';
 import '../widgets/facebook_button.dart';
 import '../widgets/google_button.dart';
 import '../widgets/text_navigator.dart';
@@ -44,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  login() async{
+  login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
@@ -53,14 +54,18 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         isLoading = false;
       });
-      if(message == "Log in successfully!"){
+      if (message == GlobalVariable.loginSuc) {
         showSnackBar(message, Colors.green, Colors.black);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CustomerHomeScreen()));
-      }else{
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const CustomerHomeScreen()));
+      } else {
         showSnackBar(message, ColorLib.primaryColor, Colors.white);
       }
     } else {
-      showSnackBar("Please fill all fields", ColorLib.primaryColor, Colors.white);
+      showSnackBar(
+          GlobalVariable.fillAllField, ColorLib.primaryColor, Colors.white);
     }
   }
 
@@ -73,26 +78,29 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Form(
             key: _formKey,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: GetSize.symmetricPadding*2),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: GetSize.symmetricPadding * 2),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Distance(
                     height: GetSize.distance * 6,
                   ),
-                  const TitleScreen(title: "Login",),
+                  const TitleScreen(
+                    title: "Login",
+                  ),
                   const Distance(
                     height: GetSize.distance * 3,
                   ),
                   BaseInput(
-                    onChanged: (value){
+                    onChanged: (value) {
                       email = value;
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your email";
+                        return GlobalVariable.enterEmail;
                       } else if (value.isVailEmail() == false) {
-                        return "Invalid email";
+                        return GlobalVariable.emailValidator;
                       }
                       return null;
                     },
@@ -103,12 +111,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: GetSize.distance * 3,
                   ),
                   BaseInput(
-                    onChanged: (value){
+                    onChanged: (value) {
                       password = value;
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your password";
+                        return GlobalVariable.enterPass;
+                      }else if(value.length < 8){
+                        return GlobalVariable.passValidator;
                       }
                       return null;
                     },
@@ -118,7 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   TextNavigator(
                     onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
+                        ),
+                      );
                     },
                     title: "Forgot password?",
                   ),
@@ -129,16 +144,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: GetSize.getHeight(context) * 0.06,
                     width: GetSize.getWidth(context),
                     child: BaseButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         login();
                       },
-                      titleRow: isLoading ? const Center( child: CircularProgressIndicator(),) : const Text(
-                        "Login",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: ColorLib.whiteColor,
-                        ),
-                      ),
+                      titleRow: isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : const Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: ColorLib.whiteColor,
+                              ),
+                            ),
                     ),
                   ),
                   const Distance(
@@ -185,11 +204,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Distance(
                     height: GetSize.distance * 3,
                   ),
-                  FaceBookButton(onPressed: (){}),
+                  FaceBookButton(onPressed: () {}),
                   const Distance(
                     height: GetSize.distance,
                   ),
-                  GoogleButton(onPressed: (){})
+                  GoogleButton(onPressed: () {})
                 ],
               ),
             ),
@@ -199,7 +218,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
 
 class Line extends StatelessWidget {
   final double width;

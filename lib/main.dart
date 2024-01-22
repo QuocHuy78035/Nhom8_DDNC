@@ -1,5 +1,4 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
-import 'package:ddnangcao_project/features/auth/views/forgot_pass_screen.dart';
 import 'package:ddnangcao_project/features/auth/views/splash_screen.dart';
 import 'package:ddnangcao_project/providers/user_provider.dart';
 import 'package:flutter/material.dart';
