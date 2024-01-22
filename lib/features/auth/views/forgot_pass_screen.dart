@@ -70,7 +70,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     height: 10,
                   ),
                   const Text(
-                      "Please enter your email address to request a password reset"),
+                      GlobalVariable.resetPassTitle),
                   const SizedBox(
                     height: 30,
                   ),

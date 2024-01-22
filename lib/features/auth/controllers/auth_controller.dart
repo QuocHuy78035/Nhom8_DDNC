@@ -99,7 +99,6 @@ class AuthController implements IAuth {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     String userId = prefs.getString("userId") ?? "";
-    print("userId controller $userId");
     String email = prefs.getString("email") ?? "";
     String name = prefs.getString("name") ?? "";
     String accessToken = prefs.getString("accessToken") ?? "";
