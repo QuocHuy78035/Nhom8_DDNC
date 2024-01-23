@@ -1,3 +1,4 @@
+import 'package:ddnangcao_project/features/main/views/detail_food.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
@@ -50,9 +51,24 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
-                      Image.asset(
-                        "assets/images/foods/food01.png",
-                        width: GetSize.getWidth(context),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/images/foods/food01.png",
+                            width: GetSize.getWidth(context),
+                          ),
+                          Positioned(
+                            top: 30,
+                            left: 0,
+                            child: IconButton(
+                              onPressed: (){
+                                Navigator.pop(context);
+                              }, icon: Icon(Icons.arrow_back,
+                            color: ColorLib.blackColor,
+                            size: 30,)
+                          ),)
+                        ],
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -71,7 +87,7 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                             ),
                             SizedBox(
                               width: GetSize.getWidth(context) * 0.8,
-                              child: Text(
+                              child: const Text(
                                 "Description",
                                 style: TextStyle(fontSize: 22),
                                 overflow: TextOverflow.ellipsis,
@@ -160,7 +176,7 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                             const SizedBox(
                               height: 40,
                             ),
-                            Text(
+                            const Text(
                               "Popular items",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 26),
@@ -168,7 +184,12 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                             const SizedBox(
                               height: 20,
                             ),
-                            FoodOfRestaurant(),
+                            GestureDetector(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailFoodScreen()));
+                              },
+                              child: FoodOfRestaurant(),
+                            ),
                             FoodOfRestaurant(),
                             FoodOfRestaurant(),
                             FoodOfRestaurant(),

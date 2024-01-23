@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ddnangcao_project/features/main/views/restaurant_order.dart';
+import 'package:ddnangcao_project/features/search/views/search_screen.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
@@ -30,82 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 horizontal: GetSize.symmetricPadding * 2),
             child: Column(
               children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.location_on_outlined),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Current location",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Text(
-                              "TP.HCM",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    Icon(Icons.notifications_none_outlined)
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    height: 35,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: ColorLib.primaryColor),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(25),
-                      ),
-                    ),
-                    child: const Row(
-                      children: [
-                        Padding(
-                          padding:
-                              EdgeInsets.only(left: GetSize.symmetricPadding),
-                          child: Icon(
-                            Icons.search,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "Search menu, food or drink",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
                 CarouselSlider(
                   items: myBanner,
                   options: CarouselOptions(
@@ -466,9 +391,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
             height: 20,
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+            },
             child: Container(
-              height: 35,
+              height: 40,
               decoration: BoxDecoration(
                 border: Border.all(color: ColorLib.primaryColor),
                 borderRadius: const BorderRadius.all(

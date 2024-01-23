@@ -21,7 +21,7 @@ class BaseInput extends StatefulWidget {
 }
 
 class _BaseInputState extends State<BaseInput> {
-  bool isHiddenPass = false;
+  bool isHiddenPass = true;
 
   @override
   Widget build(BuildContext context) {
