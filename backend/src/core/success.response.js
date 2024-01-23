@@ -26,7 +26,7 @@ class OK extends SuccessResponse {
 
 class CREATED extends SuccessResponse {
   constructor({
-    option = {},
+    options = {},
     message,
     statusCode = StatusCodes.CREATED,
     reasonStatusCode = ReasonPhrases.CREATED,

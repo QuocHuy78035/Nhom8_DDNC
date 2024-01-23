@@ -78,8 +78,8 @@ class AuthenService {
         "There is no user with email address or OTP has expired!"
       );
     }
-
-    if (user.OTP !== OTP) {
+    const hashOTP = crypto.createHash("sha256").update(OTP).digest("hex");
+    if (user.OTP !== hashOTP) {
       throw new AuthFailureError(
         "Your entered OTP is invalid! Please try again!"
       );
@@ -115,7 +115,8 @@ class AuthenService {
     }
 
     const OTP = generateOTPConfig(4);
-    user.OTP = OTP;
+    const hashOTP = crypto.createHash("sha256").update(OTP).digest("hex");
+    user.OTP = hashOTP;
     user.OTPExpires = Date.now() + EXPIRES_TIME;
     await user.save({ validateBeforeSave: false });
     try {
