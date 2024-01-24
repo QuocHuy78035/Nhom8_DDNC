@@ -1,9 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
 import 'package:ddnangcao_project/features/main/views/restaurant_order.dart';
 import 'package:ddnangcao_project/features/search/views/search_screen.dart';
+import 'package:ddnangcao_project/models/category.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
+
+import 'food_category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,8 +17,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final MainController mainController = MainController();
+  List<CategoryModel> listCate = [];
+
+  getAllCategory() async {
+    listCate = await mainController.findAllCate();
+  }
+
   @override
   Widget build(BuildContext context) {
+    print("Length la: ${listCate.length}");
     final myBanner = [
       Image.asset("assets/images/banners/Banner.png"),
       Image.asset("assets/images/banners/Banner.png"),
@@ -44,9 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       enlargeCenterPage: true,
                       onPageChanged: (index, reason) {}),
                 ),
-                const Column(
+                Column(
                   children: [
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
@@ -58,63 +70,55 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Snack",
-                            imageUrl: "assets/images/categories/snack.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Seafood",
-                            imageUrl: "assets/images/categories/seafood.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          )
-                        ],
-                      ),
+                    FutureBuilder(
+                      future: getAllCategory(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: 60,
+                              width: GetSize.getWidth(context),
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: listCate.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FoodCategoryScreen(
+                                                cateName: "${listCate[index].cateName}",
+                                            caterId:
+                                                "${listCate[index].cateId}",
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Category(
+                                      categoryName:
+                                          "${listCate[index].cateName}",
+                                      imageUrl:
+                                          "assets/images/categories/dessert.png",
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        } else {
+                          // Data is still loading, return a loading indicator or an empty container
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                      },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 30,
                     ),
                   ],
@@ -166,9 +170,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const RestaurantOrder()));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const RestaurantOrder(),
+                                ),
+                              );
                             },
                             child: Row(
                               children: [
@@ -325,13 +331,20 @@ class Category extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundImage: AssetImage(imageUrl),
+        Column(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundImage: AssetImage(imageUrl),
+            ),
+            Text(categoryName)
+          ],
         ),
-        Text(categoryName)
+        const SizedBox(
+          width: 20,
+        )
       ],
     );
   }
@@ -392,7 +405,10 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SearchScreen()));
             },
             child: Container(
               height: 40,

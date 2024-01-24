@@ -184,12 +184,6 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                             const SizedBox(
                               height: 20,
                             ),
-                            GestureDetector(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailFoodScreen()));
-                              },
-                              child: FoodOfRestaurant(),
-                            ),
                             FoodOfRestaurant(),
                             FoodOfRestaurant(),
                             FoodOfRestaurant(),

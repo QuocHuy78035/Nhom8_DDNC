@@ -128,3 +128,127 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
+
+
+
+class Restaurant extends StatelessWidget {
+  const Restaurant({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 280,
+      child: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                child: SizedBox(
+                  width: 280,
+                  child: Image.asset("assets/images/foods/food01.png"),
+                ),
+              ),
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey,
+                      offset: Offset(
+                        5.0,
+                        5.0,
+                      ),
+                      blurRadius: 10.0,
+                      spreadRadius: 2.0,
+                    ), //BoxShadow
+                    BoxShadow(
+                      color: Colors.white,
+                      offset: Offset(0.0, 0.0),
+                      blurRadius: 0.0,
+                      spreadRadius: 0.0,
+                    ), //BoxShadow
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      width: 230,
+                      child: Text(
+                        "Crazy tacko",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 230,
+                      child: Text(
+                        "Delicouse tackos, appetizing snacks, fr...",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              child: Image.asset(
+                                  "assets/images/foods/truck-fast.png"),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text("€3,00")
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              child:
+                              Image.asset("assets/images/foods/timer.png"),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text("40-50min")
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              child: Image.asset(
+                                  "assets/images/foods/star-Filled.png"),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text("4.5")
+                          ],
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
