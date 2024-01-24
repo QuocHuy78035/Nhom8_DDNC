@@ -1,19 +1,41 @@
-import 'package:ddnangcao_project/features/main/views/detail_food.dart';
+import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
+import 'package:ddnangcao_project/features/restaurant/views/controllers/restaurant_controler.dart';
+import 'package:ddnangcao_project/models/food.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
+import 'food_category_screen.dart';
 
-class RestaurantOrder extends StatefulWidget {
-  const RestaurantOrder({super.key});
+class RestaurantOrderScreen extends StatefulWidget {
+  final String name;
+  final String address;
+  final int rating;
+  final String timeOpen;
+  final String timeClose;
+  final String storeId;
+
+  const RestaurantOrderScreen(
+      {super.key,
+      required this.name,
+      required this.address,
+      required this.rating,
+      required this.timeOpen,
+      required this.timeClose,
+      required this.storeId});
 
   @override
-  State<RestaurantOrder> createState() => _RestaurantOrderState();
+  State<RestaurantOrderScreen> createState() => _RestaurantOrderScreenState();
 }
 
-class _RestaurantOrderState extends State<RestaurantOrder> {
+class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
   final ScrollController scrollController = ScrollController();
-
+  final RestaurantController restaurantController = RestaurantController();
   bool showHeader = false;
+  List<FoodModel> listFood = [];
+
+  getFoodByResId() async {
+    listFood = await restaurantController.findAllFoodByStoreId(widget.storeId);
+  }
 
   @override
   void initState() {
@@ -62,12 +84,15 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                             top: 30,
                             left: 0,
                             child: IconButton(
-                              onPressed: (){
-                                Navigator.pop(context);
-                              }, icon: Icon(Icons.arrow_back,
-                            color: ColorLib.blackColor,
-                            size: 30,)
-                          ),)
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: ColorLib.blackColor,
+                                  size: 30,
+                                )),
+                          )
                         ],
                       ),
                       Padding(
@@ -80,15 +105,15 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                             const SizedBox(
                               height: 20,
                             ),
-                            const Text(
-                              "Nha Hang",
+                            Text(
+                              widget.name,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 34),
                             ),
                             SizedBox(
                               width: GetSize.getWidth(context) * 0.8,
-                              child: const Text(
-                                "Description",
+                              child: Text(
+                                widget.address,
                                 style: TextStyle(fontSize: 22),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -105,15 +130,14 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                const Text("Excellent 9.5"),
+                                Text("Excellent with ${widget.rating} star"),
                               ],
                             ),
                             const SizedBox(
                               height: 10,
                             ),
                             Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
                                   children: [
@@ -142,8 +166,7 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                                     height: 30,
                                     width: 60,
                                     decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(20),
+                                        borderRadius: BorderRadius.circular(20),
                                         color: ColorLib.secondaryColor),
                                     child: const Center(
                                       child: Text(
@@ -170,7 +193,8 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                const Text("10:00 - 22:00"),
+                                Text(
+                                    "${widget.timeOpen} - ${widget.timeClose}"),
                               ],
                             ),
                             const SizedBox(
@@ -181,13 +205,79 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 26),
                             ),
-                            const SizedBox(
-                              height: 20,
+                            FutureBuilder(
+                              future: getFoodByResId(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  return ListView.builder(
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: listFood.length,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      DetailFoodScreen(
+                                                    foodName:
+                                                        listFood[index].name ??
+                                                            "",
+                                                    price:
+                                                        listFood[index].price ??
+                                                            0,
+                                                    image:
+                                                        listFood[index].image ??
+                                                            "",
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: FoodOfRestaurant(
+                                              name: listFood[index].name ?? "",
+                                              index: index + 1,
+                                              price: listFood[index].price ?? 0,
+                                              type: listFood[index]
+                                                      .category
+                                                      ?.cateName ??
+                                                  "",
+                                              rating:
+                                                  listFood[index].price ?? 0,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  return Column(
+                                    children: [
+                                      ListView.separated(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: 2,
+                                        itemBuilder: (context, index) =>
+                                            const CardSkeltonOrderRestaurant(),
+                                        separatorBuilder: (context, index) =>
+                                            const SizedBox(height: 16),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      )
+                                    ],
+                                  );
+                                }
+                              },
                             ),
-                            FoodOfRestaurant(),
-                            FoodOfRestaurant(),
-                            FoodOfRestaurant(),
-                            FoodOfRestaurant()
                           ],
                         ),
                       )
@@ -208,7 +298,7 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
                   backgroundColor: Colors.white,
                   leading: BackButton(),
                   title: Text(
-                    "NHA HANG",
+                    widget.name,
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
@@ -221,7 +311,19 @@ class _RestaurantOrderState extends State<RestaurantOrder> {
 }
 
 class FoodOfRestaurant extends StatelessWidget {
-  const FoodOfRestaurant({super.key});
+  final int index;
+  final String name;
+  final int price;
+  final int rating;
+  final String type;
+
+  const FoodOfRestaurant(
+      {super.key,
+      required this.name,
+      required this.index,
+      required this.price,
+      required this.type,
+      required this.rating});
 
   @override
   Widget build(BuildContext context) {
@@ -236,22 +338,26 @@ class FoodOfRestaurant extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "1. Pesto pasta",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    "$index. $name",
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    "Desription 12312312312312312312312123123123",
+                    "Type: $type",
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 18),
                   ),
                   const SizedBox(
                     height: 6,
                   ),
-                  Text("150.000 VND",
-                      style: TextStyle(
-                        color: ColorLib.primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ))
+                  Text(
+                    "Cost: $price VNĐ",
+                    style: TextStyle(
+                      color: ColorLib.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 ],
               ),
             ),
@@ -272,6 +378,41 @@ class FoodOfRestaurant extends StatelessWidget {
         const SizedBox(
           height: 10,
         )
+      ],
+    );
+  }
+}
+
+class CardSkeltonOrderRestaurant extends StatelessWidget {
+  const CardSkeltonOrderRestaurant({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const SizedBox(
+          width: 20,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Skeleton(height: 20, width: GetSize.getWidth(context) * 0.4),
+            SizedBox(
+              height: 10,
+            ),
+            Skeleton(height: 20, width: GetSize.getWidth(context) * 0.15),
+            SizedBox(
+              height: 10,
+            ),
+            Skeleton(height: 20, width: GetSize.getWidth(context) * 0.2),
+          ],
+        ),
+        SizedBox(
+          width: 30,
+        ),
+        Skeleton(height: 80, width: GetSize.getWidth(context) * 0.3),
       ],
     );
   }

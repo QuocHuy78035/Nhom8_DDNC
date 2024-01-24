@@ -38,9 +38,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         currentIndex: _selectedIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.shop), label: "Orders"),
+          BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: "Restaurants"),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "Cart"),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notification"),
+          BottomNavigationBarItem(icon: Icon(Icons.ad_units_sharp), label: "My Orders"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile")
         ],
         onTap: (index){

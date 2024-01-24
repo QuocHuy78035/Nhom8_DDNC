@@ -1,7 +1,11 @@
+import 'package:ddnangcao_project/features/main/views/restaurant_order_screen.dart';
+import 'package:ddnangcao_project/features/restaurant/views/controllers/restaurant_controler.dart';
+import 'package:ddnangcao_project/models/store.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
+import '../../main/views/food_category_screen.dart';
 
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({super.key});
@@ -11,15 +15,24 @@ class RestaurantScreen extends StatefulWidget {
 }
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
+  final RestaurantController restaurantController = RestaurantController();
+  late List<StoreModel> listStore = [];
+
+  findAllRestaurant() async {
+    listStore = await restaurantController.findAllStore();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(),
       body: SingleChildScrollView(
-        child: Padding(
+        child: Container(
           padding:
               EdgeInsets.symmetric(horizontal: GetSize.symmetricPadding * 2),
+          color: Colors.black12.withOpacity(0.05),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "Restaurant",
@@ -28,7 +41,74 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
+              FutureBuilder(
+                future: findAllRestaurant(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      height: GetSize.getHeight(context) * 0.85,
+                      width: GetSize.getWidth(context),
+                      child: ListView.builder(
+                        itemCount: listStore.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            RestaurantOrderScreen(
+                                          name: listStore[index].name ?? "",
+                                          address:
+                                              listStore[index].address ?? "",
+                                          rating: listStore[index].rating ?? 0,
+                                          timeOpen:
+                                              listStore[index].timeOpen ?? "",
+                                          timeClose:
+                                              listStore[index].timeClose ?? "",
+                                          storeId: listStore[index].id ?? "",
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Restaurant(
+                                    name: listStore[index].name ?? '',
+                                    rating: listStore[index].rating ?? 0,
+                                    address: listStore[index].address ?? "",
+                                    image: listStore[index].image ?? '',
+                                    timeOpen: listStore[index].timeOpen ?? '',
+                                    timeClode: listStore[index].timeClose ?? '',
+                                  )),
+                              const SizedBox(
+                                height: 20,
+                              )
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: GetSize.symmetricPadding * 2,
+                          vertical: 10),
+                      color: Colors.black12.withOpacity(0.05),
+                      height: GetSize.getHeight(context) * 0.85,
+                      width: GetSize.getWidth(context),
+                      child: ListView.separated(
+                        itemCount: listStore.length,
+                        itemBuilder: (context, index) =>
+                            const NewsCardSkelton(),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
+                      ),
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -129,17 +209,27 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-
-
 class Restaurant extends StatelessWidget {
-  const Restaurant({
-    super.key,
-  });
+  final String name;
+  final int rating;
+  final String address;
+  final String image;
+  final String timeOpen;
+  final String timeClode;
+
+  const Restaurant(
+      {super.key,
+      required this.name,
+      required this.rating,
+      required this.address,
+      required this.image,
+      required this.timeOpen,
+      required this.timeClode});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 280,
+      width: GetSize.getWidth(context),
       child: Stack(
         children: [
           Column(
@@ -147,13 +237,13 @@ class Restaurant extends StatelessWidget {
             children: [
               ClipRRect(
                 child: SizedBox(
-                  width: 280,
+                  width: GetSize.getWidth(context),
                   child: Image.asset("assets/images/foods/food01.png"),
                 ),
               ),
               Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(10),
@@ -179,19 +269,19 @@ class Restaurant extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(
-                      width: 230,
+                    SizedBox(
+                      width: GetSize.getWidth(context)*0.9,
                       child: Text(
-                        "Crazy tacko",
+                        name,
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(
-                      width: 230,
+                    SizedBox(
+                      width: GetSize.getWidth(context)*0.9,
                       child: Text(
-                        "Delicouse tackos, appetizing snacks, fr...",
+                        address,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -205,13 +295,13 @@ class Restaurant extends StatelessWidget {
                           children: [
                             SizedBox(
                               width: 16,
-                              child: Image.asset(
-                                  "assets/images/foods/truck-fast.png"),
+                              child:
+                                  Image.asset("assets/images/foods/timer.png"),
                             ),
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("€3,00")
+                            Text(timeOpen)
                           ],
                         ),
                         Row(
@@ -219,12 +309,12 @@ class Restaurant extends StatelessWidget {
                             SizedBox(
                               width: 16,
                               child:
-                              Image.asset("assets/images/foods/timer.png"),
+                                  Image.asset("assets/images/foods/timer.png"),
                             ),
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("40-50min")
+                            Text(timeClode)
                           ],
                         ),
                         Row(
@@ -234,10 +324,10 @@ class Restaurant extends StatelessWidget {
                               child: Image.asset(
                                   "assets/images/foods/star-Filled.png"),
                             ),
-                            const SizedBox(
+                            SizedBox(
                               width: 10,
                             ),
-                            Text("4.5")
+                            Text("$rating")
                           ],
                         )
                       ],

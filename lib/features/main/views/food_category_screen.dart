@@ -1,5 +1,5 @@
 import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
-import 'package:ddnangcao_project/features/main/views/detail_food.dart';
+import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
 import 'package:ddnangcao_project/models/food.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
