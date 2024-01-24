@@ -2,7 +2,8 @@ const { getSelectData, convertToObjectId } = require("../../utils");
 
 const food = require("../food.model");
 
-const findAllFoods = async ({ select = [], filter = {} }) => {
+const findAllFoods = async ({ select = [], filter = {}, sort = "ctime" }) => {
+  let sortBy = Object.fromEntries([sort].map((val) => [val, -1]));
   return await food
     .find(filter)
     .populate({ path: "store", select: { createdAt: 0, updatedAt: 0, __v: 0 } })
@@ -10,7 +11,8 @@ const findAllFoods = async ({ select = [], filter = {} }) => {
       path: "category",
       select: { createdAt: 0, updatedAt: 0, __v: 0 },
     })
-    .select(getSelectData(select));
+    .select(getSelectData(select))
+    .sort(sortBy);
 };
 
 const findFood = async ({ id, select = [] }) => {

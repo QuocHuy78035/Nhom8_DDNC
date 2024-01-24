@@ -23,7 +23,10 @@ const userSchema = new mongoose.Schema(
     },
     avatar: { type: String },
     address: { type: String },
-    favoriteFood: { type: Array, default: [] },
+    favoriteFoods: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Food" }],
+      default: [],
+    },
     password: {
       type: String,
       required: [true, "Please provide your password!"],

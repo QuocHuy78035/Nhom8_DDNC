@@ -1,11 +1,14 @@
-const { isNull } = require("lodash");
 const { OK, CREATED } = require("../core/success.response");
 const FoodService = require("../services/food.service");
-const { convertToObjectId } = require("../utils");
+const { removeUndefinedInObject } = require("../utils");
 
 class FoodController {
   findAllFoods = async (req, res, next) => {
-    const result = await FoodService.findAllFoods(req.query);
+    const { category, store, sort } = req.query;
+    const result = await FoodService.findAllFoods({
+      filter: removeUndefinedInObject({ category, store }),
+      sort,
+    });
     return new OK({
       message: "Find all foods successfully!",
       metadata: result,
