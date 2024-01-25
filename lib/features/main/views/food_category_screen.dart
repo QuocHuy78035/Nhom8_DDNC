@@ -184,7 +184,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               DetailFoodScreen(
-                                                foodId: listFood[index].id ?? "",
+                                            foodId: listFood[index].id ?? "",
                                             foodName: "${listFood[index].name}",
                                             price: listFood[index].price ?? 0,
                                             image: '',
@@ -270,25 +270,25 @@ class Food extends StatelessWidget {
               Text(name,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                   )),
               Text(
                 "Price: $price VNĐ",
                 maxLines: 1,
-                style: TextStyle(
+                style: const TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: ColorLib.blackColor),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Row(
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       Icon(
                         Icons.location_on,
@@ -301,10 +301,10 @@ class Food extends StatelessWidget {
                       )
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
-                  Row(
+                  const Row(
                     children: [
                       Icon(
                         Icons.timer,
@@ -317,19 +317,19 @@ class Food extends StatelessWidget {
                       )
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.star,
                         color: ColorLib.primaryColor,
                         size: 20,
                       ),
                       Text(
                         "$rating",
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       )
                     ],
                   )

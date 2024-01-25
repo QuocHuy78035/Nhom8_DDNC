@@ -22,7 +22,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     const Center(
       child: Text("Profile"),
     ),
-    ProfileScreen()
+    const ProfileScreen()
   ];
 
   @override

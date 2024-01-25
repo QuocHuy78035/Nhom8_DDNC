@@ -1,6 +1,5 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
 import 'package:ddnangcao_project/features/auth/views/splash_screen.dart';
-import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
 import 'package:ddnangcao_project/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +46,6 @@ class _MyAppState extends State<MyApp> {
       ),
       //home: Provider.of<UserProvider>(context).user.accessToken != ""  ? CustomerHomeScreen() : LoginScreen(),
       home: const SplashScreen(),
-      //home: ForgotPasswordScreen(),
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:ddnangcao_project/features/favourite/controllers/favourite_contr
 import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../models/food_favourite.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
@@ -32,7 +31,8 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       setState(() {
         listFavouriteFood.removeAt(index);
       });
-      ShowSnackBar().showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
+      ShowSnackBar()
+          .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
     }
   }
 
@@ -72,7 +72,9 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                 ),
                                 IconButton(
                                     onPressed: () {
-                                      deleteFavourite(listFavouriteFood[index].id ?? "", index);
+                                      deleteFavourite(
+                                          listFavouriteFood[index].id ?? "",
+                                          index);
                                     },
                                     icon: const Icon(
                                       Icons.favorite,
@@ -154,25 +156,25 @@ class FoodFavourite extends StatelessWidget {
               Text(name,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                   )),
               Text(
                 "Price: $price VNĐ",
                 maxLines: 1,
-                style: TextStyle(
+                style: const TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: ColorLib.blackColor),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Row(
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       Icon(
                         Icons.location_on,
@@ -185,19 +187,19 @@ class FoodFavourite extends StatelessWidget {
                       )
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.star,
                         color: ColorLib.primaryColor,
                         size: 20,
                       ),
                       Text(
                         "$rating",
-                        style: TextStyle(color: Colors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       )
                     ],
                   )
@@ -206,7 +208,6 @@ class FoodFavourite extends StatelessWidget {
             ],
           ),
         ),
-
       ],
     );
   }

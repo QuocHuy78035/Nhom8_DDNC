@@ -1,6 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
-import 'package:ddnangcao_project/features/main/views/restaurant_order_screen.dart';
 import 'package:ddnangcao_project/features/search/views/search_screen.dart';
 import 'package:ddnangcao_project/models/category.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
@@ -176,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               //   ),
                               // );
                             },
-                            child: Row(
+                            child: const Row(
                               children: [
                                 Food(),
                                 SizedBox(
@@ -280,7 +279,7 @@ class Food extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("€3,00")
+                            const Text("€3,00")
                           ],
                         ),
                         Row(

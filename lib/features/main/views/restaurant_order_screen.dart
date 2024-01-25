@@ -87,7 +87,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.arrow_back,
                                   color: ColorLib.blackColor,
                                   size: 30,
@@ -107,14 +107,14 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                             ),
                             Text(
                               widget.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 34),
                             ),
                             SizedBox(
                               width: GetSize.getWidth(context) * 0.8,
                               child: Text(
                                 widget.address,
-                                style: TextStyle(fontSize: 22),
+                                style: const TextStyle(fontSize: 22),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -225,7 +225,9 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       DetailFoodScreen(
-                                                        foodId: listFood[index].id ?? "",
+                                                    foodId:
+                                                        listFood[index].id ??
+                                                            "",
                                                     foodName:
                                                         listFood[index].name ??
                                                             "",
@@ -271,7 +273,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                         separatorBuilder: (context, index) =>
                                             const SizedBox(height: 16),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 10,
                                       )
                                     ],
@@ -297,10 +299,10 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                 preferredSize: const Size.fromHeight(kToolbarHeight),
                 child: AppBar(
                   backgroundColor: Colors.white,
-                  leading: BackButton(),
+                  leading: const BackButton(),
                   title: Text(
                     widget.name,
-                    style: TextStyle(color: Colors.black),
+                    style: const TextStyle(color: Colors.black),
                   ),
                 ),
               ),
@@ -336,7 +338,7 @@ class FoodOfRestaurant extends StatelessWidget {
               width: GetSize.getWidth(context) * 0.3,
               child: Image.asset("assets/images/foods/food02.png"),
             ),
-            SizedBox(
+            const SizedBox(
               width: 20,
             ),
             SizedBox(
@@ -353,14 +355,14 @@ class FoodOfRestaurant extends StatelessWidget {
                     "Type: $type",
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
                   const SizedBox(
                     height: 6,
                   ),
                   Text(
                     "Cost: $price VNĐ",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: ColorLib.primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
@@ -369,11 +371,11 @@ class FoodOfRestaurant extends StatelessWidget {
               ),
             ),
             IconButton(
-              color: ColorLib.primaryColor,
-                onPressed: (){},
-                icon: Icon(Icons.add,
-                )
-            )
+                color: ColorLib.primaryColor,
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.add,
+                ))
           ],
         ),
         const SizedBox(
@@ -402,18 +404,18 @@ class CardSkeltonOrderRestaurant extends StatelessWidget {
     return Row(
       children: [
         Skeleton(height: 80, width: GetSize.getWidth(context) * 0.3),
-        SizedBox(
+        const SizedBox(
           width: 30,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Skeleton(height: 20, width: GetSize.getWidth(context) * 0.4),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Skeleton(height: 20, width: GetSize.getWidth(context) * 0.15),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Skeleton(height: 20, width: GetSize.getWidth(context) * 0.2),
