@@ -1,9 +1,9 @@
 "use strict";
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 const COLLECTION_NAME = "Stores";
 const DOCUMENT_NAME = "Store";
 
-const storeSchema = new mongoose.Schema(
+const storeSchema = new Schema(
   {
     name: { type: String },
     image: { type: String, default: "" },
@@ -12,7 +12,7 @@ const storeSchema = new mongoose.Schema(
       type: Number,
       min: [1, "Rating must be above or equal 1"],
       max: [5, "Rating must be below or equal 5"],
-      default: 3,
+      default: 1,
     },
     time_open: { type: String },
     time_close: { type: String },
@@ -21,4 +21,4 @@ const storeSchema = new mongoose.Schema(
 );
 
 //Export the model
-module.exports = mongoose.model(DOCUMENT_NAME, storeSchema);
+module.exports = model(DOCUMENT_NAME, storeSchema);

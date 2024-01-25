@@ -30,6 +30,16 @@ class UserController {
       message: "Delete favorite foods successfully!",
     }).send(res);
   };
+  checkFoodIsFavorite = async (req, res, next) => {
+    const result = await UserService.checkFoodIsFavorite({
+      userId: req.user.userId,
+      food: req.params.food,
+    });
+    return new OK({
+      message: "Check food is favorite successfully!",
+      metadata: { result },
+    }).send(res);
+  };
 }
 
 module.exports = new UserController();

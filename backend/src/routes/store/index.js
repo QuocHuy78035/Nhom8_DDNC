@@ -5,6 +5,9 @@ const { authentication } = require("../../auth/authUtils");
 
 const router = express.Router();
 router.route("/").get(asyncHandler(StoreController.findAllStores));
+router
+  .route("/top10rating")
+  .get(asyncHandler(StoreController.findTop10RatingStores));
 router.route("/:id").get(asyncHandler(StoreController.findStore));
 router.use(authentication);
 router.route("/").post(asyncHandler(StoreController.createStore));

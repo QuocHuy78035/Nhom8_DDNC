@@ -2,6 +2,7 @@ const {
   addFoodToFavorite,
   getFavoriteFoods,
   deleteFavoriteFood,
+  checkFoodIsFavorite,
 } = require("../models/repositories/user.repo");
 
 class UserService {
@@ -15,6 +16,9 @@ class UserService {
   }
   static async deleteFavoriteFood({ userId, food }) {
     return await deleteFavoriteFood({ userId, food });
+  }
+  static async checkFoodIsFavorite({ userId, food }) {
+    return await checkFoodIsFavorite({ userId, food });
   }
 }
 

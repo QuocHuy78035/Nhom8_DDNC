@@ -1,16 +1,18 @@
 "use strict";
-const mongoose = require("mongoose");
+const {Schema, model} = require("mongoose");
 const COLLECTION_NAME = "Vouchers";
 const DOCUMENT_NAME = "Voucher";
 
-const cartSchema = new mongoose.Schema(
+const voucherSchema = new Schema(
   {
     price: { type: Number, required: true },
-    minimumPrice: { type: Number, required: true },
-    expiresAt: { type: Date },
+    minimumPayment: { type: Number, required: true },
+    expiresAt: { type: Date, required: true },
+    image: { type: String },
+    description: { type: String },
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );
 
 //Export the model
-module.exports = mongoose.model(DOCUMENT_NAME, cartSchema);
+module.exports = model(DOCUMENT_NAME, voucherSchema);

@@ -3,9 +3,21 @@ const StoreService = require("../services/store.service");
 
 class StoreController {
   findAllStores = async (req, res, next) => {
-    const result = await StoreService.findAllStores();
+    const { sort, categories, search } = req.query;
+    const result = await StoreService.findAllStores({
+      categories,
+      search,
+      sort,
+    });
     return new OK({
       message: "Find all stores successfully!",
+      metadata: result,
+    }).send(res);
+  };
+  findTop10RatingStores = async (req, res, next) => {
+    const result = await StoreService.findTop10RatingStores();
+    return new OK({
+      message: "Find top 10 rating stores successfully!",
       metadata: result,
     }).send(res);
   };

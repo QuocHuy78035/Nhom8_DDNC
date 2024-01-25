@@ -28,7 +28,7 @@ const foodSchema = new Schema(
       type: Number,
       min: [1, "Rating must be above or equal 1"],
       max: [5, "Rating must be below or equal 5"],
-      default: 3,
+      default: 1,
     },
     left: {
       type: Number,

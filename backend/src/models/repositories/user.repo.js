@@ -7,9 +7,13 @@ const addFoodToFavorite = async ({ userId, food }) => {
   if (user.favoriteFoods.includes(food)) {
     throw new BadRequestError("This food is already in your favorite list.");
   }
-  return await userModel.findByIdAndUpdate(userId, {
-    $addToSet: { favoriteFoods: convertToObjectId(food) },
-  });
+  return await userModel.findByIdAndUpdate(
+    userId,
+    {
+      $addToSet: { favoriteFoods: convertToObjectId(food) },
+    },
+    { new: true }
+  );
 };
 
 const getFavoriteFoods = async ({ userId }) => {
@@ -27,4 +31,14 @@ const deleteFavoriteFood = async ({ userId, food }) => {
   });
 };
 
-module.exports = { addFoodToFavorite, getFavoriteFoods, deleteFavoriteFood };
+const checkFoodIsFavorite = async ({ userId, food }) => {
+  const user = await userModel.findById(userId);
+  return user.favoriteFoods.includes(food);
+};
+
+module.exports = {
+  addFoodToFavorite,
+  getFavoriteFoods,
+  deleteFavoriteFood,
+  checkFoodIsFavorite,
+};

@@ -1,13 +1,39 @@
-const { BadRequestError } = require("../../core/error.response");
+const { BadRequestError, NotFoundError } = require("../../core/error.response");
 const { getSelectData, convertToObjectId } = require("../../utils");
 const cartModel = require("../cart.model");
+const foodModel = require("../food.model");
 
-const addToCart = async ({ user, food }) => {
-  const cart = await cartModel.findOne({ user, food });
+const addToCart = async ({ userId, foodId, number }) => {
+  const cart = await cartModel.findOne({ user: userId, food: foodId });
   if (cart) {
     throw new BadRequestError("Food has added to cart already!");
   }
-  return await cartModel.create({ user, food });
+  const food = await foodModel.findById(foodId);
+  if (food.left < number) {
+    throw new BadRequestError(`Only ${food.left} left for this food!`);
+  }
+  return await cartModel.create({ user: userId, food: foodId, number });
+};
+
+const updateNumberCart = async ({ userId, foodId, mode }) => {
+  if (!["increment", "decrement"].includes(mode)) {
+    throw new NotFoundError("Not Found!");
+  }
+  const cart = await cartModel.findOne({ user: userId, food: foodId });
+  if (!cart) {
+    throw new BadRequestError("Food is not existed in cart!");
+  }
+  const result = await cartModel.findOneAndUpdate(
+    { user: userId, food: foodId },
+    {
+      $inc: { number: mode === "increment" ? 1 : -1 },
+    },
+    { new: true }
+  );
+  if (result.number === 0) {
+    await cartModel.findByIdAndDelete(result._id);
+  }
+  return result;
 };
 
 const getCart = async ({ user, select = [] }) => {
@@ -51,4 +77,5 @@ const getCart = async ({ user, select = [] }) => {
 module.exports = {
   addToCart,
   getCart,
+  updateNumberCart,
 };

@@ -7,4 +7,5 @@ const router = express.Router();
 router.use(authentication);
 router.route("/").get(asyncHandler(CartController.getCart));
 router.route("/").post(asyncHandler(CartController.addToCart));
+router.route("/:mode").patch(asyncHandler(CartController.updateNumberCart));
 module.exports = router;

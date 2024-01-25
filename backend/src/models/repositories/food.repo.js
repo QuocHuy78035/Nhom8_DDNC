@@ -1,17 +1,32 @@
-const { getSelectData, convertToObjectId } = require("../../utils");
+const {
+  getSelectData,
+  convertToObjectId,
+  getUnselectData,
+  removeUndefinedInObject,
+} = require("../../utils");
 
 const food = require("../food.model");
 
-const findAllFoods = async ({ select = [], filter = {}, sort = "ctime" }) => {
+const findAllFoods = async ({
+  unselect = [],
+  filter = {},
+  sort = "ctime",
+  search,
+}) => {
   let sortBy = Object.fromEntries([sort].map((val) => [val, -1]));
   return await food
-    .find(filter)
+    .find(
+      removeUndefinedInObject({
+        ...filter,
+        name: { $regex: search ? search : "" },
+      })
+    )
     .populate({ path: "store", select: { createdAt: 0, updatedAt: 0, __v: 0 } })
     .populate({
       path: "category",
       select: { createdAt: 0, updatedAt: 0, __v: 0 },
     })
-    .select(getSelectData(select))
+    .select(getUnselectData(unselect))
     .sort(sortBy);
 };
 

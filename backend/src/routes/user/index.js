@@ -12,4 +12,7 @@ router.route("/favorite").get(asyncHandler(UserController.getFavoriteFoods));
 router
   .route("/favorite/:food")
   .delete(asyncHandler(UserController.deleteFavoriteFood));
+router
+  .route("/favorite/checkIsFavorite/:food")
+  .get(asyncHandler(UserController.checkFoodIsFavorite));
 module.exports = router;

@@ -1,8 +1,15 @@
-const { addToCart, getCart } = require("../models/repositories/cart.repo");
+const {
+  addToCart,
+  getCart,
+  updateNumberCart,
+} = require("../models/repositories/cart.repo");
 
 class CartService {
-  static async addToCart({ user, food }) {
-    return await addToCart({ user, food });
+  static async addToCart({ user, food, number }) {
+    return await addToCart({ userId: user, foodId: food, number });
+  }
+  static async updateNumberCart({ user, food, mode }) {
+    return await updateNumberCart({ userId: user, foodId: food, mode });
   }
   static async getCart({ user }) {
     return await getCart({

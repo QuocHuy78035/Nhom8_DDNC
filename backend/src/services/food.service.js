@@ -5,21 +5,22 @@ const {
 } = require("../models/repositories/food.repo");
 
 class FoodService {
-  static async findAllFoods({ filter, sort }) {
+  static async findAllFoods({ filter, sort, search }) {
     return await findAllFoods({
-      select: ["name", "image", "category", "store", "price", "rating"],
+      unselect: ["createdAt", "updatedAt", "__v"],
       filter,
       sort,
+      search,
     });
   }
   static async findFood(id) {
     return await findFood({
       id,
-      select: ["name", "image", "category", "store", "price", "rating"],
+      unselect: ["createdAt", "updatedAt", "__v"],
     });
   }
-  static async createFood({ name, picture, category, store, price, left }) {
-    return await createFood({ name, picture, category, store, price, left });
+  static async createFood({ name, image, category, store, price, left }) {
+    return await createFood({ name, image, category, store, price, left });
   }
 }
 

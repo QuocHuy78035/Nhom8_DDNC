@@ -1,20 +1,20 @@
 const { OK, CREATED } = require("../core/success.response");
 const FoodService = require("../services/food.service");
-const { removeUndefinedInObject } = require("../utils");
 
 class FoodController {
   findAllFoods = async (req, res, next) => {
-    const { category, store, sort } = req.query;
+    const { category, store, sort, search } = req.query;
     const result = await FoodService.findAllFoods({
-      filter: removeUndefinedInObject({ category, store }),
+      filter: { category, store },
       sort,
+      search,
     });
     return new OK({
       message: "Find all foods successfully!",
       metadata: result,
     }).send(res);
   };
-
+  
   findFood = async (req, res, next) => {
     const result = await FoodService.findFood(req.params.id);
     return new OK({
