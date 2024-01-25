@@ -184,6 +184,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               DetailFoodScreen(
+                                                foodId: listFood[index].id ?? "",
                                             foodName: "${listFood[index].name}",
                                             price: listFood[index].price ?? 0,
                                             image: '',

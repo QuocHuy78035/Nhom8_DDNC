@@ -1,4 +1,5 @@
 import 'package:ddnangcao_project/features/auth/views/login_screen.dart';
+import 'package:ddnangcao_project/features/favourite/views/favourite_screen.dart';
 import 'package:ddnangcao_project/features/profile/controllers/profile_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileController profileController = ProfileController();
 
-  logoutUser() async{
+  logoutUser() async {
     String message = await profileController.logoutUser();
     profileController.logOut(context);
     debugPrint(message);
@@ -22,41 +23,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            //logoutUser();
-            showCupertinoDialog(
-              context: context,
-              builder: (BuildContext context) => CupertinoAlertDialog(
-                title: Text("Log Out"),
-                content: Text("Are you sure to Log out?"),
-                actions: <CupertinoDialogAction>[
-                  CupertinoDialogAction(
-                    child: Text("No"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                //logoutUser();
+                showCupertinoDialog(
+                  context: context,
+                  builder: (BuildContext context) => CupertinoAlertDialog(
+                    title: Text("Log Out"),
+                    content: Text("Are you sure to Log out?"),
+                    actions: <CupertinoDialogAction>[
+                      CupertinoDialogAction(
+                        child: Text("No"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      CupertinoDialogAction(
+                        child: Text("Yes"),
+                        onPressed: () async {
+                          logoutUser();
+                          Navigator.pop(context);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                          );
+                        },
+                      )
+                    ],
                   ),
-                  CupertinoDialogAction(
-                    child: Text("Yes"),
-                    onPressed: () async {
-                      logoutUser();
-                      Navigator.pop(context);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
-                        ),
-                      );
-                    },
-                  )
-                ],
-              ),
-            );
-          },
-          child: Text("Log Out"),
-        ),
+                );
+              },
+              child: Text("Log Out"),
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavouriteScreen(),
+                  ),
+                );
+              },
+              child: Text("Favourite"))
+        ],
       ),
     );
   }

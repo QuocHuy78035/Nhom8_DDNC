@@ -225,6 +225,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       DetailFoodScreen(
+                                                        foodId: listFood[index].id ?? "",
                                                     foodName:
                                                         listFood[index].name ??
                                                             "",
@@ -330,10 +331,16 @@ class FoodOfRestaurant extends StatelessWidget {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
-              width: GetSize.getWidth(context) * 0.5,
+              width: GetSize.getWidth(context) * 0.3,
+              child: Image.asset("assets/images/foods/food02.png"),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            SizedBox(
+              width: GetSize.getWidth(context) * 0.4,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -361,9 +368,11 @@ class FoodOfRestaurant extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(
-              width: GetSize.getWidth(context) * 0.3,
-              child: Image.asset("assets/images/foods/food02.png"),
+            IconButton(
+              color: ColorLib.primaryColor,
+                onPressed: (){},
+                icon: Icon(Icons.add,
+                )
             )
           ],
         ),
@@ -392,8 +401,9 @@ class CardSkeltonOrderRestaurant extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const SizedBox(
-          width: 20,
+        Skeleton(height: 80, width: GetSize.getWidth(context) * 0.3),
+        SizedBox(
+          width: 30,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,10 +419,6 @@ class CardSkeltonOrderRestaurant extends StatelessWidget {
             Skeleton(height: 20, width: GetSize.getWidth(context) * 0.2),
           ],
         ),
-        SizedBox(
-          width: 30,
-        ),
-        Skeleton(height: 80, width: GetSize.getWidth(context) * 0.3),
       ],
     );
   }

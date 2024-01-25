@@ -1,11 +1,10 @@
-import 'package:ddnangcao_project/models/category.dart';
-import 'package:ddnangcao_project/models/store.dart';
 
-class FoodModel{
+
+class FoodFavouriteModel{
   String? id;
   String? name;
-  CategoryModel? category;
-  StoreModel? store;
+  String? category;
+  String? store;
   int? price;
   int? rating;
   String? image;
@@ -14,7 +13,7 @@ class FoodModel{
   String? createdAt;
   String? updatedAt;
 
-  FoodModel({
+  FoodFavouriteModel({
     this.id,
     this.name,
     this.category,
@@ -28,12 +27,12 @@ class FoodModel{
     this.updatedAt
   });
 
-  FoodModel.fromJson(Map<String, dynamic> json) {
+  FoodFavouriteModel.fromJson(Map<String, dynamic> json) {
     try {
       id = json['_id'];
       name = json['name'];
-      category = CategoryModel.fromJson(json['category']);
-      store = StoreModel.fromJson(json['store']);
+      category = json['category'];
+      store = json['store'];
       price = json['price'];
       rating = json['rating'];
       image = json['image'];
@@ -50,8 +49,8 @@ class FoodModel{
     final Map<String, dynamic> data = <String, dynamic>{};
     data['_id'] = id;
     data['name'] = name;
-    data['category'] = category?.toJson();
-    data['store'] = store?.toJson();
+    data['category'] = category;
+    data['store'] = store;
     data['price'] = price;
     data['rating'] = rating;
     data['image'] = image;

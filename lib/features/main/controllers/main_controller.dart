@@ -3,6 +3,7 @@ import 'package:ddnangcao_project/models/category.dart';
 import 'package:ddnangcao_project/models/food.dart';
 import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:http/http.dart' as https;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'i_main.dart';
 
 class MainController implements IMain {
@@ -54,4 +55,5 @@ class MainController implements IMain {
     }
     return listFood;
   }
+
 }

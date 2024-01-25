@@ -15,4 +15,5 @@ class GlobalVariable{
   static const String signUpSuc = "Sign up successfully!";
   static const String resetPassSuc = "Reset Password Successfully!";
   static const String verifySuc = "Verify OTP successfully!";
+  static const String addFavouriteFoodSuc = "Add to favorite successfully!";
 }

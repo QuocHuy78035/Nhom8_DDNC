@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
-import '../../main/views/food_category_screen.dart';
 
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({super.key});
@@ -95,16 +94,11 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: GetSize.symmetricPadding * 2,
                           vertical: 10),
-                      color: Colors.black12.withOpacity(0.05),
-                      height: GetSize.getHeight(context) * 0.85,
+                      height: GetSize.getHeight(context) * 0.7,
                       width: GetSize.getWidth(context),
-                      child: ListView.separated(
-                        itemCount: listStore.length,
-                        itemBuilder: (context, index) =>
-                            const NewsCardSkelton(),
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
-                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      )
                     );
                   }
                 },
