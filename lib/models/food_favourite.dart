@@ -41,7 +41,7 @@ class FoodFavouriteModel{
       createdAt = json['createdAt'];
       updatedAt = json['updatedAt'];
     } catch (e) {
-      print("Error parsing FoodModel: $e");
+      print("Error parsing Food Favourite Model: $e");
     }
   }
 

@@ -51,7 +51,6 @@ class FavouriteController implements IFavourite{
       List<dynamic> listFoodResponse = data['metadata'];
 
       for (var food in listFoodResponse) {
-        print("Food $food");
         listFoodFavourite.add(FoodFavouriteModel.fromJson(food));
       }
       print("Get all food Suc");

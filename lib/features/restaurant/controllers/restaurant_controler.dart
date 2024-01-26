@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:ddnangcao_project/features/restaurant/views/controllers/i_restaurant.dart';
 import 'package:ddnangcao_project/models/food.dart';
 import 'package:ddnangcao_project/models/store.dart';
 import 'package:http/http.dart' as https;
 import '../../../../utils/global_variable.dart';
+import 'i_restaurant.dart';
 
 class RestaurantController implements IRestaurant{
   @override
@@ -15,12 +15,16 @@ class RestaurantController implements IRestaurant{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
+    print("Restaurant");
+    print(response.body);
     if (response.statusCode == 200) {
+      print('222');
       final Map<String, dynamic> data = jsonDecode(response.body);
       List<dynamic> listStoreResponse = data['metadata'];
       for (var store in listStoreResponse) {
         listStore.add(StoreModel.fromJson(store));
       }
+      print("123");
     } else {
       throw Exception("Fail to get store");
     }

@@ -1,15 +1,15 @@
 import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
-import 'package:ddnangcao_project/features/restaurant/views/controllers/restaurant_controler.dart';
 import 'package:ddnangcao_project/models/food.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
+import '../../restaurant/controllers/restaurant_controler.dart';
 import 'food_category_screen.dart';
 
 class RestaurantOrderScreen extends StatefulWidget {
   final String name;
   final String address;
-  final int rating;
+  final double rating;
   final String timeOpen;
   final String timeClose;
   final String storeId;
@@ -267,7 +267,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                         shrinkWrap: true,
                                         physics:
                                             const NeverScrollableScrollPhysics(),
-                                        itemCount: 2,
+                                        itemCount: listFood.length,
                                         itemBuilder: (context, index) =>
                                             const CardSkeltonOrderRestaurant(),
                                         separatorBuilder: (context, index) =>

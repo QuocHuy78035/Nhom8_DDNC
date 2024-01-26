@@ -1,3 +1,4 @@
+import 'package:ddnangcao_project/features/add_to_cart/views/cart_screen.dart';
 import 'package:ddnangcao_project/features/profile/views/profile_screen.dart';
 import 'package:ddnangcao_project/features/restaurant/views/restaurant_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +17,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   final List<Widget> _tabs = [
     const HomeScreen(),
     const RestaurantScreen(),
-    const Center(
-      child: Text("Book mark"),
-    ),
+    const CartScreen(),
     const Center(
       child: Text("Profile"),
     ),

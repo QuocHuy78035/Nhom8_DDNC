@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     print("Token + ${Provider.of<UserProvider>(context).user.accessToken}");
+    print("User Id + ${Provider.of<UserProvider>(context).user.id}");
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

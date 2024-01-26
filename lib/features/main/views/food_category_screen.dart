@@ -11,7 +11,6 @@ class FoodCategoryScreen extends StatefulWidget {
 
   const FoodCategoryScreen(
       {super.key, required this.caterId, required this.cateName});
-
   @override
   State<FoodCategoryScreen> createState() => _FoodCategoryScreenState();
 }
@@ -22,7 +21,6 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
 
   getAllFood() async {
     listFood = await mainController.findAllFoodByCateId(widget.caterId);
-    print(listFood.length);
   }
 
   Color colorBackground = ColorLib.primaryColor;

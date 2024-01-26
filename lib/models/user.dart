@@ -8,11 +8,16 @@ class User {
   User({this.id, this.name, this.email, this.accessToken, this.refreshToken});
 
   User.fromJson(Map<String, dynamic> json) {
-    id = json['_id'] ;
-    name = json['name'];
-    email = json['email'];
-    accessToken = json['accessToken'];
-    refreshToken = json['refreshToken'];
+    try{
+      id = json['_id'] ;
+      name = json['name'];
+      email = json['email'];
+      accessToken = json['accessToken'];
+      refreshToken = json['refreshToken'];
+    }catch(e){
+      print("Error parsing user model: $e");
+
+    }
   }
 
   Map<String, dynamic> toJson() {

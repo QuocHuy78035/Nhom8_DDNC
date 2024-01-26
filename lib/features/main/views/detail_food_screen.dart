@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ddnangcao_project/features/add_to_cart/controllers/add_to_cart_controller.dart';
 import 'package:ddnangcao_project/features/favourite/controllers/favourite_controller.dart';
 import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/utils/snack_bar.dart';
@@ -26,7 +27,23 @@ class DetailFoodScreen extends StatefulWidget {
 
 class _DetailFoodScreenState extends State<DetailFoodScreen> {
   final FavouriteController favouriteController = FavouriteController();
+  final AddToCartController addToCartController = AddToCartController();
 
+  addToCart() async{
+    String message = await addToCartController.addToCart(widget.foodId, 3);
+    if (message == GlobalVariable.addToCartSuc) {
+      ShowSnackBar()
+          .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
+    }else if(message == "Food has added to cart already!"){
+      ShowSnackBar()
+          .showSnackBar(message, ColorLib.primaryColor, ColorLib.whiteColor, context);
+    }
+    else {
+      ShowSnackBar().showSnackBar("Add Food to Cart failed",
+          ColorLib.primaryColor, ColorLib.blackColor, context);
+    }
+  }
+  
   addFavouriteFood() async {
     String message = await favouriteController.addToFavourite(widget.foodId);
     if (message == GlobalVariable.addFavouriteFoodSuc) {
@@ -132,7 +149,10 @@ class _DetailFoodScreenState extends State<DetailFoodScreen> {
                 ),
               ],
             ),
-          )
+          ),
+          ElevatedButton(onPressed: (){
+            addToCart();
+          }, child: Text("Add To Cart"))
         ],
       ),
     );

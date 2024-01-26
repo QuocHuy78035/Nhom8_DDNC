@@ -6,9 +6,13 @@ class CategoryModel{
   CategoryModel({this.cateId, this.cateName});
 
   CategoryModel.fromJson(Map<String, dynamic> json){
-    cateId = json['_id'];
-    cateName = json['name'];
-    image = json['image'];
+    try{
+      cateId = json['_id'];
+      cateName = json['name'];
+      image = json['image'];
+    }catch(e){
+      print("Error parsing category model: $e");
+    }
   }
 
   Map<String, dynamic> toJson() {

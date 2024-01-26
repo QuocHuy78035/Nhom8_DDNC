@@ -1,10 +1,10 @@
 import 'package:ddnangcao_project/features/main/views/restaurant_order_screen.dart';
-import 'package:ddnangcao_project/features/restaurant/views/controllers/restaurant_controler.dart';
 import 'package:ddnangcao_project/models/store.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
+import '../controllers/restaurant_controler.dart';
 
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({super.key});
@@ -24,16 +24,16 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar(),
+      appBar: const MyAppBar(),
       body: SingleChildScrollView(
         child: Container(
           padding:
-              EdgeInsets.symmetric(horizontal: GetSize.symmetricPadding * 2),
+              const EdgeInsets.symmetric(horizontal: GetSize.symmetricPadding * 2),
           color: Colors.black12.withOpacity(0.05),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Restaurant",
                 style: TextStyle(
                   fontSize: 32,
@@ -205,7 +205,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class Restaurant extends StatelessWidget {
   final String name;
-  final int rating;
+  final double rating;
   final String address;
   final String image;
   final String timeOpen;
@@ -267,7 +267,7 @@ class Restaurant extends StatelessWidget {
                       width: GetSize.getWidth(context)*0.9,
                       child: Text(
                         name,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -318,7 +318,7 @@ class Restaurant extends StatelessWidget {
                               child: Image.asset(
                                   "assets/images/foods/star-Filled.png"),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             Text("$rating")
