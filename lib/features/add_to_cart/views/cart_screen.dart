@@ -1,9 +1,10 @@
 import 'package:ddnangcao_project/features/add_to_cart/controllers/add_to_cart_controller.dart';
 import 'package:flutter/material.dart';
-
 import '../../../models/food_cart.dart';
 import '../../../utils/color_lib.dart';
+import '../../../utils/global_variable.dart';
 import '../../../utils/size_lib.dart';
+import '../../../utils/snack_bar.dart';
 import '../../main/views/food_category_screen.dart';
 
 class CartScreen extends StatefulWidget {
@@ -17,15 +18,44 @@ class _CartScreenState extends State<CartScreen> {
   List<FoodCartModel> listCart = [];
   final AddToCartController addToCartController = AddToCartController();
 
-  getAllCart() async{
+  getAllCart() async {
     listCart = await addToCartController.getAllCart();
+  }
+
+  decrementCart(int index) async {
+    print(listCart[index].food?.id);
+    String message = await addToCartController
+        .updateCartDecrement("${listCart[index].food?.id}");
+    if (message == GlobalVariable.updateCartSuc) {
+      ShowSnackBar().showSnackBar(message, Colors.green, Colors.white, context);
+      setState(() {
+        listCart[index].number = listCart[index].number! - 1;
+      });
+    } else {
+      ShowSnackBar().showSnackBar("Fail to decrement value of cart",
+          ColorLib.primaryColor, Colors.white, context);
+    }
+  }
+
+  increment(int index) async {
+    String message = await addToCartController
+        .updateCartIncrement("${listCart[index].food?.id}");
+    if (message == GlobalVariable.updateCartSuc) {
+      ShowSnackBar().showSnackBar(message, Colors.green, Colors.white, context);
+      setState(() {
+        listCart[index].number = listCart[index].number! - 1;
+      });
+    } else {
+      ShowSnackBar().showSnackBar("Fail to increment value of cart",
+          ColorLib.primaryColor, Colors.white, context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Cart"),
+        title: const Text("Cart"),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -35,11 +65,9 @@ class _CartScreenState extends State<CartScreen> {
               FutureBuilder(
                 future: getAllCart(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState ==
-                      ConnectionState.done) {
+                  if (snapshot.connectionState == ConnectionState.done) {
                     return ListView.builder(
-                      physics:
-                      const NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: listCart.length,
                       itemBuilder: (context, index) {
@@ -48,9 +76,15 @@ class _CartScreenState extends State<CartScreen> {
                             GestureDetector(
                               onTap: () {},
                               child: FoodOfRestaurant(
-                                name:  listCart[index].food?.name ?? "",
+                                increment: (){
+                                  increment(index);
+                                },
+                                decrement: (){
+                                  decrementCart(index);
+                                },
+                                name: listCart[index].food?.name ?? "",
                                 index: index + 1,
-                                price:  listCart[index].food?.price ?? 0,
+                                price: listCart[index].food?.price ?? 0,
                                 number: listCart[index].number ?? 0,
                               ),
                             ),
@@ -66,13 +100,12 @@ class _CartScreenState extends State<CartScreen> {
                       children: [
                         ListView.separated(
                           shrinkWrap: true,
-                          physics:
-                          const NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: listCart.length,
                           itemBuilder: (context, index) =>
-                          const CardSkeltonOrderRestaurant(),
+                              const CardSkeltonOrderRestaurant(),
                           separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
+                              const SizedBox(height: 16),
                         ),
                         const SizedBox(
                           height: 10,
@@ -90,20 +123,23 @@ class _CartScreenState extends State<CartScreen> {
   }
 }
 
-
-
 class FoodOfRestaurant extends StatelessWidget {
   final int index;
   final String name;
   final int price;
   final int number;
+  final void Function() decrement;
+  final void Function() increment;
 
-  const FoodOfRestaurant(
-      {super.key,
-        required this.name,
-        required this.index,
-        required this.price,
-        required this.number});
+  const FoodOfRestaurant({
+    super.key,
+    required this.name,
+    required this.index,
+    required this.price,
+    required this.number,
+    required this.decrement,
+    required this.increment
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -142,12 +178,25 @@ class FoodOfRestaurant extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
-                color: ColorLib.primaryColor,
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.add,
-                ))
+            Column(
+              children: [
+                IconButton(
+                  color: ColorLib.primaryColor,
+                  onPressed: increment,
+                  icon: const Icon(
+                    Icons.add,
+                  ),
+                ),
+                IconButton(
+                    color: ColorLib.primaryColor,
+                    onPressed: () {
+                      decrement();
+                    },
+                    icon: const Icon(
+                      Icons.remove,
+                    ))
+              ],
+            )
           ],
         ),
         const SizedBox(

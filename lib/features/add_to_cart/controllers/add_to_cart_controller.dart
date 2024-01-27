@@ -68,4 +68,56 @@ class AddToCartController implements IAddToCart{
     return listCart;
   }
 
+  @override
+  Future<String> updateCartDecrement(String foodId) async{
+    final SharedPreferences sharedPreferences =
+    await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString("accessToken");
+    final String? userId = sharedPreferences.getString("userId");
+    late String message;
+    final response = await https.patch(
+      Uri.parse("${GlobalVariable.apiUrl}/cart/decrement"),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'authorization': token ?? "",
+        "x-client-id": userId ?? ""
+      },
+      body: jsonEncode({
+        "food": foodId
+      })
+    );
+    Map<String, dynamic> data = jsonDecode(response.body);
+    if(data['status'] == 200){
+      message = data['message'];
+    }else{
+      throw Exception("Fail to decrement cart");
+    }return message;
+  }
+
+  @override
+  Future<String> updateCartIncrement(String foodId) async {
+    final SharedPreferences sharedPreferences =
+    await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString("accessToken");
+    final String? userId = sharedPreferences.getString("userId");
+    late String message;
+    final response = await https.patch(
+        Uri.parse("${GlobalVariable.apiUrl}/cart/increment"),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'authorization': token ?? "",
+          "x-client-id": userId ?? ""
+        },
+        body: jsonEncode({
+          "food": foodId
+        })
+    );
+    print("Increment ${response.body}");
+    Map<String, dynamic> data = jsonDecode(response.body);
+    if(data['status'] == 200){
+      message = data['message'];
+    }else{
+      throw Exception("Fail to increment cart");
+    }return message;
+  }
 }

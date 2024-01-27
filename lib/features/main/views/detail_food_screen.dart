@@ -28,22 +28,22 @@ class DetailFoodScreen extends StatefulWidget {
 class _DetailFoodScreenState extends State<DetailFoodScreen> {
   final FavouriteController favouriteController = FavouriteController();
   final AddToCartController addToCartController = AddToCartController();
+  late int value = 1;
 
-  addToCart() async{
-    String message = await addToCartController.addToCart(widget.foodId, 3);
+  addToCart() async {
+    String message = await addToCartController.addToCart(widget.foodId, value);
     if (message == GlobalVariable.addToCartSuc) {
       ShowSnackBar()
           .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
-    }else if(message == "Food has added to cart already!"){
-      ShowSnackBar()
-          .showSnackBar(message, ColorLib.primaryColor, ColorLib.whiteColor, context);
-    }
-    else {
+    } else if (message == "Food has added to cart already!") {
+      ShowSnackBar().showSnackBar(
+          message, ColorLib.primaryColor, ColorLib.whiteColor, context);
+    } else {
       ShowSnackBar().showSnackBar("Add Food to Cart failed",
           ColorLib.primaryColor, ColorLib.blackColor, context);
     }
   }
-  
+
   addFavouriteFood() async {
     String message = await favouriteController.addToFavourite(widget.foodId);
     if (message == GlobalVariable.addFavouriteFoodSuc) {
@@ -150,9 +150,36 @@ class _DetailFoodScreenState extends State<DetailFoodScreen> {
               ],
             ),
           ),
-          ElevatedButton(onPressed: (){
-            addToCart();
-          }, child: Text("Add To Cart"))
+          ElevatedButton(
+            onPressed: () {
+              addToCart();
+            },
+            child: const Text(
+              "Add To Cart",
+            ),
+          ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    value -= 1;
+                    if(value <1) value = 1;
+                  });
+                },
+                icon: const Icon(Icons.remove),
+              ),
+              Text("$value"),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    value += 1;
+                  });
+                },
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          )
         ],
       ),
     );

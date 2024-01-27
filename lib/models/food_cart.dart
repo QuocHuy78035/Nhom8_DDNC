@@ -98,9 +98,13 @@ class FoodCartModel {
   FoodCartModel({this.id, this.food, this.number});
 
   FoodCartModel.fromJson(Map<String, dynamic> json) {
-    id = json['_id'];
-    food = FoodDetailModel.fromJson(json['food']);
-    number = json['number'];
+    try{
+      id = json['_id'];
+      food = FoodDetailModel.fromJson(json['food']);
+      number = json['number'];
+    }catch(e){
+      print("Fail to parse data Food cart model $e");
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -130,5 +134,43 @@ class CartModel {
     } catch (e) {
       print("fail to parse data Cart Model $e");
     }
+  }
+}
+
+
+class CartUpdateNumber{
+  String? id;
+  String? userId;
+  String? foodId;
+  int? number;
+  String? createdAt;
+  String? updatedAt;
+  int? v;
+  CartUpdateNumber({this.id, this.userId, this.foodId, this.number, this.createdAt, this.updatedAt, this.v});
+
+  CartUpdateNumber.fromJson(Map<String, dynamic> json) {
+    try{
+      id = json['_id'];
+      userId = json['user'];
+      foodId = json['food'];
+      number = json['number'];
+      createdAt = json['createdAt'];
+      updatedAt = json['updatedAt'];
+      v = json['__v'];
+    }catch(e){
+      print("Fail to parse data CartUpdateNumber $e");
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = id;
+    data['user'] = userId;
+    data['food'] = foodId;
+    data['number'] = number;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['__v'] = v;
+    return data;
   }
 }
