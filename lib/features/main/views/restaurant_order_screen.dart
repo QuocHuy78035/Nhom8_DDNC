@@ -4,7 +4,7 @@ import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
 import '../../restaurant/controllers/restaurant_controler.dart';
-import 'food_category_screen.dart';
+import 'store_category_screen.dart';
 
 class RestaurantOrderScreen extends StatefulWidget {
   final String name;

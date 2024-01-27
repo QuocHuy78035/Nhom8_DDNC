@@ -6,7 +6,7 @@ import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
 
-import 'food_category_screen.dart';
+import 'store_category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("Length la: ${listCate.length}");
     final myBanner = [
       Image.asset("assets/images/banners/Banner.png"),
       Image.asset("assets/images/banners/Banner.png"),
@@ -92,7 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               FoodCategoryScreen(
-                                                cateName: "${listCate[index].cateName}",
+                                            cateName:
+                                                "${listCate[index].cateName}",
                                             caterId:
                                                 "${listCate[index].cateId}",
                                           ),
@@ -111,9 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         } else {
-                          // Data is still loading, return a loading indicator or an empty container
                           return const Center(
-                              child: CircularProgressIndicator());
+                            child: CircularProgressIndicator(),
+                          );
                         }
                       },
                     ),
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Fastest delivery 🔥",
+                          "Top Rating Restaurant🔥",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -139,12 +139,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {},
                           child: Container(
                             height: 30,
-                            width: 60,
+                            width: 65,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 color: ColorLib.secondaryColor),
-                            child: const Center(
-                              child: Text(
+                            child: TextButton(
+                              onPressed: (){
+                              },
+                              child: const Text(
                                 "See all",
                                 style: TextStyle(
                                     fontSize: 12,
@@ -187,7 +189,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                     ),
-                    Text("123")
                   ],
                 )
               ],
@@ -292,7 +293,7 @@ class Food extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("40-50min")
+                            const Text("40-50min")
                           ],
                         ),
                         Row(
@@ -305,7 +306,7 @@ class Food extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("4.5")
+                            const Text("4.5")
                           ],
                         )
                       ],

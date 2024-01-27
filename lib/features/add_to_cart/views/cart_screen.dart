@@ -5,7 +5,7 @@ import '../../../utils/color_lib.dart';
 import '../../../utils/global_variable.dart';
 import '../../../utils/size_lib.dart';
 import '../../../utils/snack_bar.dart';
-import '../../main/views/food_category_screen.dart';
+import '../../main/views/store_category_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});

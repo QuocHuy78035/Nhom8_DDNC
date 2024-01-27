@@ -81,4 +81,27 @@ class FavouriteController implements IFavourite{
       throw Exception("Fail to delete favourite food");
     }return message;
   }
+
+  @override
+  Future<bool> checkFavourite(String foodId) async{
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String? token = sharedPreferences.getString("accessToken");
+    final String? userId = sharedPreferences.getString("userId");
+    late bool isFavourite;
+    final response = await https.get(
+      Uri.parse("${GlobalVariable.apiUrl}/user/favorite/checkIsFavorite/$foodId"),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'authorization': token ?? "",
+        "x-client-id": userId ?? ""
+      }
+    );
+    Map<String, dynamic> data = jsonDecode(response.body);
+    print("Favourite $data");
+    if(data['status'] == 200){
+      isFavourite = data['metadata']['result'];
+    }else{
+      throw Exception("Fail to Check Favourite food");
+    }return isFavourite;
+  }
 }

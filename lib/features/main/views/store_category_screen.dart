@@ -1,6 +1,7 @@
 import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
-import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
+import 'package:ddnangcao_project/features/main/views/food_store_category_screen.dart';
 import 'package:ddnangcao_project/models/food.dart';
+import 'package:ddnangcao_project/models/store.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
@@ -11,6 +12,7 @@ class FoodCategoryScreen extends StatefulWidget {
 
   const FoodCategoryScreen(
       {super.key, required this.caterId, required this.cateName});
+
   @override
   State<FoodCategoryScreen> createState() => _FoodCategoryScreenState();
 }
@@ -18,9 +20,25 @@ class FoodCategoryScreen extends StatefulWidget {
 class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
   final MainController mainController = MainController();
   List<FoodModel> listFood = [];
+  List<StoreFindByCateIdModel> listStore = [];
 
   getAllFood() async {
     listFood = await mainController.findAllFoodByCateId(widget.caterId);
+  }
+
+  getAllStoreByCateId() async {
+    //listStore = await mainController.findAllStoreByCateId(widget.caterId);
+    List<StoreFindByCateIdModel> tempStoreList =
+        await mainController.findAllStoreByCateId(widget.caterId);
+    Set<String> storeIds = {};
+    listStore.clear();
+
+    for (var store in tempStoreList) {
+      if (!storeIds.contains(store.id)) {
+        storeIds.add(store.id ?? "");
+        listStore.add(store);
+      }
+    }
   }
 
   Color colorBackground = ColorLib.primaryColor;
@@ -40,7 +58,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Food Of ${widget.cateName}"),
+        title: Text("Store Of ${widget.cateName}"),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -160,7 +178,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                     height: 20,
                   ),
                   FutureBuilder(
-                    future: getAllFood(),
+                    future: getAllStoreByCateId(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         return Container(
@@ -171,7 +189,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                           height: GetSize.getHeight(context) * 0.85,
                           width: GetSize.getWidth(context),
                           child: ListView.builder(
-                            itemCount: listFood.length,
+                            itemCount: listStore.length,
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
@@ -181,21 +199,20 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              DetailFoodScreen(
-                                            foodId: listFood[index].id ?? "",
-                                            foodName: "${listFood[index].name}",
-                                            price: listFood[index].price ?? 0,
-                                            image: '',
+                                              FoodStoreCategoryScreen(
+                                                cateName: widget.cateName,
+                                                cateId: widget.caterId,
+                                            storeId: listStore[index].id,
                                           ),
                                         ),
                                       );
                                     },
-                                    child: Food(
-                                      name: "${listFood[index].name}",
-                                      price: listFood[index].price,
-                                      rating: listFood[index].rating,
-                                      image:
-                                          "assets/images/foods/food_search.png",
+                                    child: Store(
+                                      name: '${listStore[index].name}',
+                                      address: '${listStore[index].address}',
+                                      rating: listStore[index].rating,
+                                      timeClose: listStore[index].timeClose,
+                                      timeOpen: listStore[index].timeOpen,
                                     ),
                                   ),
                                   const SizedBox(
@@ -235,17 +252,21 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
   }
 }
 
-class Food extends StatelessWidget {
+class Store extends StatelessWidget {
   final String name;
   final int? rating;
-  final int? price;
+  final String? address;
+  final String? timeClose;
+  final String? timeOpen;
   final String? image;
 
-  const Food(
+  const Store(
       {super.key,
       required this.name,
       this.rating,
-      required this.price,
+      required this.address,
+      this.timeClose,
+      this.timeOpen,
       this.image});
 
   @override
@@ -255,26 +276,27 @@ class Food extends StatelessWidget {
       children: [
         Image.asset(
           image ?? "assets/images/foods/food_search.png",
-          width: 88,
+          width: GetSize.getWidth(context) * 0.3,
         ),
         const SizedBox(
-          width: 10,
+          width: 20,
         ),
-        SizedBox(
-          width: GetSize.getWidth(context) * 0.62,
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  )),
               Text(
-                "Price: $price VNĐ",
+                name,
+                overflow: TextOverflow.ellipsis,
                 maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                "$address",
+                maxLines: 3,
                 style: const TextStyle(
                     overflow: TextOverflow.ellipsis,
                     fontSize: 16,
@@ -286,32 +308,32 @@ class Food extends StatelessWidget {
               ),
               Row(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
-                        Icons.location_on,
+                      const Icon(
+                        Icons.timer,
                         size: 20,
                         color: ColorLib.primaryColor,
                       ),
                       Text(
-                        "500 m",
-                        style: TextStyle(color: Colors.grey),
+                        "$timeOpen",
+                        style: const TextStyle(color: Colors.grey),
                       )
                     ],
                   ),
                   const SizedBox(
                     width: 20,
                   ),
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.timer,
                         color: ColorLib.primaryColor,
                         size: 20,
                       ),
                       Text(
-                        "10 minute",
-                        style: TextStyle(color: Colors.grey),
+                        "$timeClose",
+                        style: const TextStyle(color: Colors.grey),
                       )
                     ],
                   ),
@@ -332,7 +354,7 @@ class Food extends StatelessWidget {
                     ],
                   )
                 ],
-              )
+              ),
             ],
           ),
         )

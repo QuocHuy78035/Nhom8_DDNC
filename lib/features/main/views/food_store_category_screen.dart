@@ -1,51 +1,45 @@
-import 'package:ddnangcao_project/features/favourite/controllers/favourite_controller.dart';
+import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
 import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
-import 'package:ddnangcao_project/utils/snack_bar.dart';
+import 'package:ddnangcao_project/features/main/views/store_category_screen.dart';
+import 'package:ddnangcao_project/models/food.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../models/food_favourite.dart';
+
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
-import '../../main/views/store_category_screen.dart';
 
-class FavouriteScreen extends StatefulWidget {
-  const FavouriteScreen({super.key});
+class FoodStoreCategoryScreen extends StatefulWidget {
+  final String? cateName;
+  final String? storeId;
+  final String? cateId;
+
+  const FoodStoreCategoryScreen(
+      {super.key, required this.storeId, required this.cateId, required this.cateName});
 
   @override
-  State<FavouriteScreen> createState() => _FavouriteScreenState();
+  State<FoodStoreCategoryScreen> createState() =>
+      _FoodStoreCategoryScreenState();
 }
 
-class _FavouriteScreenState extends State<FavouriteScreen> {
-  List<FoodFavouriteModel> listFavouriteFood = [];
-  final FavouriteController favouriteController = FavouriteController();
+class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
+  final MainController mainController = MainController();
+  List<FoodModel> listFood = [];
 
-  getAllFavouriteFood() async {
-    final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-    listFavouriteFood = await favouriteController.getAllFavouriteFoodByUserId(
-        sharedPreferences.getString('userId') ?? "");
-  }
-
-  deleteFavourite(String foodId, int index) async {
-    String message = await favouriteController.deleteFavourite(foodId);
-    if (message != "") {
-      setState(() {
-        listFavouriteFood.removeAt(index);
-      });
-      ShowSnackBar()
-          .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
-    }
+  getFoodByStoreIdAndCateId() async {
+    listFood = await mainController.findAllFoodByStoreIdAndCateId(
+        "${widget.storeId}", "${widget.cateId}");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Favourite")),
+      appBar: AppBar(
+        title: Text("${widget.cateName}"),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             FutureBuilder(
-              future: getAllFavouriteFood(),
+              future: getFoodByStoreIdAndCateId(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Container(
@@ -55,61 +49,49 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     height: GetSize.getHeight(context) * 0.85,
                     width: GetSize.getWidth(context),
                     child: ListView.builder(
-                      itemCount: listFavouriteFood.length,
+                      itemCount: listFood.length,
                       itemBuilder: (context, index) {
                         return Column(
                           children: [
-                            Row(
-                              children: [
-                                GestureDetector(
+                            GestureDetector(
+                                onTap: () {
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) =>
+                                  //         DetailFoodScreen(
+                                  //       foodId: listFood[index].id ?? "",
+                                  //       foodName: "${listFood[index].name}",
+                                  //       price: listFood[index].price ?? 0,
+                                  //       image: '',
+                                  //     ),
+                                  //   ),
+                                  // );
+                                },
+                                child: GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => DetailFoodScreen(
-                                          foodName:
-                                              listFavouriteFood[index].name ?? "",
-                                          price:
-                                              listFavouriteFood[index].price ??
-                                                  0,
-                                          image: listFavouriteFood[index].image,
-                                          foodId:
-                                              listFavouriteFood[index].id ?? "",
-                                        ),
+                                            foodName:
+                                                listFood[index].name ?? "",
+                                            price: listFood[index].price ?? 0,
+                                            image: listFood[index].image,
+                                            foodId: listFood[index].id ?? ""),
                                       ),
                                     );
                                   },
-                                  child: FoodFavourite(
-                                    name: "${listFavouriteFood[index].name}",
-                                    price: listFavouriteFood[index].price,
-                                    rating: listFavouriteFood[index].rating,
-                                    image:
-                                        "assets/images/foods/food_search.png",
+                                  child: Food(
+                                    left: listFood[index].left,
+                                    sold: listFood[index].sold,
+                                    name: listFood[index].name ?? "",
+                                    price: listFood[index].price,
+                                    rating: listFood[index].rating,
                                   ),
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      deleteFavourite(
-                                          listFavouriteFood[index].id ?? "",
-                                          index);
-                                    },
-                                    icon: const Icon(
-                                      Icons.favorite,
-                                      color: ColorLib.primaryColor,
-                                      size: 36,
-                                    ))
-                              ],
-                            ),
+                                )),
                             const SizedBox(
                               height: 20,
-                            ),
-                            Container(
-                              color: ColorLib.blackColor,
-                              width: GetSize.getWidth(context),
-                              height: 1,
-                            ),
-                            const SizedBox(
-                              height: 10,
                             )
                           ],
                         );
@@ -124,7 +106,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     height: GetSize.getHeight(context) * 0.85,
                     width: GetSize.getWidth(context),
                     child: ListView.separated(
-                      itemCount: listFavouriteFood.length,
+                      itemCount: listFood.length,
                       itemBuilder: (context, index) => const NewsCardSkelton(),
                       separatorBuilder: (context, index) =>
                           const SizedBox(height: 16),
@@ -140,18 +122,22 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   }
 }
 
-class FoodFavourite extends StatelessWidget {
+class Food extends StatelessWidget {
   final String name;
   final int? rating;
   final int? price;
+  final int? left;
+  final int? sold;
   final String? image;
 
-  const FoodFavourite(
+  const Food(
       {super.key,
       required this.name,
       this.rating,
       required this.price,
-      this.image});
+      this.image,
+      this.left,
+      this.sold});
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +152,7 @@ class FoodFavourite extends StatelessWidget {
           width: 10,
         ),
         SizedBox(
-          width: GetSize.getWidth(context) * 0.5,
+          width: GetSize.getWidth(context) * 0.62,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -191,16 +177,32 @@ class FoodFavourite extends StatelessWidget {
               ),
               Row(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.location_on,
                         size: 20,
                         color: ColorLib.primaryColor,
                       ),
                       Text(
-                        "500 m",
-                        style: TextStyle(color: Colors.grey),
+                        "$left",
+                        style: const TextStyle(color: Colors.grey),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.timer,
+                        color: ColorLib.primaryColor,
+                        size: 20,
+                      ),
+                      Text(
+                        "$sold",
+                        style: const TextStyle(color: Colors.grey),
                       )
                     ],
                   ),
@@ -224,11 +226,8 @@ class FoodFavourite extends StatelessWidget {
               )
             ],
           ),
-        ),
+        )
       ],
     );
   }
 }
-
-
-

@@ -1,19 +1,33 @@
 import 'package:ddnangcao_project/features/main/views/restaurant_order_screen.dart';
 import 'package:ddnangcao_project/models/store.dart';
 import 'package:flutter/material.dart';
-
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
+import '../../main/views/store_category_screen.dart';
 import '../controllers/restaurant_controler.dart';
 
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({super.key});
-
   @override
   State<RestaurantScreen> createState() => _RestaurantScreenState();
 }
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
+  Color colorBackground = ColorLib.primaryColor;
+  Color colorText = ColorLib.blackColor;
+  String searchValue = "";
+  final TextEditingController textEditingController = TextEditingController();
+  List<Color> backgroundColor = [
+    ColorLib.primaryColor,
+    ColorLib.whiteColor,
+    ColorLib.whiteColor
+  ];
+  List<Color> textColor = [
+    ColorLib.whiteColor,
+    ColorLib.blackColor,
+    ColorLib.blackColor
+  ];
+
   final RestaurantController restaurantController = RestaurantController();
   late List<StoreModel> listStore = [];
 
@@ -26,85 +40,211 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     return Scaffold(
       appBar: const MyAppBar(),
       body: SingleChildScrollView(
-        child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: GetSize.symmetricPadding * 2),
-          color: Colors.black12.withOpacity(0.05),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Restaurant",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              FutureBuilder(
-                future: findAllRestaurant(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      height: GetSize.getHeight(context) * 0.85,
-                      width: GetSize.getWidth(context),
-                      child: ListView.builder(
-                        itemCount: listStore.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            RestaurantOrderScreen(
-                                          name: listStore[index].name ?? "",
-                                          address:
-                                              listStore[index].address ?? "",
-                                          rating: listStore[index].rating ?? 0,
-                                          timeOpen:
-                                              listStore[index].timeOpen ?? "",
-                                          timeClose:
-                                              listStore[index].timeClose ?? "",
-                                          storeId: listStore[index].id ?? "",
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Restaurant(
-                                    name: listStore[index].name ?? '',
-                                    rating: listStore[index].rating ?? 0,
-                                    address: listStore[index].address ?? "",
-                                    image: listStore[index].image ?? '',
-                                    timeOpen: listStore[index].timeOpen ?? '',
-                                    timeClode: listStore[index].timeClose ?? '',
-                                  )),
-                              const SizedBox(
-                                height: 20,
-                              )
-                            ],
-                          );
-                        },
-                      ),
-                    );
-                  } else {
-                    return Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  const Text("Sort by",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      )),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (backgroundColor[0] == ColorLib.primaryColor) {
+                          return;
+                        } else {
+                          backgroundColor[0] = ColorLib.primaryColor;
+                          backgroundColor[1] = ColorLib.whiteColor;
+                          backgroundColor[2] = ColorLib.whiteColor;
+                          textColor[0] = ColorLib.whiteColor;
+                          textColor[1] = ColorLib.blackColor;
+                          textColor[2] = ColorLib.blackColor;
+                        }
+                      });
+                    },
+                    child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: GetSize.symmetricPadding * 2,
-                          vertical: 10),
-                      height: GetSize.getHeight(context) * 0.7,
-                      width: GetSize.getWidth(context),
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    );
-                  }
-                },
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: backgroundColor[0],
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        "Newest",
+                        style: TextStyle(color: textColor[0]),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (backgroundColor[1] == ColorLib.primaryColor) {
+                          return;
+                        } else {
+                          backgroundColor[0] = ColorLib.whiteColor;
+                          backgroundColor[1] = ColorLib.primaryColor;
+                          backgroundColor[2] = ColorLib.whiteColor;
+                          textColor[0] = ColorLib.blackColor;
+                          textColor[1] = ColorLib.whiteColor;
+                          textColor[2] = ColorLib.blackColor;
+                        }
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          color: backgroundColor[1],
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Text(
+                        "Rating",
+                        style: TextStyle(color: textColor[1]),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (backgroundColor[2] == ColorLib.primaryColor) {
+                          return;
+                        } else {
+                          backgroundColor[0] = ColorLib.whiteColor;
+                          backgroundColor[1] = ColorLib.whiteColor;
+                          backgroundColor[2] = ColorLib.primaryColor;
+                          textColor[0] = ColorLib.blackColor;
+                          textColor[1] = ColorLib.blackColor;
+                          textColor[2] = ColorLib.whiteColor;
+                        }
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        color: backgroundColor[2],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        "Nearest",
+                        style: TextStyle(color: textColor[2]),
+                      ),
+                    ),
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Text(
+                    "All Restaurant",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  color: Colors.black12.withOpacity(0.05),
+                  child: FutureBuilder(
+                    future: findAllRestaurant(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          height: GetSize.getHeight(context) * 0.85,
+                          width: GetSize.getWidth(context),
+                          child: ListView.builder(
+                            itemCount: listStore.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                RestaurantOrderScreen(
+                                              name: listStore[index].name ?? "",
+                                              address:
+                                                  listStore[index].address ??
+                                                      "",
+                                              rating:
+                                                  listStore[index].rating ?? 0,
+                                              timeOpen:
+                                                  listStore[index].timeOpen ??
+                                                      "",
+                                              timeClose:
+                                                  listStore[index].timeClose ??
+                                                      "",
+                                              storeId:
+                                                  listStore[index].id ?? "",
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Restaurant(
+                                        name: listStore[index].name ?? '',
+                                        rating: listStore[index].rating ?? 0,
+                                        address: listStore[index].address ?? "",
+                                        image: listStore[index].image ?? '',
+                                        timeOpen:
+                                            listStore[index].timeOpen ?? '',
+                                        timeClode:
+                                            listStore[index].timeClose ?? '',
+                                      )),
+                                  const SizedBox(
+                                    height: 20,
+                                  )
+                                ],
+                              );
+                            },
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          color: Colors.black12.withOpacity(0.05),
+                          height: GetSize.getHeight(context) * 0.85,
+                          width: GetSize.getWidth(context),
+                          child: ListView.separated(
+                            itemCount: listStore.length,
+                            itemBuilder: (context, index) => const NewsCardSkelton(),
+                            separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                )
+
+              ],
+            )
+          ],
         ),
       ),
     );
@@ -264,7 +404,7 @@ class Restaurant extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: GetSize.getWidth(context)*0.9,
+                      width: GetSize.getWidth(context) * 0.9,
                       child: Text(
                         name,
                         style: const TextStyle(
@@ -273,7 +413,7 @@ class Restaurant extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      width: GetSize.getWidth(context)*0.9,
+                      width: GetSize.getWidth(context) * 0.9,
                       child: Text(
                         address,
                         overflow: TextOverflow.ellipsis,
@@ -333,6 +473,62 @@ class Restaurant extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class NewsCardSkelton extends StatelessWidget {
+  const NewsCardSkelton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Skeleton(width: GetSize.getWidth(context), height: 120),
+        const SizedBox(
+          height: 10,
+        ),
+        const Skeleton(
+          height: 20,
+          width: 60,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Skeleton(
+            height: 10,
+            width: GetSize.getWidth(context)*0.4
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Skeleton(
+                height: 10,
+                width: 30
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Skeleton(
+                height: 10,
+                width: 40
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Skeleton(
+                height: 10,
+                width: 30
+            ),
+          ],
+        )
+      ],
     );
   }
 }

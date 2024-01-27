@@ -61,7 +61,6 @@ class AddToCartController implements IAddToCart{
           listCart.add(cart);
         }
       }
-      print(listCart);
     } else {
       throw Exception("Fail to get all cart");
     }
@@ -112,7 +111,6 @@ class AddToCartController implements IAddToCart{
           "food": foodId
         })
     );
-    print("Increment ${response.body}");
     Map<String, dynamic> data = jsonDecode(response.body);
     if(data['status'] == 200){
       message = data['message'];

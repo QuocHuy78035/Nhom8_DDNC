@@ -6,7 +6,7 @@ import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
-import 'food_category_screen.dart';
+import 'store_category_screen.dart';
 
 class DetailFoodScreen extends StatefulWidget {
   final String foodName;
@@ -29,6 +29,14 @@ class _DetailFoodScreenState extends State<DetailFoodScreen> {
   final FavouriteController favouriteController = FavouriteController();
   final AddToCartController addToCartController = AddToCartController();
   late int value = 1;
+  bool isFavourite = false;
+
+  checkFavourite() async{
+    bool check = await favouriteController.checkFavourite(widget.foodId);
+    setState(() {
+      isFavourite = check;
+    });
+  }
 
   addToCart() async {
     String message = await addToCartController.addToCart(widget.foodId, value);
@@ -53,6 +61,12 @@ class _DetailFoodScreenState extends State<DetailFoodScreen> {
       ShowSnackBar().showSnackBar("Add Food to favourite failed",
           ColorLib.primaryColor, ColorLib.blackColor, context);
     }
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    checkFavourite();
   }
 
   @override
@@ -126,10 +140,24 @@ class _DetailFoodScreenState extends State<DetailFoodScreen> {
                     ),
                     IconButton(
                       onPressed: () {
-                        addFavouriteFood();
+                        if(isFavourite == false){
+                          addFavouriteFood();
+                          setState(() {
+                            isFavourite = true;
+                          });
+                        }else if(isFavourite == true){
+                          favouriteController.deleteFavourite(widget.foodId);
+                          setState(() {
+                            isFavourite = false;
+                          });
+                        }
                       },
-                      icon: const Icon(
+                      icon: isFavourite == false ? const Icon(
                         Icons.favorite_outline,
+                        size: 30,
+                        color: ColorLib.primaryColor,
+                      ) : const Icon(
+                        Icons.favorite,
                         size: 30,
                         color: ColorLib.primaryColor,
                       ),
