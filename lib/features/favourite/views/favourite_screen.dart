@@ -1,8 +1,8 @@
 import 'package:ddnangcao_project/features/favourite/controllers/favourite_controller.dart';
 import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
+import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/food_favourite.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
@@ -20,15 +20,12 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   final FavouriteController favouriteController = FavouriteController();
 
   getAllFavouriteFood() async {
-    final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-    listFavouriteFood = await favouriteController.getAllFavouriteFoodByUserId(
-        sharedPreferences.getString('userId') ?? "");
+    listFavouriteFood = await favouriteController.getAllFavouriteFoodByUserId();
   }
 
   deleteFavourite(String foodId, int index) async {
     String message = await favouriteController.deleteFavourite(foodId);
-    if (message != "") {
+    if (message == GlobalVariable.deleteFavouriteSuc) {
       setState(() {
         listFavouriteFood.removeAt(index);
       });
@@ -40,10 +37,24 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Favourite")),
+      appBar: const MyAppBar(),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(
+              height: 10,
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Favourite Food',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
             FutureBuilder(
               future: getAllFavouriteFood(),
               builder: (context, snapshot) {
@@ -68,7 +79,8 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                       MaterialPageRoute(
                                         builder: (context) => DetailFoodScreen(
                                           foodName:
-                                              listFavouriteFood[index].name ?? "",
+                                              listFavouriteFood[index].name ??
+                                                  "",
                                           price:
                                               listFavouriteFood[index].price ??
                                                   0,
@@ -230,5 +242,94 @@ class FoodFavourite extends StatelessWidget {
   }
 }
 
+class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const MyAppBar({super.key});
 
+  @override
+  Size get preferredSize => const Size.fromHeight(100);
 
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: GetSize.symmetricPadding * 2,
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: GetSize.getHeight(context) * 0.06,
+          ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.location_on_outlined),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Current location",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Text(
+                        "TP.HCM",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              Icon(Icons.notifications_none_outlined)
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          InkWell(
+            onTap: () {},
+            child: Container(
+              height: 35,
+              decoration: BoxDecoration(
+                border: Border.all(color: ColorLib.primaryColor),
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(25),
+                ),
+              ),
+              child: const Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: GetSize.symmetricPadding),
+                    child: Icon(
+                      Icons.search,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "Search favourite menu, food or drink",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

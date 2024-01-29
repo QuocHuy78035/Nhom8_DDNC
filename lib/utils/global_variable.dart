@@ -19,4 +19,5 @@ class GlobalVariable{
   static const String addToCartSuc = "Add to cart successfully!";
   static const String updateCartSuc = "Update cart successfully!";
   static const String checkFavouriteSuc = "Check food is favorite successfully!";
+  static const String deleteFavouriteSuc = "Delete favorite foods successfully!";
 }

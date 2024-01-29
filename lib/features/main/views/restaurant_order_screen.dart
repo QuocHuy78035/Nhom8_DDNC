@@ -32,13 +32,17 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
   final RestaurantController restaurantController = RestaurantController();
   bool showHeader = false;
   List<FoodModel> listFood = [];
+  int count = 0;
 
   getFoodByResId() async {
     listFood = await restaurantController.findAllFoodByStoreId(widget.storeId);
   }
 
+  List<int> costFood = [];
+
   @override
   void initState() {
+    getFoodByResId();
     scrollController.addListener(() {
       if (scrollController.position.pixels >= 48) {
         if (showHeader) return;
@@ -95,194 +99,290 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                           )
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: GetSize.symmetricPadding * 2,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                              widget.name,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 34),
-                            ),
-                            SizedBox(
-                              width: GetSize.getWidth(context) * 0.8,
-                              child: Text(
-                                widget.address,
-                                style: const TextStyle(fontSize: 22),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Image.asset(
-                                  "assets/images/foods/star-Filled.png",
-                                  height: 14,
+                                Text(
+                                  widget.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30),
                                 ),
-                                const SizedBox(
-                                  width: 10,
+                                SizedBox(
+                                  width: GetSize.getWidth(context) * 0.8,
+                                  child: Text(
+                                    widget.address,
+                                    style: const TextStyle(fontSize: 20),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
                                 ),
-                                Text("Excellent with ${widget.rating} star"),
                               ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
+                          ),
+                          const SizedBox(
+                            height: 6,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
                                   children: [
                                     Image.asset(
-                                      "assets/images/foods/truck-fast.png",
+                                      "assets/images/foods/star-Filled.png",
                                       height: 14,
                                     ),
                                     const SizedBox(
                                       width: 10,
                                     ),
-                                    const Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                    Text("${widget.rating} (999+ Reviewed)"),
+                                    const SizedBox(
+                                      width: 6,
+                                    ),
+                                    Container(
+                                      height: 18,
+                                      width: 1,
+                                      color: Colors.black,
+                                    ),
+                                    const SizedBox(
+                                      width: 6,
+                                    ),
+                                    const Row(
                                       children: [
-                                        Text("Delivery in 40-50 min"),
-                                        Text(
-                                          "Home (HCM)",
-                                        )
+                                        Icon(
+                                          Icons.access_time_outlined,
+                                          size: 18,
+                                        ),
+                                        SizedBox(
+                                          width: 2,
+                                        ),
+                                        Text('17 min')
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
-                                GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: 30,
-                                    width: 60,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: ColorLib.secondaryColor),
-                                    child: const Center(
-                                      child: Text(
-                                        "Change",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: ColorLib.primaryColor),
-                                      ),
-                                    ),
-                                  ),
+                                const Icon(
+                                  Icons.favorite_outline,
+                                  color: ColorLib.primaryColor,
                                 )
                               ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              children: [
-                                Image.asset(
-                                  "assets/images/foods/timer.png",
-                                  height: 14,
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                    "${widget.timeOpen} - ${widget.timeClose}"),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 40,
-                            ),
-                            const Text(
-                              "Popular items",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 26),
-                            ),
-                            FutureBuilder(
-                              future: getFoodByResId(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  return ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: listFood.length,
-                                    itemBuilder: (context, index) {
-                                      return Column(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DetailFoodScreen(
-                                                    foodId:
-                                                        listFood[index].id ??
-                                                            "",
-                                                    foodName:
-                                                        listFood[index].name ??
-                                                            "",
-                                                    price:
-                                                        listFood[index].price ??
-                                                            0,
-                                                    image:
-                                                        listFood[index].image ??
-                                                            "",
+                          ),
+                          const Distance(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              "assets/images/foods/truck-fast.png",
+                                              height: 30,
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            const Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Standard Delivery",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              );
-                                            },
-                                            child: FoodOfRestaurant(
-                                              name: listFood[index].name ?? "",
-                                              index: index + 1,
-                                              price: listFood[index].price ?? 0,
-                                              type: listFood[index]
-                                                      .category
-                                                      ?.cateName ??
-                                                  "",
-                                              rating:
-                                                  listFood[index].price ?? 0,
+                                                Text(
+                                                  "Home (HCM)",
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {},
+                                          child: const Center(
+                                            child: Text(
+                                              "Change",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: ColorLib.primaryColor),
                                             ),
                                           ),
-                                          const SizedBox(
-                                            height: 10,
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  return Column(
-                                    children: [
-                                      ListView.separated(
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemCount: listFood.length,
-                                        itemBuilder: (context, index) =>
-                                            const CardSkeltonOrderRestaurant(),
-                                        separatorBuilder: (context, index) =>
-                                            const SizedBox(height: 16),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      )
-                                    ],
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                          "assets/images/foods/timer.png",
+                                          height: 14,
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                            "${widget.timeOpen} - ${widget.timeClose}"),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Distance(),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Popular items",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 26),
+                                    ),
+                                    FutureBuilder(
+                                      future: getFoodByResId(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          for (var item in listFood) {
+                                            costFood.add(0);
+                                          }
+                                          print("length + ${costFood.length}");
+                                          print("value + $costFood");
+                                          return ListView.builder(
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount: listFood.length,
+                                            itemBuilder: (context, index) {
+                                              return Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              DetailFoodScreen(
+                                                            sold:
+                                                                listFood[index]
+                                                                    .sold,
+                                                            left:
+                                                                listFood[index]
+                                                                    .left,
+                                                            foodId:
+                                                                listFood[index]
+                                                                        .id ??
+                                                                    "",
+                                                            foodName:
+                                                                listFood[index]
+                                                                        .name ??
+                                                                    "",
+                                                            price: listFood[
+                                                                        index]
+                                                                    .price ??
+                                                                0,
+                                                            image: listFood[
+                                                                        index]
+                                                                    .image ??
+                                                                "",
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: FoodOfRestaurant(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          count += 1;
+                                                        });
+
+                                                      },
+                                                      sold:
+                                                          listFood[index].sold,
+                                                      left:
+                                                          listFood[index].left,
+                                                      name: listFood[index]
+                                                              .name ??
+                                                          "",
+                                                      index: index + 1,
+                                                      price: listFood[index]
+                                                              .price ??
+                                                          0,
+                                                      type: listFood[index]
+                                                              .category
+                                                              ?.cateName ??
+                                                          "",
+                                                      rating: listFood[index]
+                                                              .price ??
+                                                          0,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 20,
+                                                  )
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        } else {
+                                          return Column(
+                                            children: [
+                                              ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: listFood.length,
+                                                itemBuilder: (context, index) =>
+                                                    const CardSkeltonOrderRestaurant(),
+                                                separatorBuilder: (context,
+                                                        index) =>
+                                                    const SizedBox(height: 16),
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              )
+                                            ],
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          )
+                        ],
                       )
                     ],
                   ),
@@ -309,16 +409,105 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
             )
         ],
       ),
+      bottomSheet: count != 0
+          ? BottomSheet(
+              onClosing: () {},
+              builder: (BuildContext context) {
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black12),
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20)),
+                  ),
+                  height: 70,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Stack(
+                        children: [
+                          const Icon(
+                            Icons.shopping_cart,
+                            size: 60,
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: ColorLib.primaryColor),
+                              child: Text(
+                                "$count",
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      const Text(
+                        "Total: VND",
+                        style: TextStyle(
+                            fontSize: 18, color: ColorLib.primaryColor),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorLib.primaryColor),
+                          onPressed: () {},
+                          child: const Text(
+                            "Checkout",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            )
+          : null,
+    );
+  }
+}
+
+class Distance extends StatelessWidget {
+  const Distance({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 10,
+        ),
+        Container(
+          height: 4,
+          width: GetSize.getWidth(context),
+          color: Colors.black12,
+        ),
+        const SizedBox(
+          height: 10,
+        )
+      ],
     );
   }
 }
 
 class FoodOfRestaurant extends StatelessWidget {
   final int index;
+  final void Function()? onPressed;
   final String name;
   final int price;
   final int rating;
   final String type;
+  final int? left;
+  final int? sold;
 
   const FoodOfRestaurant(
       {super.key,
@@ -326,6 +515,9 @@ class FoodOfRestaurant extends StatelessWidget {
       required this.index,
       required this.price,
       required this.type,
+      this.onPressed,
+      this.sold,
+      this.left,
       required this.rating});
 
   @override
@@ -342,40 +534,80 @@ class FoodOfRestaurant extends StatelessWidget {
               width: 20,
             ),
             SizedBox(
-              width: GetSize.getWidth(context) * 0.4,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "$index. $name",
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                        fontSize: 20, fontWeight: FontWeight.w500),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     "Type: $type",
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        '$sold sold',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      Container(
+                        height: 14,
+                        width: 1,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(
+                        width: 6,
+                      ),
+                      Text(
+                        '$left left',
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 6,
                   ),
-                  Text(
-                    "Cost: $price VNĐ",
-                    style: const TextStyle(
-                      color: ColorLib.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        "$price VNĐ",
+                        style: const TextStyle(
+                            color: ColorLib.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      ),
+                      const SizedBox(
+                        width: 80,
+                      ),
+                      Container(
+                        width: 30,
+                        height: 30,
+                        color: ColorLib.primaryColor,
+                        child: Center(
+                          child: IconButton(
+                            color: Colors.white,
+                            onPressed: onPressed,
+                            icon: const Icon(
+                              size: 16,
+                              Icons.add,
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
                   )
                 ],
               ),
             ),
-            IconButton(
-                color: ColorLib.primaryColor,
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.add,
-                ))
           ],
         ),
         const SizedBox(
@@ -384,7 +616,7 @@ class FoodOfRestaurant extends StatelessWidget {
         Container(
           width: GetSize.getWidth(context),
           height: 1,
-          color: Colors.grey,
+          color: Colors.black12,
         ),
         const SizedBox(
           height: 10,

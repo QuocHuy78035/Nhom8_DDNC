@@ -33,7 +33,7 @@ class FavouriteController implements IFavourite{
   }
 
   @override
-  Future<List<FoodFavouriteModel>> getAllFavouriteFoodByUserId(String userId) async{
+  Future<List<FoodFavouriteModel>> getAllFavouriteFoodByUserId() async{
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     List<FoodFavouriteModel> listFoodFavourite = [];
     final String? token = sharedPreferences.getString("accessToken");

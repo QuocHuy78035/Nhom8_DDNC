@@ -1,4 +1,6 @@
 import 'package:ddnangcao_project/features/add_to_cart/views/cart_screen.dart';
+import 'package:ddnangcao_project/features/favourite/views/favourite_screen.dart';
+import 'package:ddnangcao_project/features/order/views/order_screen.dart';
 import 'package:ddnangcao_project/features/profile/views/profile_screen.dart';
 import 'package:ddnangcao_project/features/restaurant/views/restaurant_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,10 +19,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   final List<Widget> _tabs = [
     const HomeScreen(),
     const RestaurantScreen(),
-    const CartScreen(),
-    const Center(
-      child: Text("Profile"),
-    ),
+    const FavouriteScreen(),
+    const OrderScreen(),
     const ProfileScreen()
   ];
 
@@ -38,7 +38,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: "Restaurants"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "Cart"),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Likes"),
           BottomNavigationBarItem(icon: Icon(Icons.ad_units_sharp), label: "My Orders"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile")
         ],
