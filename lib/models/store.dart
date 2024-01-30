@@ -27,7 +27,7 @@ class StoreModel{
       image = json['image'];
     }
     catch (e) {
-      print("Error parsing Store: $e");
+      //print("Error parsing Store: $e");
     }
   }
 

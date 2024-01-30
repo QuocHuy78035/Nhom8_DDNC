@@ -1,11 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
 import 'package:ddnangcao_project/features/search/views/search_screen.dart';
-import 'package:ddnangcao_project/models/category.dart';
+import 'package:ddnangcao_project/providers/home_provider.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'store_category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,11 +15,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final MainController mainController = MainController();
-  List<CategoryModel> listCate = [];
-
-  getAllCategory() async {
-    listCate = await mainController.findAllCate();
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<HomeProvider>(context, listen: false).getAllCategory();
   }
 
   @override
@@ -71,18 +69,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    FutureBuilder(
-                      future: getAllCategory(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
+                    Consumer<HomeProvider>(builder: (context, value, child) {
+                      if (value.listCate.isEmpty) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        if (value.isLoading) {
+                          return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: SizedBox(
+                                height: 70,
+                                width: GetSize.getWidth(context),
+                                child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: value.listCate.length,
+                                    itemBuilder: (context, index) {
+                                      return const CardSkeltonHomeScreen();
+                                    }),
+                              ));
+                        } else {
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: SizedBox(
-                              height: 60,
+                              height: 70,
                               width: GetSize.getWidth(context),
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                itemCount: listCate.length,
+                                itemCount: value.listCate.length,
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                     onTap: () {
@@ -92,16 +106,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                           builder: (context) =>
                                               FoodCategoryScreen(
                                             cateName:
-                                                "${listCate[index].cateName}",
+                                                "${value.listCate[index].cateName}",
                                             caterId:
-                                                "${listCate[index].cateId}",
+                                                "${value.listCate[index].cateId}",
                                           ),
                                         ),
                                       );
                                     },
                                     child: Category(
                                       categoryName:
-                                          "${listCate[index].cateName}",
+                                          "${value.listCate[index].cateName}",
                                       imageUrl:
                                           "assets/images/categories/dessert.png",
                                     ),
@@ -110,13 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           );
-                        } else {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
                         }
-                      },
-                    ),
+                      }
+                    }),
                     const SizedBox(
                       height: 30,
                     ),
@@ -144,8 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 borderRadius: BorderRadius.circular(20),
                                 color: ColorLib.secondaryColor),
                             child: TextButton(
-                              onPressed: (){
-                              },
+                              onPressed: () {},
                               child: const Text(
                                 "See all",
                                 style: TextStyle(
@@ -336,7 +345,7 @@ class Category extends StatelessWidget {
         Column(
           children: [
             CircleAvatar(
-              radius: 20,
+              radius: 24,
               backgroundImage: AssetImage(imageUrl),
             ),
             Text(categoryName)
@@ -443,6 +452,37 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CardSkeltonHomeScreen extends StatelessWidget {
+  const CardSkeltonHomeScreen({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Column(
+          children: [
+            CircleSkeleton(
+              size: 50,
+            ),
+            SizedBox(
+              height: 4,
+            ),
+            Skeleton(
+              height: 16,
+              width: 50,
+            )
+          ],
+        ),
+        SizedBox(
+          width: 20,
+        )
+      ],
     );
   }
 }

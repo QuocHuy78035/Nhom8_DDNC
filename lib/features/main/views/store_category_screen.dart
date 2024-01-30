@@ -27,7 +27,6 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
   }
 
   getAllStoreByCateId() async {
-    //listStore = await mainController.findAllStoreByCateId(widget.caterId);
     List<StoreFindByCateIdModel> tempStoreList =
         await mainController.findAllStoreByCateId(widget.caterId);
     Set<String> storeIds = {};

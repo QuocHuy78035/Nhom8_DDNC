@@ -1,10 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ddnangcao_project/features/add_to_cart/controllers/add_to_cart_controller.dart';
-import 'package:ddnangcao_project/features/favourite/controllers/favourite_controller.dart';
-import 'package:ddnangcao_project/utils/global_variable.dart';
-import 'package:ddnangcao_project/utils/snack_bar.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:ddnangcao_project/providers/food_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
 import 'store_category_screen.dart';
@@ -31,47 +28,11 @@ class DetailFoodScreen extends StatefulWidget {
 }
 
 class _DetailFoodScreenState extends State<DetailFoodScreen> {
-  final FavouriteController favouriteController = FavouriteController();
-  final AddToCartController addToCartController = AddToCartController();
   late int value = 1;
-  bool isFavourite = false;
-
-  checkFavourite() async {
-    bool check = await favouriteController.checkFavourite(widget.foodId);
-    setState(() {
-      isFavourite = check;
-    });
-  }
-
-  addToCart() async {
-    String message = await addToCartController.addToCart(widget.foodId, value);
-    if (message == GlobalVariable.addToCartSuc) {
-      ShowSnackBar()
-          .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
-    } else if (message == "Food has added to cart already!") {
-      ShowSnackBar().showSnackBar(
-          message, ColorLib.primaryColor, ColorLib.whiteColor, context);
-    } else {
-      ShowSnackBar().showSnackBar("Add Food to Cart failed",
-          ColorLib.primaryColor, ColorLib.blackColor, context);
-    }
-  }
-
-  addFavouriteFood() async {
-    String message = await favouriteController.addToFavourite(widget.foodId);
-    if (message == GlobalVariable.addFavouriteFoodSuc) {
-      ShowSnackBar()
-          .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
-    } else {
-      ShowSnackBar().showSnackBar("Add Food to favourite failed",
-          ColorLib.primaryColor, ColorLib.blackColor, context);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    checkFavourite();
+    Provider.of<FoodProvider>(context, listen: false).checkFavourite(widget.foodId);
   }
 
   @override
@@ -147,32 +108,28 @@ class _DetailFoodScreenState extends State<DetailFoodScreen> {
                           maxLines: 2,
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          if (isFavourite == false) {
-                            addFavouriteFood();
-                            setState(() {
-                              isFavourite = true;
-                            });
-                          } else if (isFavourite == true) {
-                            favouriteController.deleteFavourite(widget.foodId);
-                            setState(() {
-                              isFavourite = false;
-                            });
-                          }
-                        },
-                        icon: isFavourite == false
-                            ? const Icon(
-                                Icons.favorite_outline,
-                                size: 30,
-                                color: ColorLib.primaryColor,
-                              )
-                            : const Icon(
-                                Icons.favorite,
-                                size: 30,
-                                color: ColorLib.primaryColor,
-                              ),
-                      )
+                      Consumer<FoodProvider>(builder: (context, value, child){
+                        return IconButton(
+                          onPressed: () {
+                            if (value.isFavourite == false) {
+                              value.addFavouriteFood(widget.foodId, context);
+                            } else if (value.isFavourite == true) {
+                              value.deleteFavouriteFood(widget.foodId, context);
+                            }
+                          },
+                          icon: value.isFavourite == false
+                              ? const Icon(
+                            Icons.favorite_outline,
+                            size: 30,
+                            color: ColorLib.primaryColor,
+                          )
+                              : const Icon(
+                            Icons.favorite,
+                            size: 30,
+                            color: ColorLib.primaryColor,
+                          ),
+                        );
+                      })
                     ],
                   ),
                   Row(
@@ -291,7 +248,8 @@ class _DetailFoodScreenState extends State<DetailFoodScreen> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: ColorLib.primaryColor),
                       onPressed: () {
-                        addToCart();
+                        //addToCart();
+                        Provider.of<FoodProvider>(context, listen: false).addToCart(widget.foodId, value, context);
                       },
                       child: const Text(
                         "Add To Cart",

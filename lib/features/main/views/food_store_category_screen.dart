@@ -1,9 +1,8 @@
-import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
 import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
 import 'package:ddnangcao_project/features/main/views/store_category_screen.dart';
-import 'package:ddnangcao_project/models/food.dart';
+import 'package:ddnangcao_project/providers/food_provider.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
 
@@ -21,12 +20,11 @@ class FoodStoreCategoryScreen extends StatefulWidget {
 }
 
 class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
-  final MainController mainController = MainController();
-  List<FoodModel> listFood = [];
 
-  getFoodByStoreIdAndCateId() async {
-    listFood = await mainController.findAllFoodByStoreIdAndCateId(
-        "${widget.storeId}", "${widget.cateId}");
+  @override
+  void initState(){
+    super.initState();
+    Provider.of<FoodProvider>(context, listen: false).getFoodByStoreIdAndCateId(widget.storeId ?? "", widget.cateId ?? "");
   }
 
   @override
@@ -38,10 +36,27 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            FutureBuilder(
-              future: getFoodByStoreIdAndCateId(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
+            Consumer<FoodProvider>(builder: (context, value, child){
+              if(value.listFood.isEmpty){
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }else{
+                if(value.isLoading){
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: GetSize.symmetricPadding * 2, vertical: 10),
+                    color: Colors.black12.withOpacity(0.05),
+                    height: GetSize.getHeight(context) * 0.85,
+                    width: GetSize.getWidth(context),
+                    child: ListView.separated(
+                      itemCount: value.listFood.length,
+                      itemBuilder: (context, index) => const NewsCardSkelton(),
+                      separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
+                    ),
+                  );
+                }else{
                   return Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: GetSize.symmetricPadding * 2, vertical: 10),
@@ -49,25 +64,12 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
                     height: GetSize.getHeight(context) * 0.85,
                     width: GetSize.getWidth(context),
                     child: ListView.builder(
-                      itemCount: listFood.length,
+                      itemCount: value.listFood.length,
                       itemBuilder: (context, index) {
                         return Column(
                           children: [
                             GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) =>
-                                  //         DetailFoodScreen(
-                                  //       foodId: listFood[index].id ?? "",
-                                  //       foodName: "${listFood[index].name}",
-                                  //       price: listFood[index].price ?? 0,
-                                  //       image: '',
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
+                                onTap: () { },
                                 child: GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -75,19 +77,19 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
                                       MaterialPageRoute(
                                         builder: (context) => DetailFoodScreen(
                                             foodName:
-                                                listFood[index].name ?? "",
-                                            price: listFood[index].price ?? 0,
-                                            image: listFood[index].image,
-                                            foodId: listFood[index].id ?? ""),
+                                            value.listFood[index].name ?? "",
+                                            price: value.listFood[index].price ?? 0,
+                                            image: value.listFood[index].image,
+                                            foodId: value.listFood[index].id ?? ""),
                                       ),
                                     );
                                   },
                                   child: Food(
-                                    left: listFood[index].left,
-                                    sold: listFood[index].sold,
-                                    name: listFood[index].name ?? "",
-                                    price: listFood[index].price,
-                                    rating: listFood[index].rating,
+                                    left: value.listFood[index].left,
+                                    sold: value.listFood[index].sold,
+                                    name: value.listFood[index].name ?? "",
+                                    price: value.listFood[index].price,
+                                    rating: value.listFood[index].rating,
                                   ),
                                 )),
                             const SizedBox(
@@ -98,23 +100,9 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
                       },
                     ),
                   );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: GetSize.symmetricPadding * 2, vertical: 10),
-                    color: Colors.black12.withOpacity(0.05),
-                    height: GetSize.getHeight(context) * 0.85,
-                    width: GetSize.getWidth(context),
-                    child: ListView.separated(
-                      itemCount: listFood.length,
-                      itemBuilder: (context, index) => const NewsCardSkelton(),
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
-                    ),
-                  );
                 }
-              },
-            ),
+              }
+            })
           ],
         ),
       ),

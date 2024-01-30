@@ -15,16 +15,12 @@ class RestaurantController implements IRestaurant{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-    print("Restaurant");
-    print(response.body);
     if (response.statusCode == 200) {
-      print('222');
       final Map<String, dynamic> data = jsonDecode(response.body);
       List<dynamic> listStoreResponse = data['metadata'];
       for (var store in listStoreResponse) {
         listStore.add(StoreModel.fromJson(store));
       }
-      print("123");
     } else {
       throw Exception("Fail to get store");
     }

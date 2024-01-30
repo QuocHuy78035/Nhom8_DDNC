@@ -1,19 +1,31 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
 import 'package:ddnangcao_project/features/auth/views/splash_screen.dart';
+import 'package:ddnangcao_project/providers/food_provider.dart';
+import 'package:ddnangcao_project/providers/home_provider.dart';
+import 'package:ddnangcao_project/providers/restaurant_provider.dart';
 import 'package:ddnangcao_project/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => UserProvider(),
-          ),
-        ],
-        child: const MyApp(),
-      ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => HomeProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RestaurantProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FoodProvider(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -25,11 +37,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   final AuthController authController = AuthController();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     authController.getUserData(context);
   }

@@ -1,10 +1,11 @@
 import 'package:ddnangcao_project/features/main/views/restaurant_order_screen.dart';
-import 'package:ddnangcao_project/models/store.dart';
+import 'package:ddnangcao_project/providers/restaurant_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
 import '../../main/views/store_category_screen.dart';
-import '../controllers/restaurant_controler.dart';
+
 
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({super.key});
@@ -28,11 +29,10 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     ColorLib.blackColor
   ];
 
-  final RestaurantController restaurantController = RestaurantController();
-  late List<StoreModel> listStore = [];
-
-  findAllRestaurant() async {
-    listStore = await restaurantController.findAllStore();
+  @override
+  void initState(){
+    super.initState();
+    Provider.of<RestaurantProvider>(context, listen: false).findAllRestaurant();
   }
 
   @override
@@ -169,16 +169,31 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   color: Colors.black12.withOpacity(0.05),
-                  child: FutureBuilder(
-                    future: findAllRestaurant(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
+                  child: Consumer<RestaurantProvider>(
+                    builder: (BuildContext context, RestaurantProvider value, Widget? child) {
+                    if(value.listStore.isEmpty){
+                      return const Center(
+                        child: CircularProgressIndicator()
+                      );
+                    }else {
+                      if(value.isLoading){
                         return Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          color: Colors.black12.withOpacity(0.05),
                           height: GetSize.getHeight(context) * 0.85,
                           width: GetSize.getWidth(context),
+                          child: ListView.separated(
+                            itemCount: value.listStore.length,
+                            itemBuilder: (context, index) => const NewsCardSkelton(),
+                            separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
+                          ),
+                        );
+                      }else{
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          height: GetSize.getHeight(context),
                           child: ListView.builder(
-                            itemCount: listStore.length,
+                            itemCount: value.listStore.length,
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
@@ -189,57 +204,47 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 RestaurantOrderScreen(
-                                              name: listStore[index].name ?? "",
-                                              address:
-                                                  listStore[index].address ??
+                                                  name: value.listStore[index].name ?? "",
+                                                  address:
+                                                  value.listStore[index].address ??
                                                       "",
-                                              rating:
-                                                  listStore[index].rating ?? 0,
-                                              timeOpen:
-                                                  listStore[index].timeOpen ??
+                                                  rating:
+                                                  value.listStore[index].rating ?? 0,
+                                                  timeOpen:
+                                                  value.listStore[index].timeOpen ??
                                                       "",
-                                              timeClose:
-                                                  listStore[index].timeClose ??
+                                                  timeClose:
+                                                  value.listStore[index].timeClose ??
                                                       "",
-                                              storeId:
-                                                  listStore[index].id ?? "",
-                                            ),
+                                                  storeId:
+                                                  value.listStore[index].id ?? "",
+                                                ),
                                           ),
                                         );
                                       },
                                       child: Restaurant(
-                                        name: listStore[index].name ?? '',
-                                        rating: listStore[index].rating ?? 0,
-                                        address: listStore[index].address ?? "",
-                                        image: listStore[index].image ?? '',
+                                        name: value.listStore[index].name ?? '',
+                                        rating: value.listStore[index].rating ?? 0,
+                                        address: value.listStore[index].address ?? "",
+                                        image: value.listStore[index].image ?? '',
                                         timeOpen:
-                                            listStore[index].timeOpen ?? '',
+                                        value.listStore[index].timeOpen ?? '',
                                         timeClode:
-                                            listStore[index].timeClose ?? '',
+                                        value.listStore[index].timeClose ?? '',
                                       )),
                                   const SizedBox(
-                                    height: 20,
+                                    height: 30,
                                   )
                                 ],
                               );
                             },
                           ),
                         );
-                      } else {
-                        return Container(
-                          color: Colors.black12.withOpacity(0.05),
-                          height: GetSize.getHeight(context) * 0.85,
-                          width: GetSize.getWidth(context),
-                          child: ListView.separated(
-                            itemCount: listStore.length,
-                            itemBuilder: (context, index) => const NewsCardSkelton(),
-                            separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
-                          ),
-                        );
                       }
-                    },
-                  ),
+                    }
+                  },
+
+                  )
                 )
 
               ],
@@ -487,19 +492,19 @@ class NewsCardSkelton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Skeleton(width: GetSize.getWidth(context), height: 120),
+        Skeleton(width: GetSize.getWidth(context), height: 160),
         const SizedBox(
           height: 10,
         ),
         const Skeleton(
-          height: 20,
-          width: 60,
+          height: 30,
+          width: 200,
         ),
         const SizedBox(
           height: 10,
         ),
         Skeleton(
-            height: 10,
+            height: 20,
             width: GetSize.getWidth(context)*0.4
         ),
         const SizedBox(
@@ -527,6 +532,9 @@ class NewsCardSkelton extends StatelessWidget {
                 width: 30
             ),
           ],
+        ),
+        const SizedBox(
+          height: 20,
         )
       ],
     );

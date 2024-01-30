@@ -1,10 +1,11 @@
 import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
-import 'package:ddnangcao_project/models/food.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
+import '../../../providers/restaurant_provider.dart';
 import '../../../utils/color_lib.dart';
-import '../../restaurant/controllers/restaurant_controler.dart';
 import 'store_category_screen.dart';
+import 'package:provider/provider.dart';
+
 
 class RestaurantOrderScreen extends StatefulWidget {
   final String name;
@@ -29,20 +30,14 @@ class RestaurantOrderScreen extends StatefulWidget {
 
 class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
   final ScrollController scrollController = ScrollController();
-  final RestaurantController restaurantController = RestaurantController();
   bool showHeader = false;
-  List<FoodModel> listFood = [];
   int count = 0;
-
-  getFoodByResId() async {
-    listFood = await restaurantController.findAllFoodByStoreId(widget.storeId);
-  }
 
   List<int> costFood = [];
 
   @override
   void initState() {
-    getFoodByResId();
+    Provider.of<RestaurantProvider>(context, listen: false).getFoodByResId(widget.storeId);
     scrollController.addListener(() {
       if (scrollController.position.pixels >= 48) {
         if (showHeader) return;
@@ -88,14 +83,15 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                             top: 30,
                             left: 0,
                             child: IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: const Icon(
-                                  Icons.arrow_back,
-                                  color: ColorLib.blackColor,
-                                  size: 30,
-                                )),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: ColorLib.blackColor,
+                                size: 30,
+                              ),
+                            ),
                           )
                         ],
                       ),
@@ -270,21 +266,37 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                           fontWeight: FontWeight.bold,
                                           fontSize: 26),
                                     ),
-                                    FutureBuilder(
-                                      future: getFoodByResId(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.done) {
-                                          for (var item in listFood) {
-                                            costFood.add(0);
-                                          }
-                                          print("length + ${costFood.length}");
-                                          print("value + $costFood");
+                                    Consumer<RestaurantProvider>(builder: (context, value, child){
+                                      if(value.listFood.isEmpty){
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      }else{
+                                        if(value.isLoading){
+                                          return Column(
+                                            children: [
+                                              ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                const NeverScrollableScrollPhysics(),
+                                                itemCount: value.listFood.length,
+                                                itemBuilder: (context, index) =>
+                                                const CardSkeltonOrderRestaurant(),
+                                                separatorBuilder: (context,
+                                                    index) =>
+                                                const SizedBox(height: 16),
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              )
+                                            ],
+                                          );
+                                        }else{
                                           return ListView.builder(
                                             physics:
-                                                const NeverScrollableScrollPhysics(),
+                                            const NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
-                                            itemCount: listFood.length,
+                                            itemCount: value.listFood.length,
                                             itemBuilder: (context, index) {
                                               return Column(
                                                 children: [
@@ -295,29 +307,29 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               DetailFoodScreen(
-                                                            sold:
-                                                                listFood[index]
+                                                                sold:
+                                                                value.listFood[index]
                                                                     .sold,
-                                                            left:
-                                                                listFood[index]
+                                                                left:
+                                                                value.listFood[index]
                                                                     .left,
-                                                            foodId:
-                                                                listFood[index]
-                                                                        .id ??
+                                                                foodId:
+                                                                value.listFood[index]
+                                                                    .id ??
                                                                     "",
-                                                            foodName:
-                                                                listFood[index]
-                                                                        .name ??
+                                                                foodName:
+                                                                value.listFood[index]
+                                                                    .name ??
                                                                     "",
-                                                            price: listFood[
-                                                                        index]
+                                                                price: value.listFood[
+                                                                index]
                                                                     .price ??
-                                                                0,
-                                                            image: listFood[
-                                                                        index]
+                                                                    0,
+                                                                image: value.listFood[
+                                                                index]
                                                                     .image ??
-                                                                "",
-                                                          ),
+                                                                    "",
+                                                              ),
                                                         ),
                                                       );
                                                     },
@@ -326,25 +338,24 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                                         setState(() {
                                                           count += 1;
                                                         });
-
                                                       },
                                                       sold:
-                                                          listFood[index].sold,
+                                                      value.listFood[index].sold,
                                                       left:
-                                                          listFood[index].left,
-                                                      name: listFood[index]
-                                                              .name ??
+                                                      value.listFood[index].left,
+                                                      name: value.listFood[index]
+                                                          .name ??
                                                           "",
                                                       index: index + 1,
-                                                      price: listFood[index]
-                                                              .price ??
+                                                      price: value.listFood[index]
+                                                          .price ??
                                                           0,
-                                                      type: listFood[index]
-                                                              .category
-                                                              ?.cateName ??
+                                                      type: value.listFood[index]
+                                                          .category
+                                                          ?.cateName ??
                                                           "",
-                                                      rating: listFood[index]
-                                                              .price ??
+                                                      rating: value.listFood[index]
+                                                          .price ??
                                                           0,
                                                     ),
                                                   ),
@@ -355,28 +366,9 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                               );
                                             },
                                           );
-                                        } else {
-                                          return Column(
-                                            children: [
-                                              ListView.separated(
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: listFood.length,
-                                                itemBuilder: (context, index) =>
-                                                    const CardSkeltonOrderRestaurant(),
-                                                separatorBuilder: (context,
-                                                        index) =>
-                                                    const SizedBox(height: 16),
-                                              ),
-                                              const SizedBox(
-                                                height: 10,
-                                              )
-                                            ],
-                                          );
                                         }
-                                      },
-                                    ),
+                                      }
+                                    })
                                   ],
                                 ),
                               )
