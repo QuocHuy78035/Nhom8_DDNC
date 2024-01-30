@@ -1,8 +1,10 @@
 import 'package:ddnangcao_project/features/favourite/controllers/favourite_controller.dart';
 import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
+import 'package:ddnangcao_project/providers/favourite_provider.dart';
 import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../models/food_favourite.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
@@ -16,22 +18,11 @@ class FavouriteScreen extends StatefulWidget {
 }
 
 class _FavouriteScreenState extends State<FavouriteScreen> {
-  List<FoodFavouriteModel> listFavouriteFood = [];
-  final FavouriteController favouriteController = FavouriteController();
 
-  getAllFavouriteFood() async {
-    listFavouriteFood = await favouriteController.getAllFavouriteFoodByUserId();
-  }
-
-  deleteFavourite(String foodId, int index) async {
-    String message = await favouriteController.deleteFavourite(foodId);
-    if (message == GlobalVariable.deleteFavouriteSuc) {
-      setState(() {
-        listFavouriteFood.removeAt(index);
-      });
-      ShowSnackBar()
-          .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
-    }
+  @override
+  void initState(){
+    super.initState();
+    Provider.of<FavouriteProvider>(context, listen: false).getAllFavouriteFood();
   }
 
   @override
@@ -42,7 +33,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             const Padding(
@@ -55,10 +46,27 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
             const SizedBox(
               height: 10,
             ),
-            FutureBuilder(
-              future: getAllFavouriteFood(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
+            Consumer<FavouriteProvider>(builder: (context, value, child){
+              if(value.listFavouriteFood.isEmpty){
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }else{
+                if(value.isLoading){
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: GetSize.symmetricPadding * 2, vertical: 10),
+                    color: Colors.black12.withOpacity(0.05),
+                    height: GetSize.getHeight(context) * 0.85,
+                    width: GetSize.getWidth(context),
+                    child: ListView.separated(
+                      itemCount: value.listFavouriteFood.length,
+                      itemBuilder: (context, index) => const NewsCardSkelton(),
+                      separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
+                    ),
+                  );
+                }else{
                   return Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: GetSize.symmetricPadding * 2, vertical: 10),
@@ -66,7 +74,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     height: GetSize.getHeight(context) * 0.85,
                     width: GetSize.getWidth(context),
                     child: ListView.builder(
-                      itemCount: listFavouriteFood.length,
+                      itemCount: value.listFavouriteFood.length,
                       itemBuilder: (context, index) {
                         return Column(
                           children: [
@@ -79,31 +87,29 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                       MaterialPageRoute(
                                         builder: (context) => DetailFoodScreen(
                                           foodName:
-                                              listFavouriteFood[index].name ??
-                                                  "",
+                                          value.listFavouriteFood[index].name ??
+                                              "",
                                           price:
-                                              listFavouriteFood[index].price ??
-                                                  0,
-                                          image: listFavouriteFood[index].image,
+                                          value.listFavouriteFood[index].price ??
+                                              0,
+                                          image: value.listFavouriteFood[index].image,
                                           foodId:
-                                              listFavouriteFood[index].id ?? "",
+                                          value.listFavouriteFood[index].id ?? "",
                                         ),
                                       ),
                                     );
                                   },
                                   child: FoodFavourite(
-                                    name: "${listFavouriteFood[index].name}",
-                                    price: listFavouriteFood[index].price,
-                                    rating: listFavouriteFood[index].rating,
+                                    name: "${value.listFavouriteFood[index].name}",
+                                    price: value.listFavouriteFood[index].price,
+                                    rating: value.listFavouriteFood[index].rating,
                                     image:
-                                        "assets/images/foods/food_search.png",
+                                    "assets/images/foods/food_search.png",
                                   ),
                                 ),
                                 IconButton(
                                     onPressed: () {
-                                      deleteFavourite(
-                                          listFavouriteFood[index].id ?? "",
-                                          index);
+                                      Provider.of<FavouriteProvider>(context, listen: false).deleteFavourite(value.listFavouriteFood[index].id ?? "", index, context);
                                     },
                                     icon: const Icon(
                                       Icons.favorite,
@@ -116,35 +122,21 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                               height: 20,
                             ),
                             Container(
-                              color: ColorLib.blackColor,
+                              color: Colors.black12,
                               width: GetSize.getWidth(context),
                               height: 1,
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 20,
                             )
                           ],
                         );
                       },
                     ),
                   );
-                } else {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: GetSize.symmetricPadding * 2, vertical: 10),
-                    color: Colors.black12.withOpacity(0.05),
-                    height: GetSize.getHeight(context) * 0.85,
-                    width: GetSize.getWidth(context),
-                    child: ListView.separated(
-                      itemCount: listFavouriteFood.length,
-                      itemBuilder: (context, index) => const NewsCardSkelton(),
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
-                    ),
-                  );
                 }
-              },
-            ),
+              }
+            })
           ],
         ),
       ),

@@ -1,5 +1,7 @@
 import 'package:ddnangcao_project/features/add_to_cart/controllers/add_to_cart_controller.dart';
+import 'package:ddnangcao_project/providers/add_to_cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../models/food_cart.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/global_variable.dart';
@@ -52,70 +54,85 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Provider.of<AddToCartProvider>(context, listen: false).getAllCart();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Cart"),
-      ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              FutureBuilder(
-                future: getAllCart(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: listCart.length,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () {},
-                              child: FoodOfRestaurant(
-                                increment: (){
-                                  increment(index);
-                                },
-                                decrement: (){
-                                  decrementCart(index);
-                                },
-                                name: listCart[index].food?.name ?? "",
-                                index: index + 1,
-                                price: listCart[index].food?.price ?? 0,
-                                number: listCart[index].number ?? 0,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            )
-                          ],
-                        );
-                      },
+              const SizedBox(
+                height: 30,
+              ),
+              Consumer<AddToCartProvider>(
+                builder: (context, value, child) {
+                  if (value.listCart.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
                     );
                   } else {
-                    return Column(
-                      children: [
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: listCart.length,
-                          itemBuilder: (context, index) =>
-                              const CardSkeltonOrderRestaurant(),
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 16),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        )
-                      ],
-                    );
+                    if (value.isLoading) {
+                      return Column(
+                        children: [
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: value.listCart.length,
+                            itemBuilder: (context, index) =>
+                            const CardSkeltonOrderRestaurant(),
+                            separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          )
+                        ],
+                      );
+                    } else {
+                      return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: value.listCart.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () {},
+                                child: FoodOfRestaurant(
+                                  increment: () {
+                                    Provider.of<AddToCartProvider>(context,
+                                        listen: false)
+                                        .increment(index, context);
+                                  },
+                                  decrement: () {
+                                    Provider.of<AddToCartProvider>(context,
+                                        listen: false)
+                                        .decrementCart(index, context);
+                                  },
+                                  name: value.listCart[index].food?.name ?? "",
+                                  index: index + 1,
+                                  price: value.listCart[index].food?.price ?? 0,
+                                  number: value.listCart[index].number,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    }
                   }
                 },
               ),
-            ],
+          ],
           ),
         ),
       ),
@@ -127,19 +144,18 @@ class FoodOfRestaurant extends StatelessWidget {
   final int index;
   final String name;
   final int price;
-  final int number;
+  final int? number;
   final void Function() decrement;
   final void Function() increment;
 
-  const FoodOfRestaurant({
-    super.key,
-    required this.name,
-    required this.index,
-    required this.price,
-    required this.number,
-    required this.decrement,
-    required this.increment
-  });
+  const FoodOfRestaurant(
+      {super.key,
+      required this.name,
+      required this.index,
+      required this.price,
+      this.number,
+      required this.decrement,
+      required this.increment});
 
   @override
   Widget build(BuildContext context) {

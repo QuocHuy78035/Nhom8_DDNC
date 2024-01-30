@@ -1,5 +1,7 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
 import 'package:ddnangcao_project/features/auth/views/splash_screen.dart';
+import 'package:ddnangcao_project/providers/add_to_cart_provider.dart';
+import 'package:ddnangcao_project/providers/favourite_provider.dart';
 import 'package:ddnangcao_project/providers/food_provider.dart';
 import 'package:ddnangcao_project/providers/home_provider.dart';
 import 'package:ddnangcao_project/providers/restaurant_provider.dart';
@@ -13,6 +15,12 @@ void main() {
       providers: [
         ChangeNotifierProvider(
           create: (context) => HomeProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AddToCartProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FavouriteProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) => UserProvider(),

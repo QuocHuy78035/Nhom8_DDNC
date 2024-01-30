@@ -57,9 +57,11 @@ class _LoginScreenState extends State<LoginScreen> {
       if (message == GlobalVariable.loginSuc) {
         showSnackBar(message, Colors.green, Colors.black);
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const CustomerHomeScreen()));
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CustomerHomeScreen(),
+          ),
+        );
       } else {
         showSnackBar(message, ColorLib.primaryColor, Colors.white);
       }
@@ -117,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return GlobalVariable.enterPass;
-                      }else if(value.length < 8){
+                      } else if (value.length < 8) {
                         return GlobalVariable.passValidator;
                       }
                       return null;
