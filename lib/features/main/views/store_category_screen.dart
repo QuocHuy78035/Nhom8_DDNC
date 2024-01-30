@@ -1,8 +1,7 @@
-import 'package:ddnangcao_project/features/main/controllers/main_controller.dart';
 import 'package:ddnangcao_project/features/main/views/food_store_category_screen.dart';
-import 'package:ddnangcao_project/models/food.dart';
-import 'package:ddnangcao_project/models/store.dart';
+import 'package:ddnangcao_project/providers/home_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
 
@@ -18,27 +17,6 @@ class FoodCategoryScreen extends StatefulWidget {
 }
 
 class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
-  final MainController mainController = MainController();
-  List<FoodModel> listFood = [];
-  List<StoreFindByCateIdModel> listStore = [];
-
-  getAllFood() async {
-    listFood = await mainController.findAllFoodByCateId(widget.caterId);
-  }
-
-  getAllStoreByCateId() async {
-    List<StoreFindByCateIdModel> tempStoreList =
-        await mainController.findAllStoreByCateId(widget.caterId);
-    Set<String> storeIds = {};
-    listStore.clear();
-
-    for (var store in tempStoreList) {
-      if (!storeIds.contains(store.id)) {
-        storeIds.add(store.id ?? "");
-        listStore.add(store);
-      }
-    }
-  }
 
   Color colorBackground = ColorLib.primaryColor;
   Color colorText = ColorLib.blackColor;
@@ -52,6 +30,13 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
     ColorLib.blackColor,
     ColorLib.blackColor
   ];
+
+  @override
+  void initState(){
+    super.initState();
+    Provider.of<HomeProvider>(context, listen: false).getAllFood(widget.caterId);
+    Provider.of<HomeProvider>(context, listen: false).getAllStoreByCateId(widget.caterId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,10 +161,29 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  FutureBuilder(
-                    future: getAllStoreByCateId(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
+                  Consumer<HomeProvider>(builder: (context, value, child){
+                    if(value.listStore.isEmpty){
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }else{
+                      if(value.isLoading){
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: GetSize.symmetricPadding * 2,
+                              vertical: 10),
+                          color: Colors.black12.withOpacity(0.05),
+                          height: GetSize.getHeight(context) * 0.85,
+                          width: GetSize.getWidth(context),
+                          child: ListView.separated(
+                            itemCount: value.listStore.length,
+                            itemBuilder: (context, index) =>
+                            const NewsCardSkelton(),
+                            separatorBuilder: (context, index) =>
+                            const SizedBox(height: 16),
+                          ),
+                        );
+                      }else{
                         return Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: GetSize.symmetricPadding * 2,
@@ -188,7 +192,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                           height: GetSize.getHeight(context) * 0.85,
                           width: GetSize.getWidth(context),
                           child: ListView.builder(
-                            itemCount: listStore.length,
+                            itemCount: value.listStore.length,
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
@@ -201,17 +205,17 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                                               FoodStoreCategoryScreen(
                                                 cateName: widget.cateName,
                                                 cateId: widget.caterId,
-                                            storeId: listStore[index].id,
-                                          ),
+                                                storeId: value.listStore[index].id,
+                                              ),
                                         ),
                                       );
                                     },
                                     child: Store(
-                                      name: '${listStore[index].name}',
-                                      address: '${listStore[index].address}',
-                                      rating: listStore[index].rating,
-                                      timeClose: listStore[index].timeClose,
-                                      timeOpen: listStore[index].timeOpen,
+                                      name: '${value.listStore[index].name}',
+                                      address: '${value.listStore[index].address}',
+                                      rating: value.listStore[index].rating,
+                                      timeClose: value.listStore[index].timeClose,
+                                      timeOpen: value.listStore[index].timeOpen,
                                     ),
                                   ),
                                   const SizedBox(
@@ -222,25 +226,9 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                             },
                           ),
                         );
-                      } else {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: GetSize.symmetricPadding * 2,
-                              vertical: 10),
-                          color: Colors.black12.withOpacity(0.05),
-                          height: GetSize.getHeight(context) * 0.85,
-                          width: GetSize.getWidth(context),
-                          child: ListView.separated(
-                            itemCount: listFood.length,
-                            itemBuilder: (context, index) =>
-                                const NewsCardSkelton(),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 16),
-                          ),
-                        );
                       }
-                    },
-                  ),
+                    }
+                  })
                 ],
               )
             ],
