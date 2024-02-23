@@ -10,7 +10,6 @@ class GlobalVariable{
   static const String enterFullVerifyCode = "Please enter verify code";
   static const String resetPassTitle = "Please enter your email address to request a password reset";
 
-
   static const String loginSuc = "Log in successfully!";
   static const String signUpSuc = "Sign up successfully!";
   static const String resetPassSuc = "Reset Password Successfully!";

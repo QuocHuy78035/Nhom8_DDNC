@@ -19,5 +19,42 @@ class SplashScreen extends StatelessWidget {
       pageTransitionType: PageTransitionType.rightToLeftWithFade,
       nextScreen: Provider.of<UserProvider>(context).user.accessToken != ""  ? const CustomerHomeScreen() : const LoginScreen(),
     );
+
+
+    // return FutureBuilder<bool>(
+    //   future: checkLoggedInUser(),
+    //   builder: (context, snapshot) {
+    //     if (snapshot.connectionState == ConnectionState.waiting) {
+    //       return Scaffold(
+    //         body: Center(
+    //           child: CircularProgressIndicator(),
+    //         ),
+    //       );
+    //     } else {
+    //       if (snapshot.hasError) {
+    //         return Scaffold(
+    //           body: Center(
+    //             child: Text('Error: ${snapshot.error}'),
+    //           ),
+    //         );
+    //       } else {
+    //         final isLoggedIn = snapshot.data!;
+    //         return AnimatedSplashScreen(
+    //           splash: Lottie.asset('assets/images/auth/splash/splash.json'),
+    //           splashIconSize: 250,
+    //           backgroundColor: Colors.black,
+    //           pageTransitionType: PageTransitionType.rightToLeftWithFade,
+    //           nextScreen: isLoggedIn ? CustomerHomeScreen() : LoginScreen(),
+    //         );
+    //       }
+    //     }
+    //   },
+    // );
   }
+
+  // Future<bool> checkLoggedInUser() async {
+  //   final db = await DatabaseHelper.database;
+  //   final result = await db.query('users');
+  //   return result.isNotEmpty;
+  // }
 }

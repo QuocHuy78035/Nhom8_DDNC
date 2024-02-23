@@ -8,6 +8,8 @@ import '../../../utils/global_variable.dart';
 import '../../../utils/size_lib.dart';
 import '../../../utils/snack_bar.dart';
 import '../../main/views/store_category_screen.dart';
+import 'package:flutter_paypal/flutter_paypal.dart';
+
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -25,7 +27,6 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   decrementCart(int index) async {
-    print(listCart[index].food?.id);
     String message = await addToCartController
         .updateCartDecrement("${listCart[index].food?.id}");
     if (message == GlobalVariable.updateCartSuc) {
@@ -85,9 +86,9 @@ class _CartScreenState extends State<CartScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: value.listCart.length,
                             itemBuilder: (context, index) =>
-                            const CardSkeltonOrderRestaurant(),
+                                const CardSkeltonOrderRestaurant(),
                             separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
+                                const SizedBox(height: 16),
                           ),
                           const SizedBox(
                             height: 10,
@@ -107,12 +108,12 @@ class _CartScreenState extends State<CartScreen> {
                                 child: FoodOfRestaurant(
                                   increment: () {
                                     Provider.of<AddToCartProvider>(context,
-                                        listen: false)
+                                            listen: false)
                                         .increment(index, context);
                                   },
                                   decrement: () {
                                     Provider.of<AddToCartProvider>(context,
-                                        listen: false)
+                                            listen: false)
                                         .decrementCart(index, context);
                                   },
                                   name: value.listCart[index].food?.name ?? "",
@@ -132,7 +133,74 @@ class _CartScreenState extends State<CartScreen> {
                   }
                 },
               ),
-          ],
+          TextButton(
+              onPressed: () => {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => UsePaypal(
+                        sandboxMode: true,
+                        clientId:
+                        "AfcHO079_yirebcCRj6BlKUhY48w9uq3k4k-EM6HCQTAKHt3Tp6Buzfn0f3b0PRqUKUQwWfLDQtKlJxz",
+                        secretKey:
+                        "EBN8StcvtdYCRgC2wG1UlvPNHeitK9ehvABHievjJnLAjiB_P8lzkHsHH5OENl16yqIw5zexz7tLeiDu",
+                        returnURL: "https://samplesite.com/return",
+                        cancelURL: "https://samplesite.com/cancel",
+                        transactions: const [
+                          {
+                            "amount": {
+                              "total": '70',
+                              "currency": "USD",
+                              "details": {
+                                "subtotal": '70',
+                                "shipping": '0',
+                                "shipping_discount": 0
+                              }
+                            },
+                            "description": "The payment transaction description.",
+                            "item_list": {
+                              "items": [
+                                {
+                                  "name": "Apple",
+                                  "quantity": 4,
+                                  "price": '5',
+                                  "currency": "USD"
+                                },
+                                {
+                                  "name": "Pineapple",
+                                  "quantity": 5,
+                                  "price": '10',
+                                  "currency": "USD"
+                                }
+                              ],
+                              // shipping address is Optional
+                              "shipping_address": {
+                                "recipient_name": "Raman Singh",
+                                "line1": "Delhi",
+                                "line2": "",
+                                "city": "Delhi",
+                                "country_code": "IN",
+                                "postal_code": "11001",
+                                "phone": "+00000000",
+                                "state": "Texas"
+                              },
+                            }
+                          }
+                        ],
+                        note: "Contact us for any questions on your order.",
+                        onSuccess: (Map params) async {
+                          print("onSuccess: $params");
+                        },
+                        onError: (error) {
+                          print("onError: $error");
+                        },
+                        onCancel: (params) {
+                          print('cancelled: $params');
+                        }),
+                  ),
+                )
+              },
+              child: const Text("Make Payment")),
+            ],
           ),
         ),
       ),

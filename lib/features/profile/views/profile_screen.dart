@@ -1,4 +1,5 @@
 import 'package:ddnangcao_project/features/auth/views/login_screen.dart';
+import 'package:ddnangcao_project/features/chat/views/chat_screen.dart';
 import 'package:ddnangcao_project/features/favourite/views/favourite_screen.dart';
 import 'package:ddnangcao_project/features/profile/controllers/profile_controller.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
@@ -63,9 +64,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(
               height: 20,
             ),
-            const NavFunction(
-              icon: Icons.person,
-              title: "My Profile",
+            GestureDetector(
+              onTap: (){
+                //Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
+              },
+
+              child: const NavFunction(
+                icon: Icons.person,
+                title: "My Profile",
+              ),
             ),
             GestureDetector(
               onTap: () {
@@ -134,6 +141,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: const Text("Yes"),
                           onPressed: () async {
                             logoutUser();
+
+                            //sqlite
                             Navigator.pop(context);
                             Navigator.pushReplacement(
                               context,

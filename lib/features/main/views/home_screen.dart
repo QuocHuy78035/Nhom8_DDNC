@@ -4,6 +4,8 @@ import 'package:ddnangcao_project/providers/home_provider.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'store_category_screen.dart';
 
@@ -15,10 +17,71 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  Position? _currentLocation;
+  late bool servicePermission = true;
+  late LocationPermission permission;
+
+  String currentAddress = '';
+
+  Future<void> _getCurrentLocationAndAddress() async {
+    try {
+      _currentLocation = await _getCurrentLocation();
+      await _getAddress();
+    } catch (e) {
+      print("Error getting current location and address: $e");
+    }
+  }
+
+  Future<Position> _getCurrentLocation() async {
+    if (!servicePermission) {
+      print("Service disabled");
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
+  Future<void> _getAddress() async {
+    try {
+      List<Placemark> placesmarks = await placemarkFromCoordinates(
+          _currentLocation!.latitude, _currentLocation!.longitude);
+
+      if (placesmarks.isNotEmpty) {
+        Placemark placemark = placesmarks[0];
+        setState(() {
+          currentAddress =
+          "${placemark.street}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}, ";
+        });
+      } else {
+        setState(() {
+          currentAddress = "Không thể tìm thấy địa chỉ.";
+        });
+      }
+    } catch (e) {
+      print("Error getting address: $e");
+      setState(() {
+        currentAddress = "Lỗi khi lấy địa chỉ.";
+      });
+    }
+  }
+
   @override
-  void initState() {
+  void initState(){
     super.initState();
+    _initializeState();
     Provider.of<HomeProvider>(context, listen: false).getAllCategory();
+  }
+
+  Future<void> _initializeState() async {
+    try {
+      await _getCurrentLocationAndAddress();
+      Provider.of<HomeProvider>(context, listen: false).getAllCategory();
+    } catch (e) {
+      print("Error initializing state: $e");
+    }
   }
 
   @override
@@ -31,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Image.asset("assets/images/banners/Banner.png"),
     ];
     return Scaffold(
-      appBar: const MyAppBar(),
+      appBar: MyAppBar(currentLocation: currentAddress,),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -72,7 +135,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Consumer<HomeProvider>(builder: (context, value, child) {
                       if (value.listCate.isEmpty) {
                         return const Center(
-                          child: CircularProgressIndicator(),
+                          child:Center(
+                            child: Text("No Have Item"),
+                          ),
                         );
                       } else {
                         if (value.isLoading) {
@@ -360,7 +425,8 @@ class Category extends StatelessWidget {
 }
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MyAppBar({super.key});
+  final String currentLocation;
+  const MyAppBar({super.key,required this.currentLocation});
 
   @override
   Size get preferredSize => const Size.fromHeight(100);
@@ -376,37 +442,41 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           SizedBox(
             height: GetSize.getHeight(context) * 0.06,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  Icon(Icons.location_on_outlined),
-                  SizedBox(
+                  const Icon(Icons.location_on_outlined),
+                  const SizedBox(
                     width: 10,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Current location",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      Text(
-                        "TP.HCM",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                      SizedBox(
+                        width: GetSize.getWidth(context)*0.7,
+                        child: Text(
+                          currentLocation,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       )
                     ],
                   ),
                 ],
               ),
-              Icon(Icons.notifications_none_outlined)
+              const Icon(Icons.notifications_none_outlined)
             ],
           ),
           const SizedBox(

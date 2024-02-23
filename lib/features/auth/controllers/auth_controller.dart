@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ddnangcao_project/models/user.dart';
 import 'package:ddnangcao_project/providers/user_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -17,14 +19,10 @@ class AuthController implements IAuth {
       BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     late String resMessage;
-    // String? accessToken = prefs.getString('accessToken');
-    // print("123 ${prefs.getString('accessToken')}");
-
     final response = await http.post(
       Uri.parse('${GlobalVariable.apiUrl}/login'),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
-        //'Authorization': accessToken ?? ""
       },
       body: jsonEncode(
         {'email': email, 'password': password},
@@ -48,7 +46,6 @@ class AuthController implements IAuth {
           .setUser(data['metadata']['user']);
     } else {
       return resMessage;
-      //throw Exception('Failed to log in');
     }
     return resMessage;
   }
@@ -90,7 +87,6 @@ class AuthController implements IAuth {
           .setUser(data['metadata']['user']);
     } else {
       return resMessage;
-      //throw Exception('Failed to log in');
     }
     return resMessage;
   }
@@ -103,7 +99,7 @@ class AuthController implements IAuth {
     String name = prefs.getString("name") ?? "";
     String accessToken = prefs.getString("accessToken") ?? "";
     String refreshToken = prefs.getString("refreshToken") ?? "";
-    User user = User(
+    UserModel user = UserModel(
         id: userId,
         name: name,
         email: email,
@@ -150,8 +146,8 @@ class AuthController implements IAuth {
     final Map<String, dynamic> data = jsonDecode(response.body);
     resMessage = data["message"];
     resetUrl = data['metadata']['resetURL'];
-    if(resetUrl.contains("localhost")){
-       resetUrl = resetUrl.replaceFirst("localhost", "10.0.2.2");
+    if (resetUrl.contains("localhost")) {
+      resetUrl = resetUrl.replaceFirst("localhost", "10.0.2.2");
     }
     responseString.add(resMessage);
     responseString.add(resetUrl);
@@ -159,7 +155,8 @@ class AuthController implements IAuth {
   }
 
   @override
-  Future<String> resetPass(String password, String passwordConfirm, String token) async{
+  Future<String> resetPass(String password, String passwordConfirm,
+      String token) async {
     late String resMessage;
     final response = await http.post(
       Uri.parse(token),
@@ -175,7 +172,47 @@ class AuthController implements IAuth {
     );
     final Map<String, dynamic> data = jsonDecode(response.body);
     resMessage = data["message"];
-
     return resMessage;
+  }
+
+  //chat
+  //create new user
+  @override
+  Future<UserCredential> signUpWithEmailAndPass(String email,
+      String password, String userId) async {
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+    try {
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      _fireStore.collection('users').doc(userCredential.user!.uid).set({
+        //'uid' : userCredential.user!.uid,
+        'uid' : userId,
+        'email' : email
+      });
+      return userCredential;
+    }on FirebaseException catch(e){
+      throw Exception(e.code);
+    }
+  }
+
+  @override
+  Future<UserCredential> signInWithEmailAndPass(String email,
+      String password) async {
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+    try {
+      UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      _fireStore.collection('users').doc(userCredential.user!.uid).set({
+        'uid' : userCredential.user!.uid,
+        'email' : email
+      }, SetOptions(merge: true));
+      return userCredential;
+    }on FirebaseException catch(e){
+      throw Exception(e.code);
+    }
   }
 }

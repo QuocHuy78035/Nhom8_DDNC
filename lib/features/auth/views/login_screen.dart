@@ -2,13 +2,13 @@ import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart
 import 'package:ddnangcao_project/features/auth/views/forgot_pass_screen.dart';
 import 'package:ddnangcao_project/features/auth/views/register_screen.dart';
 import 'package:ddnangcao_project/features/main/views/navbar_custom.dart';
+import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:ddnangcao_project/widgets/base_button.dart';
 import 'package:ddnangcao_project/widgets/base_input.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:ddnangcao_project/utils/validator/email_validator.dart';
 import 'package:flutter/material.dart';
-
 import '../../../utils/global_variable.dart';
 import '../widgets/facebook_button.dart';
 import '../widgets/google_button.dart';
@@ -29,33 +29,22 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
-  void showSnackBar(String message, Color? colorBackground, Color? colorText) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(milliseconds: 2000),
-        backgroundColor: colorBackground ?? ColorLib.primaryColor,
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: 18,
-            color: colorText ?? ColorLib.blackColor,
-          ),
-        ),
-      ),
-    );
-  }
-
   login() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
+
+      //firebase
+      await authController.signInWithEmailAndPass(email, password);
+
       String message = await authController.loginUser(email, password, context);
+
       setState(() {
         isLoading = false;
       });
       if (message == GlobalVariable.loginSuc) {
-        showSnackBar(message, Colors.green, Colors.black);
+        ShowSnackBar().showSnackBar(message, Colors.green, Colors.black, context);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -63,11 +52,11 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else {
-        showSnackBar(message, ColorLib.primaryColor, Colors.white);
+        ShowSnackBar().showSnackBar(message, ColorLib.primaryColor, Colors.white, context);
       }
     } else {
-      showSnackBar(
-          GlobalVariable.fillAllField, ColorLib.primaryColor, Colors.white);
+      ShowSnackBar().showSnackBar(
+          GlobalVariable.fillAllField, ColorLib.primaryColor, Colors.white, context);
     }
   }
 
@@ -147,7 +136,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: GetSize.getWidth(context),
                     child: BaseButton(
                       onPressed: () async {
+
+                        //sqlite
+                        //await DatabaseHelper.saveUser('example', email, password);
                         login();
+
                       },
                       titleRow: isLoading
                           ? const Center(

@@ -39,7 +39,9 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
             Consumer<FoodProvider>(builder: (context, value, child){
               if(value.listFood.isEmpty){
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child:Center(
+                    child: Text("No Have Item"),
+                  ),
                 );
               }else{
                 if(value.isLoading){

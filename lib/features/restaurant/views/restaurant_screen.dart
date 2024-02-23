@@ -6,9 +6,9 @@ import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
 import '../../main/views/store_category_screen.dart';
 
-
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({super.key});
+
   @override
   State<RestaurantScreen> createState() => _RestaurantScreenState();
 }
@@ -30,7 +30,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   ];
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     Provider.of<RestaurantProvider>(context, listen: false).findAllRestaurant();
   }
@@ -50,11 +50,13 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  const Text("Sort by",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      )),
+                  const Text(
+                    "Sort by",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(
                     width: 20,
                   ),
@@ -170,83 +172,97 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   color: Colors.black12.withOpacity(0.05),
                   child: Consumer<RestaurantProvider>(
-                    builder: (BuildContext context, RestaurantProvider value, Widget? child) {
-                    if(value.listStore.isEmpty){
-                      return const Center(
-                        child: CircularProgressIndicator()
-                      );
-                    }else {
-                      if(value.isLoading){
-                        return Container(
-                          color: Colors.black12.withOpacity(0.05),
-                          height: GetSize.getHeight(context) * 0.85,
-                          width: GetSize.getWidth(context),
-                          child: ListView.separated(
-                            itemCount: value.listStore.length,
-                            itemBuilder: (context, index) => const NewsCardSkelton(),
-                            separatorBuilder: (context, index) =>
-                            const SizedBox(height: 16),
+                    builder: (BuildContext context, RestaurantProvider value,
+                        Widget? child) {
+                      if (value.listStore.isEmpty) {
+                        return const Center(
+                          child: Center(
+                            child: Text("No Have Item"),
                           ),
                         );
-                      }else{
-                        return Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          height: GetSize.getHeight(context),
-                          child: ListView.builder(
-                            itemCount: value.listStore.length,
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  GestureDetector(
+                      } else {
+                        if (value.isLoading) {
+                          return Container(
+                            color: Colors.black12.withOpacity(0.05),
+                            height: GetSize.getHeight(context) * 0.85,
+                            width: GetSize.getWidth(context),
+                            child: ListView.separated(
+                              itemCount: value.listStore.length,
+                              itemBuilder: (context, index) =>
+                                  const NewsCardSkelton(),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 16),
+                            ),
+                          );
+                        } else {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            height: GetSize.getHeight(context),
+                            child: ListView.builder(
+                              itemCount: value.listStore.length,
+                              itemBuilder: (context, index) {
+                                return Column(
+                                  children: [
+                                    GestureDetector(
                                       onTap: () {
+                                        print("Id : ${value.listStore[index].id}");
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 RestaurantOrderScreen(
-                                                  name: value.listStore[index].name ?? "",
-                                                  address:
-                                                  value.listStore[index].address ??
+                                              name:
+                                                  value.listStore[index].name ??
                                                       "",
-                                                  rating:
-                                                  value.listStore[index].rating ?? 0,
-                                                  timeOpen:
-                                                  value.listStore[index].timeOpen ??
+                                              address: value.listStore[index]
+                                                      .address ??
+                                                  "",
+                                              rating: value.listStore[index]
+                                                      .rating ??
+                                                  0,
+                                              timeOpen: value.listStore[index]
+                                                      .timeOpen ??
+                                                  "",
+                                              timeClose: value.listStore[index]
+                                                      .timeClose ??
+                                                  "",
+                                              storeId:
+                                                  value.listStore[index].id ??
                                                       "",
-                                                  timeClose:
-                                                  value.listStore[index].timeClose ??
-                                                      "",
-                                                  storeId:
-                                                  value.listStore[index].id ?? "",
-                                                ),
+                                            ),
                                           ),
                                         );
                                       },
                                       child: Restaurant(
                                         name: value.listStore[index].name ?? '',
-                                        rating: value.listStore[index].rating ?? 0,
-                                        address: value.listStore[index].address ?? "",
-                                        image: value.listStore[index].image ?? '',
+                                        rating:
+                                            value.listStore[index].rating ?? 0,
+                                        address:
+                                            value.listStore[index].address ??
+                                                "",
+                                        image:
+                                            value.listStore[index].image ?? '',
                                         timeOpen:
-                                        value.listStore[index].timeOpen ?? '',
+                                            value.listStore[index].timeOpen ??
+                                                '',
                                         timeClode:
-                                        value.listStore[index].timeClose ?? '',
-                                      )),
-                                  const SizedBox(
-                                    height: 30,
-                                  )
-                                ],
-                              );
-                            },
-                          ),
-                        );
+                                            value.listStore[index].timeClose ??
+                                                '',
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 30,
+                                    )
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+                        }
                       }
-                    }
-                  },
-
-                  )
+                    },
+                  ),
                 )
-
               ],
             )
           ],
@@ -503,34 +519,22 @@ class NewsCardSkelton extends StatelessWidget {
         const SizedBox(
           height: 10,
         ),
-        Skeleton(
-            height: 20,
-            width: GetSize.getWidth(context)*0.4
-        ),
+        Skeleton(height: 20, width: GetSize.getWidth(context) * 0.4),
         const SizedBox(
           height: 10,
         ),
         const Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Skeleton(
-                height: 10,
-                width: 30
-            ),
+            Skeleton(height: 10, width: 30),
             SizedBox(
               width: 10,
             ),
-            Skeleton(
-                height: 10,
-                width: 40
-            ),
+            Skeleton(height: 10, width: 40),
             SizedBox(
               width: 10,
             ),
-            Skeleton(
-                height: 10,
-                width: 30
-            ),
+            Skeleton(height: 10, width: 30),
           ],
         ),
         const SizedBox(

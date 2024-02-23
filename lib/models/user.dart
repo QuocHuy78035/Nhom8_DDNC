@@ -1,13 +1,13 @@
-class User {
+class UserModel {
   String? id;
   String? name;
   String? email;
   String? accessToken;
   String? refreshToken;
 
-  User({this.id, this.name, this.email, this.accessToken, this.refreshToken});
+  UserModel({this.id, this.name, this.email, this.accessToken, this.refreshToken});
 
-  User.fromJson(Map<String, dynamic> json) {
+  UserModel.fromJson(Map<String, dynamic> json) {
     try{
       id = json['_id'] ;
       name = json['name'];
@@ -28,5 +28,26 @@ class User {
     data['accessToken'] = accessToken;
     data['refreshToken'] = refreshToken;
     return data;
+  }
+
+//cho sqlite
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
+    };
+  }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      id: map['id'],
+      name: map['name'],
+      email: map['email'],
+      accessToken: map['accessToken'],
+      refreshToken: map['refreshToken'],
+    );
   }
 }

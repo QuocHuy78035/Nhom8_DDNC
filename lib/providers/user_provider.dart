@@ -2,16 +2,16 @@ import 'package:ddnangcao_project/models/user.dart';
 import 'package:flutter/cupertino.dart';
 
 class UserProvider extends ChangeNotifier {
-  User _user = User();
+  UserModel _user = UserModel();
 
-  User get user => _user;
+  UserModel get user => _user;
 
   void setUser(Map<String, dynamic> user){
-    _user = User.fromJson(user);
+    _user = UserModel.fromJson(user);
     notifyListeners();
   }
 
-  void setUserFromModel(User user){
+  void setUserFromModel(UserModel user){
     _user = user;
     notifyListeners();
   }

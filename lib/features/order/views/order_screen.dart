@@ -51,7 +51,7 @@ class _OrderScreenState extends State<OrderScreen> {
             Center(
               child: Text("Shoes"),
             ),
-            CartScreen()
+            CartScreen(),
           ],
         ),
       ),

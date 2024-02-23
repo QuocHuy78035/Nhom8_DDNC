@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
+import 'package:ddnangcao_project/features/chat/views/chat_screen.dart';
 import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
@@ -6,14 +9,13 @@ import '../../../utils/color_lib.dart';
 import 'store_category_screen.dart';
 import 'package:provider/provider.dart';
 
-
 class RestaurantOrderScreen extends StatefulWidget {
   final String name;
+  final String storeId;
   final String address;
   final double rating;
   final String timeOpen;
   final String timeClose;
-  final String storeId;
 
   const RestaurantOrderScreen(
       {super.key,
@@ -29,6 +31,8 @@ class RestaurantOrderScreen extends StatefulWidget {
 }
 
 class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
+  final AuthController authController = AuthController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ScrollController scrollController = ScrollController();
   bool showHeader = false;
   int count = 0;
@@ -37,7 +41,8 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
 
   @override
   void initState() {
-    Provider.of<RestaurantProvider>(context, listen: false).getFoodByResId(widget.storeId);
+    Provider.of<RestaurantProvider>(context, listen: false)
+        .getFoodByResId(widget.storeId);
     scrollController.addListener(() {
       if (scrollController.position.pixels >= 48) {
         if (showHeader) return;
@@ -167,8 +172,9 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                     ),
                                   ],
                                 ),
-                                const Icon(
-                                  Icons.favorite_outline,
+                                IconButton(
+                                  onPressed: ()  {},
+                                  icon: const Icon(Icons.favorite_outline),
                                   color: ColorLib.primaryColor,
                                 )
                               ],
@@ -266,35 +272,39 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                           fontWeight: FontWeight.bold,
                                           fontSize: 26),
                                     ),
-                                    Consumer<RestaurantProvider>(builder: (context, value, child){
-                                      if(value.listFood.isEmpty){
+                                    Consumer<RestaurantProvider>(
+                                        builder: (context, value, child) {
+                                      if (value.listFood.isEmpty) {
                                         return const Center(
-                                          child: CircularProgressIndicator(),
+                                          child: Center(
+                                            child: Text("No Have Item"),
+                                          ),
                                         );
-                                      }else{
-                                        if(value.isLoading){
+                                      } else {
+                                        if (value.isLoading) {
                                           return Column(
                                             children: [
                                               ListView.separated(
                                                 shrinkWrap: true,
                                                 physics:
-                                                const NeverScrollableScrollPhysics(),
-                                                itemCount: value.listFood.length,
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount:
+                                                    value.listFood.length,
                                                 itemBuilder: (context, index) =>
-                                                const CardSkeltonOrderRestaurant(),
+                                                    const CardSkeltonOrderRestaurant(),
                                                 separatorBuilder: (context,
-                                                    index) =>
-                                                const SizedBox(height: 16),
+                                                        index) =>
+                                                    const SizedBox(height: 16),
                                               ),
                                               const SizedBox(
                                                 height: 10,
                                               )
                                             ],
                                           );
-                                        }else{
+                                        } else {
                                           return ListView.builder(
                                             physics:
-                                            const NeverScrollableScrollPhysics(),
+                                                const NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemCount: value.listFood.length,
                                             itemBuilder: (context, index) {
@@ -307,29 +317,33 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               DetailFoodScreen(
-                                                                sold:
-                                                                value.listFood[index]
-                                                                    .sold,
-                                                                left:
-                                                                value.listFood[index]
-                                                                    .left,
-                                                                foodId:
-                                                                value.listFood[index]
+                                                            sold: value
+                                                                .listFood[index]
+                                                                .sold,
+                                                            left: value
+                                                                .listFood[index]
+                                                                .left,
+                                                            foodId: value
+                                                                    .listFood[
+                                                                        index]
                                                                     .id ??
-                                                                    "",
-                                                                foodName:
-                                                                value.listFood[index]
+                                                                "",
+                                                            foodName: value
+                                                                    .listFood[
+                                                                        index]
                                                                     .name ??
-                                                                    "",
-                                                                price: value.listFood[
-                                                                index]
+                                                                "",
+                                                            price: value
+                                                                    .listFood[
+                                                                        index]
                                                                     .price ??
-                                                                    0,
-                                                                image: value.listFood[
-                                                                index]
+                                                                0,
+                                                            image: value
+                                                                    .listFood[
+                                                                        index]
                                                                     .image ??
-                                                                    "",
-                                                              ),
+                                                                "",
+                                                          ),
                                                         ),
                                                       );
                                                     },
@@ -339,23 +353,27 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                                           count += 1;
                                                         });
                                                       },
-                                                      sold:
-                                                      value.listFood[index].sold,
-                                                      left:
-                                                      value.listFood[index].left,
-                                                      name: value.listFood[index]
-                                                          .name ??
+                                                      sold: value
+                                                          .listFood[index].sold,
+                                                      left: value
+                                                          .listFood[index].left,
+                                                      name: value
+                                                              .listFood[index]
+                                                              .name ??
                                                           "",
                                                       index: index + 1,
-                                                      price: value.listFood[index]
-                                                          .price ??
+                                                      price: value
+                                                              .listFood[index]
+                                                              .price ??
                                                           0,
-                                                      type: value.listFood[index]
-                                                          .category
-                                                          ?.cateName ??
+                                                      type: value
+                                                              .listFood[index]
+                                                              .category
+                                                              ?.cateName ??
                                                           "",
-                                                      rating: value.listFood[index]
-                                                          .price ??
+                                                      rating: value
+                                                              .listFood[index]
+                                                              .price ??
                                                           0,
                                                     ),
                                                   ),
@@ -400,6 +418,34 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
               ),
             )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          QuerySnapshot<Map<String, dynamic>> snapshot =
+              await _firestore.collection('users').get();
+          List<DocumentSnapshot<Map<String, dynamic>>> documentSnapshots =
+              snapshot.docs;
+          Map<String, dynamic>? data;
+          for (var documentSnapshot in documentSnapshots) {
+            data = documentSnapshot.data();
+          }
+          if (data != null && widget.storeId != data['uid']) {
+            await _firestore
+                .collection('users')
+                .doc(widget.storeId)
+                .set({'uid': widget.storeId, 'email': widget.name});
+          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatScreen(
+                storeId: widget.storeId,
+                storeName: widget.name,
+              ),
+            ),
+          );
+        },
+        child: const Icon(Icons.message),
       ),
       bottomSheet: count != 0
           ? BottomSheet(
