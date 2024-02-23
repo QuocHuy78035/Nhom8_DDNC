@@ -33,7 +33,7 @@ const foodSchema = new Schema(
     left: {
       type: Number,
       required: [true, "Please fill in left of the product!"],
-    },
+    }, 
     sold: { type: Number, default: 0 },
   },
   { timestamps: true, collection: COLLECTION_NAME }

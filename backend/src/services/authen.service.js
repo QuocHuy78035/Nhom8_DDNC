@@ -68,7 +68,11 @@ class AuthenService {
       },
     };
   };
-  static verifyOTP = async ({ email, OTP }) => {
+  // type: forgotPwd, signUp
+  static verifyOTP = async ({ type, email, OTP }) => {
+    if (!["forgotPwd", "signUp"].includes(type)) {
+      throw new BadRequestError("Type is invalid!");
+    }
     const user = await userModel.findOne({
       email,
       OTPExpires: { $gt: Date.now() },
@@ -88,25 +92,69 @@ class AuthenService {
     user.OTP = undefined;
     user.OTPExpires = undefined;
     await user.save({ validateBeforeSave: false });
-    const resetToken = crypto.randomBytes(32).toString("hex");
 
-    const passwordResetToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-    const passwordResetExpires = Date.now() + EXPIRES_TIME; // 10p hiệu lực
+    if (type === "forgotPwd") {
+      const resetToken = crypto.randomBytes(32).toString("hex");
 
-    await userModel.findOneAndUpdate(
-      { _id: new Types.ObjectId(user._id) },
-      { passwordResetToken, passwordResetExpires },
-      { new: true }
-    );
-    return {
-      message: "Verify OTP successfully!",
-      metadata: {
-        resetURL: `http://localhost:${process.env.PORT}/api/v1/resetPassword/${resetToken}`,
-      },
-    };
+      const passwordResetToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+      const passwordResetExpires = Date.now() + EXPIRES_TIME; // 10p hiệu lực
+
+      await userModel.findOneAndUpdate(
+        { _id: new Types.ObjectId(user._id) },
+        { passwordResetToken, passwordResetExpires },
+        { new: true }
+      );
+      return {
+        message: "Verify OTP successfully!",
+        metadata: {
+          resetURL: `http://localhost:${process.env.PORT}/api/v1/resetPassword/${resetToken}`,
+        },
+      };
+    } else if (type === "signUp") {
+      await userModel.findByIdAndUpdate(user._id, { status: "active" });
+
+      if (user) {
+        // tạo private key và public key
+        const privateKey = crypto.randomBytes(64).toString("hex");
+        const publicKey = crypto.randomBytes(64).toString("hex");
+
+        // tạo keytoken model mới
+        const newkeytoken = await KeyTokenService.createKeyToken({
+          userId: user._id,
+          publicKey,
+          privateKey,
+        });
+
+        if (!newkeytoken) {
+          throw new BadRequestError("Keytoken Error");
+        }
+
+        const tokens = await createTokenPair(
+          { userId: user._id, email },
+          publicKey,
+          privateKey
+        );
+        console.log("Create Token Successfully!", tokens);
+        return {
+          statusCode: 201,
+          message: "Sign up successfully!",
+          metadata: {
+            user: getInfoData({
+              object: user,
+              fields: ["_id", "name", "email"],
+            }),
+            tokens,
+          },
+        };
+      }
+      return {
+        statusCode: 200,
+        metadata: null,
+      };
+    }
   };
   static forgotPassword = async ({ email }) => {
     const user = await userModel.findOne({ email });
@@ -120,7 +168,7 @@ class AuthenService {
     user.OTPExpires = Date.now() + EXPIRES_TIME;
     await user.save({ validateBeforeSave: false });
     try {
-      await new Email({ email, OTP }).sendEmail();
+      await new Email({ type: "forgot", email, OTP }).sendEmail();
     } catch (error) {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
@@ -144,56 +192,41 @@ class AuthenService {
     if (!name || !email || !password || !passwordConfirm) {
       throw new BadRequestError("Error: Please fill all the fields!");
     }
-    const existingUser = await userModel.findOne({ email }).lean();
+    const existingUser = await userModel
+      .findOne({ email, status: "active" })
+      .lean();
     if (existingUser) {
       throw new BadRequestError("Error: User already registered!");
     }
 
-    const newUser = await userModel.create({
-      name,
-      email,
-      password,
-      passwordConfirm,
-      role,
-    });
-
-    if (newUser) {
-      // tạo private key và public key
-      const privateKey = crypto.randomBytes(64).toString("hex");
-      const publicKey = crypto.randomBytes(64).toString("hex");
-
-      // tạo keytoken model mới
-      const newkeytoken = await KeyTokenService.createKeyToken({
-        userId: newUser._id,
-        publicKey,
-        privateKey,
-      });
-
-      if (!newkeytoken) {
-        throw new BadRequestError("Keytoken Error");
-      }
-
-      const tokens = await createTokenPair(
-        { userId: newUser._id, email },
-        publicKey,
-        privateKey
+    const existingUnverifiedUser = await userModel
+      .findOne({ email, status: "unverified" })
+      .lean();
+    const newUser =
+      existingUnverifiedUser ||
+      (await userModel.create({
+        name,
+        email,
+        password,
+        passwordConfirm,
+        role,
+        status: "unverified",
+      }));
+    const OTP = generateOTPConfig(4);
+    const hashOTP = crypto.createHash("sha256").update(OTP).digest("hex");
+    newUser.OTP = hashOTP;
+    newUser.OTPExpires = Date.now() + EXPIRES_TIME;
+    await newUser.save({ validateBeforeSave: false });
+    try {
+      await new Email({ email, OTP }).sendEmail();
+    } catch (err) {
+      throw new InternalServerError(
+        "There was an error sending the email. Try again later!"
       );
-      console.log("Create Token Successfully!", tokens);
-      return {
-        statusCode: 201,
-        message: "Sign up successfully!",
-        metadata: {
-          user: getInfoData({
-            object: newUser,
-            fields: ["_id", "name", "email"],
-          }),
-          tokens,
-        },
-      };
     }
+
     return {
-      statusCode: 200,
-      metadata: null,
+      message: "OTP sent to email!",
     };
   };
 
@@ -205,6 +238,11 @@ class AuthenService {
     const user = await userModel.findOne({ email });
     if (!user || !(await user.matchPassword(password))) {
       throw new AuthFailureError("Error: Incorrect email or password!");
+    }
+    if (user.status === "unverified") {
+      throw new AuthFailureError(
+        "Error: This account is unverified! Please sign up again!"
+      );
     }
 
     // tạo private key và public key

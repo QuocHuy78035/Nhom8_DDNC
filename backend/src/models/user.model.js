@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       unique: true,
     },
+    status: {
+      type: String,
+      enum: ["unverified", "active", "inactive"],
+      enum: "unverified",
+    },
     role: {
       type: String,
       enum: ["user", "admin"],

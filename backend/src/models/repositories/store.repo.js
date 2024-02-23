@@ -13,7 +13,7 @@ const findAllStores = async ({
 }) => {
   let sortBy = Object.fromEntries([sort].map((val) => [val, -1]));
   let stores = await storeModel.aggregate([
-    { $match: { name: { $regex: search || "" } } },
+    { $match: { name: { $regex: search || "", $options: "i" } } },
     {
       $lookup: {
         from: "Foods",

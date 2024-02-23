@@ -1,22 +1,46 @@
 "use strict";
-const mongoose = require("mongoose");
+const { Schema, model } = require("mongoose");
 const COLLECTION_NAME = "Orders";
 const DOCUMENT_NAME = "Order";
 
-const orderSchema = new mongoose.Schema(
+const orderSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: "User" },
-    shop: { type: Schema.Types.ObjectId, ref: "Shop" },
-    rating: {
-      type: Number,
-      min: [1, "Rating must be above or equal 1"],
-      max: [5, "Rating must be below or equal 5"],
-      default: 3,
+    checkout: {
+      type: {
+        totalPrice: { type: Number, required: true, default: 0 },
+        totalApplyDiscount: { type: Number, required: true, default: 0 },
+        feeShip: { type: Number, required: true, default: 0 },
+      },
+      default: {},
     },
-    dateBuy: { type: Date, required: true },
+    shipping_address: { type: Object, default: {} },
+    payment: { type: Object, default: {} }, // method,
+    trackingNumber: { type: String, default: "#0000000000" },
+    foods: {
+      type: [
+        {
+          food: { type: Schema.Types.ObjectId, ref: "Food" },
+          quantity: { type: Number, required: true, default: 1 },
+        },
+      ],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "confirmed",
+        "prepared",
+        "shipped",
+        "cancelled",
+        "delivered",
+      ],
+      default: "pending",
+    },
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );
 
 //Export the model
-module.exports = mongoose.model(DOCUMENT_NAME, orderSchema);
+module.exports = model(DOCUMENT_NAME, orderSchema);

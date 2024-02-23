@@ -18,7 +18,7 @@ const findAllFoods = async ({
     .find(
       removeUndefinedInObject({
         ...filter,
-        name: { $regex: search ? search : "" },
+        name: { $regex: search ? search : "", $options: "i" },
       })
     )
     .populate({ path: "store", select: { createdAt: 0, updatedAt: 0, __v: 0 } })
