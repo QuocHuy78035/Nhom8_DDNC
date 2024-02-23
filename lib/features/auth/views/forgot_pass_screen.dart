@@ -1,5 +1,5 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
-import 'package:ddnangcao_project/features/auth/views/verify_screen.dart';
+import 'package:ddnangcao_project/features/auth/views/verify_forgot_pass_screen.dart';
 import 'package:ddnangcao_project/features/auth/widgets/title_screen.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/global_variable.dart';

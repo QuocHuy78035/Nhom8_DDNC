@@ -51,9 +51,9 @@ class AuthController implements IAuth {
   }
 
   @override
-  Future<String> registerUser(String name, String email, String password,
-      String passwordConfirm, BuildContext context) async {
-    late String resMessage;
+  Future<int> registerUser(String name, String email, String password,
+      String passwordConfirm) async {
+    late int statusCode;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final response = await http.post(
       Uri.parse('${GlobalVariable.apiUrl}/signup'),
@@ -70,25 +70,9 @@ class AuthController implements IAuth {
       ),
     );
     final Map<String, dynamic> data = jsonDecode(response.body);
-    resMessage = data["message"];
-    if (response.statusCode == 201) {
-      String accessToken = data['metadata']['tokens']['accessToken'].toString();
-      String refreshToken =
-      data['metadata']['tokens']['refreshToken'].toString();
-      String userId = data['metadata']['user']['_id'].toString();
-      String name = data['metadata']['user']['name'].toString();
-      String email = data['metadata']['user']['email'].toString();
-      await prefs.setString('accessToken', accessToken);
-      await prefs.setString("refreshToken", refreshToken);
-      await prefs.setString("userId", userId);
-      await prefs.setString("name", name);
-      await prefs.setString("email", email);
-      Provider.of<UserProvider>(context, listen: false)
-          .setUser(data['metadata']['user']);
-    } else {
-      return resMessage;
-    }
-    return resMessage;
+    statusCode = data["status"];
+
+    return statusCode;
   }
 
   Future<void> getUserData(context) async {
@@ -128,11 +112,11 @@ class AuthController implements IAuth {
   }
 
   @override
-  Future<List<String>> verify(String email, String otp) async {
+  Future<List<String>> verifyForgotPass(String email, String otp) async {
     List<String> responseString = [];
     late String resMessage;
     final response = await http.post(
-      Uri.parse('${GlobalVariable.apiUrl}/verify'),
+      Uri.parse('${GlobalVariable.apiUrl}/verify?type=forgotPwd'),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -152,6 +136,45 @@ class AuthController implements IAuth {
     responseString.add(resMessage);
     responseString.add(resetUrl);
     return responseString;
+  }
+
+  @override
+  Future<String> verifySignUp(String email, String otp, BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    late String resMessage;
+    final response = await http.post(
+      Uri.parse('${GlobalVariable.apiUrl}/verify?type=signUp'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(
+        {
+          "email": email,
+          "OTP": otp
+        },
+      ),
+    );
+
+    final Map<String, dynamic> data = jsonDecode(response.body);
+    resMessage = data["message"];
+    if (response.statusCode == 201) {
+      String accessToken = data['metadata']['tokens']['accessToken'].toString();
+      String refreshToken =
+      data['metadata']['tokens']['refreshToken'].toString();
+      String userId = data['metadata']['user']['_id'].toString();
+      String name = data['metadata']['user']['name'].toString();
+      String email = data['metadata']['user']['email'].toString();
+      await prefs.setString('accessToken', accessToken);
+      await prefs.setString("refreshToken", refreshToken);
+      await prefs.setString("userId", userId);
+      await prefs.setString("name", name);
+      await prefs.setString("email", email);
+      Provider.of<UserProvider>(context, listen: false)
+          .setUser(data['metadata']['user']);
+    } else {
+      return resMessage;
+    }
+    return resMessage;
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:ddnangcao_project/features/auth/views/verify_signup_screen.dart';
 import 'package:ddnangcao_project/features/chat/controllers/chat_controller.dart';
 import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/widgets/base_button.dart';
@@ -32,32 +33,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   registerUser() async {
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
     if (_formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
 
-      String message = await authController.registerUser(
-          name, email, password, passwordConfirm, context);
-      setState(() {
-        isLoading = false;
-      });
-      if (message == GlobalVariable.signUpSuc) {
-        //firebase
-        await authController.signUpWithEmailAndPass(email, password, sharedPreferences.getString("userId") ?? "");
+      //firebase
+      await authController.signUpWithEmailAndPass(email, password, sharedPreferences.getString("userId") ?? "");
 
-        ShowSnackBar()
-            .showSnackBar(message, Colors.green, Colors.black, context);
-        Navigator.pushReplacement(
+      int statusCode = await authController.registerUser(
+          name, email, password, passwordConfirm);
+      if (statusCode == 200) {
+        Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const LoginScreen(),
+            builder: (context) => VerifySignUpScreen(email: email),
           ),
         );
-      } else {
-        ShowSnackBar().showSnackBar(
-            message, ColorLib.primaryColor, Colors.white, context);
       }
     } else {
       ShowSnackBar().showSnackBar(GlobalVariable.fillAllField,

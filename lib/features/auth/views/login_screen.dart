@@ -35,8 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = true;
       });
 
-      //firebase
-      await authController.signInWithEmailAndPass(email, password);
+
 
       String message = await authController.loginUser(email, password, context);
 
@@ -54,6 +53,8 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         ShowSnackBar().showSnackBar(message, ColorLib.primaryColor, Colors.white, context);
       }
+      //firebase
+      await authController.signInWithEmailAndPass(email, password);
     } else {
       ShowSnackBar().showSnackBar(
           GlobalVariable.fillAllField, ColorLib.primaryColor, Colors.white, context);
