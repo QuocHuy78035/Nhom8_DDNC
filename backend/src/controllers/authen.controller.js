@@ -2,7 +2,12 @@
 
 const { SuccessResponse, OK } = require("../core/success.response");
 const AuthenService = require("../services/authen.service");
-
+const HEADER = {
+  API_KEY: "x-api-key",
+  CLIENT_ID: "x-client-id",
+  AUTHORIZATION: "authorization",
+  REFRESHTOKEN: "x-rtoken-id",
+};
 class AuthenController {
   resetPassword = async (req, res, next) => {
     const result = await AuthenService.resetPassword(req);
@@ -34,6 +39,18 @@ class AuthenController {
 
     const result = await AuthenService.logIn(req.body);
     return new SuccessResponse(result).send(res);
+  };
+  refreshToken = async (req, res, next) => {
+    const tokens = await AuthenService.refreshToken({
+      refreshToken: req.body.refreshToken,
+      header_client_id: req.headers[HEADER.CLIENT_ID],
+    });
+    return new SuccessResponse({
+      message: "Refresh access token successfully!",
+      metadata: {
+        tokens,
+      },
+    }).send(res);
   };
 }
 

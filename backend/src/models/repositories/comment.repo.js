@@ -105,8 +105,36 @@ const getAllComments = async ({
     .populate({ path: "user", select: { name: 1, avatar: 1 } });
 };
 
+const likeComment = async ({ commentId, userId }) => {
+  return await commentModel.findByIdAndUpdate(
+    commentId,
+    {
+      $inc: { numberOfLikes: 1 },
+      $addToSet: {
+        usersLiked: userId,
+      },
+    },
+    { new: true }
+  );
+};
+
+const unlikeComment = async ({ commentId, userId }) => {
+  return await commentModel.findByIdAndUpdate(
+    commentId,
+    {
+      $inc: { numberOfLikes: -1 },
+      $pull: {
+        usersLiked: userId,
+      },
+    },
+    { new: true }
+  );
+};
+
 module.exports = {
   createComment,
   removeComment,
   getAllComments,
+  likeComment,
+  unlikeComment,
 };

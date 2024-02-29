@@ -37,6 +37,42 @@ class CommentController {
       },
     }).send(res);
   };
+  likeComment = async (req, res, next) => {
+    const comment = await CommentService.likeComment({
+      commentId: req.params.comment,
+      userId: req.user.userId,
+    });
+    new OK({
+      message: "Like comment successfully!",
+      metadata: {
+        comment,
+      },
+    }).send(res);
+  };
+  unlikeComment = async (req, res, next) => {
+    const comment = await CommentService.unlikeComment({
+      commentId: req.params.comment,
+      userId: req.user.userId,
+    });
+    new OK({
+      message: "Unlike comment successfully!",
+      metadata: {
+        comment,
+      },
+    }).send(res);
+  };
+  checkUserLiked = async (req, res, next) => {
+    const result = await CommentService.checkUserLiked({
+      commentId: req.params.comment,
+      userId: req.user.userId,
+    });
+    new OK({
+      message: "Check user liked successfully!",
+      metadata: {
+        result,
+      },
+    }).send(res);
+  };
 }
 
 module.exports = new CommentController();

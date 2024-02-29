@@ -16,6 +16,7 @@ const commentSchema = new Schema(
       default: 1,
     },
     numberOfLikes: { type: Number, default: 0 },
+    usersLiked: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
     imageURL: [{ type: String, default: "default.png" }],
   },
   { timestamps: true, collection: COLLECTION_NAME }

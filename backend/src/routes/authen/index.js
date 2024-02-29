@@ -15,7 +15,7 @@ router
   .route("/resetPassword/:token")
   .post(asyncHandler(AuthenController.resetPassword));
 router.route("/verify").post(asyncHandler(AuthenController.verifyOTP));
-
+router.route("/refreshToken").post(asyncHandler(AuthenController.refreshToken));
 //authentication
 router.use(authentication);
 

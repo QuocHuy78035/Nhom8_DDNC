@@ -10,18 +10,21 @@ const HEADER = {
   AUTHORIZATION: "authorization",
   REFRESHTOKEN: "x-rtoken-id",
 };
-
+const TIME = 120;
 const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
     const accessToken = await JWT.sign(payload, publicKey, {
-      expiresIn: "2 days",
+      // expiresIn: "2 days",
+      expiresIn: TIME,
     });
     const refreshToken = await JWT.sign(payload, privateKey, {
       expiresIn: "7 days",
     });
 
-    return { accessToken, refreshToken };
-  } catch (error) {}
+    return { accessToken, refreshToken, timeExpired: Date.now() + TIME * 1000 };
+  } catch (error) {
+    throw new AuthFailureError("Something went wrong!");
+  }
 };
 
 const authentication = asyncHandler(async (req, res, next) => {
@@ -29,7 +32,6 @@ const authentication = asyncHandler(async (req, res, next) => {
   if (!userId) {
     throw new AuthFailureError("Invalid Request!");
   }
-  console.log(userId);
   const keyStore = await findByUserId(userId);
   if (!keyStore) {
     throw new NotFoundError("Not Found KeyStore!");

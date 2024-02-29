@@ -13,7 +13,9 @@ const { createTokenPair } = require("../auth/authUtils");
 const { Types } = require("mongoose");
 const Email = require("../utils/email");
 const generateOTPConfig = require("../utils/generateOTP.config");
+const JWT = require("jsonwebtoken");
 const EXPIRES_TIME = 10 * 60 * 1000;
+const TIME = 120;
 
 class AuthenService {
   static resetPassword = async ({
@@ -270,6 +272,32 @@ class AuthenService {
         tokens,
       },
     };
+  };
+
+  static refreshToken = async ({ refreshToken, header_client_id}) => {
+    const userId = header_client_id;
+    if (!userId) {
+      throw new AuthFailureError("Invalid Request!");
+    }
+    const keyStore = await KeyTokenService.findByUserId(userId);
+    if (!keyStore) {
+      throw new NotFoundError("Not Found KeyStore!");
+    }
+    const decodedUser = JWT.verify(refreshToken, keyStore.privateKey);
+    if (decodedUser.userId !== userId) {
+      throw new AuthFailureError("Invalid UserId");
+    }
+
+    const accessToken = await JWT.sign(
+      { userId: decodedUser.userId, email: decodedUser.email},
+      keyStore.publicKey,
+      {
+        // expiresIn: "2 days",
+        expiresIn: TIME,
+      }
+    );
+
+    return { accessToken, timeExpired: Date.now() + TIME * 1000 };
   };
 }
 
