@@ -8,6 +8,7 @@ const category = require("./category");
 const cart = require("./cart");
 const user = require("./user");
 const order = require("./order");
+const comment = require("./comment");
 const router = express.Router();
 
 router.use("/api/v1/store", store);
@@ -16,6 +17,7 @@ router.use("/api/v1/food", food);
 router.use("/api/v1/cart", cart);
 router.use("/api/v1/user", user);
 router.use("/api/v1/order", order);
+router.use("/api/v1/comment", comment); 
 router.use("/api/v1", authen);
 
 module.exports = router;

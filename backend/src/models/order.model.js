@@ -14,7 +14,7 @@ const orderSchema = new Schema(
       },
       default: {},
     },
-    shipping_address: { type: Object, default: {} },
+    shipping_address: { type: String, required: true },
     payment: { type: Object, default: {} }, // method,
     trackingNumber: { type: String, default: "#0000000000" },
     foods: {
