@@ -29,6 +29,7 @@ const authentication = asyncHandler(async (req, res, next) => {
   if (!userId) {
     throw new AuthFailureError("Invalid Request!");
   }
+  console.log(userId);
   const keyStore = await findByUserId(userId);
   if (!keyStore) {
     throw new NotFoundError("Not Found KeyStore!");

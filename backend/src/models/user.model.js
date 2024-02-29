@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    avatar: { type: String },
+    avatar: { type: String, default: "default.png" },
     address: { type: String },
     favoriteFoods: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Food" }],

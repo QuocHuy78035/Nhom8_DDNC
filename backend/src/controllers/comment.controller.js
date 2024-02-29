@@ -25,6 +25,18 @@ class CommentController {
       message: "Remove comment successfully!",
     }).send(res);
   };
+
+  getAllComments = async (req, res, next) => {
+    const comments = await CommentService.getAllComments({
+      foodId: req.query.food,
+    });
+    new OK({
+      message: "Get all comments successfully!",
+      metadata: {
+        comments,
+      },
+    }).send(res);
+  };
 }
 
 module.exports = new CommentController();

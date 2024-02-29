@@ -4,31 +4,36 @@ const storeModel = require("../store.model");
 const foodModel = require("../food.model");
 const { BadRequestError } = require("../../core/error.response");
 const transaction = require("../../helpers/transaction");
+const { removeUndefinedInObject, getSelectData } = require("../../utils");
 
 const updateRating = async ({ foodId, storeId, session }) => {
   const [avgByFood, avgByStore] = await Promise.all([
-    commentModel.aggregate([
-      {
-        $match: { food: new Types.ObjectId(foodId) },
-      },
-      {
-        $group: {
-          _id: "$food",
-          avgRating: { $avg: "$rating" },
+    await commentModel
+      .aggregate([
+        {
+          $match: { food: new Types.ObjectId(foodId) },
         },
-      },
-    ]),
-    commentModel.aggregate([
-      {
-        $match: { store: new Types.ObjectId(storeId) },
-      },
-      {
-        $group: {
-          _id: "$store",
-          avgRating: { $avg: "$rating" },
+        {
+          $group: {
+            _id: "$food",
+            avgRating: { $avg: "$rating" },
+          },
         },
-      },
-    ]),
+      ])
+      .option({ session }),
+    await commentModel
+      .aggregate([
+        {
+          $match: { store: new Types.ObjectId(storeId) },
+        },
+        {
+          $group: {
+            _id: "$store",
+            avgRating: { $avg: "$rating" },
+          },
+        },
+      ])
+      .option({ session }),
   ]);
 
   await Promise.all([
@@ -51,31 +56,27 @@ const updateRating = async ({ foodId, storeId, session }) => {
 
 const createComment = async ({ userId, storeId, foodId, comment, rating }) => {
   return await transaction(async (session) => {
-    const newComment = await commentModel.create(
-      [
-        {
-          user: userId,
-          store: storeId,
-          food: foodId,
-          comment,
-          rating,
-        },
-      ],
-      { session }
-    );
-    if (!newComment[0]) {
+    const newComment = await new commentModel({
+      user: userId,
+      store: storeId,
+      food: foodId,
+      comment,
+      rating,
+    }).save({ session });
+
+    if (!newComment) {
       throw new BadRequestError("Create comment unsuccessfully!");
     }
 
     await updateRating({ foodId, storeId, session });
 
-    return newComment[0];
+    return newComment;
   });
 };
 
 const removeComment = async (id) => {
   return await transaction(async (session) => {
-    const comment = await commentModel.findById(id);
+    const comment = await commentModel.findById(id).session(session);
     if (!comment) {
       throw new BadRequestError(`Comment with id ${id} is not found!`);
     }
@@ -90,7 +91,22 @@ const removeComment = async (id) => {
   });
 };
 
+const getAllComments = async ({
+  foodId,
+  filter = {},
+  select = [],
+  sort = "ctime",
+}) => {
+  let sortBy = Object.fromEntries([sort].map((val) => [val, -1]));
+  return await commentModel
+    .find(removeUndefinedInObject({ ...filter, food: foodId }))
+    .select(getSelectData(select))
+    .sort(sortBy)
+    .populate({ path: "user", select: { name: 1, avatar: 1 } });
+};
+
 module.exports = {
   createComment,
   removeComment,
+  getAllComments,
 };

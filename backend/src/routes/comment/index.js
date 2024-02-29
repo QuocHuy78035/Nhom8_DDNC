@@ -5,6 +5,7 @@ const { authentication } = require("../../auth/authUtils");
 
 const router = express.Router();
 
+router.route("/").get(asyncHandler(CommentController.getAllComments));
 router.use(authentication);
 router.route("/").post(asyncHandler(CommentController.createComment));
 router.route("/:id").delete(asyncHandler(CommentController.removeComment));
