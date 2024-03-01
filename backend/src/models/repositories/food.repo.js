@@ -27,7 +27,8 @@ const findAllFoods = async ({
       select: { createdAt: 0, updatedAt: 0, __v: 0 },
     })
     .select(getUnselectData(unselect))
-    .sort(sortBy);
+    .sort(sortBy)
+    .lean();
 };
 
 const findFood = async ({ id, select = [] }) => {

@@ -25,19 +25,27 @@ const foodSchema = new Schema(
       required: [true, "Please fill in the price of the product!"],
     },
     rating: {
-      type: Number,
+      type: Schema.Types.Number,
       min: [1, "Rating must be above or equal 1"],
       max: [5, "Rating must be below or equal 5"],
-      default: 1,
+      default: 1.0,
     },
     left: {
       type: Number,
       required: [true, "Please fill in left of the product!"],
-    }, 
+    },
     sold: { type: Number, default: 0 },
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );
+
+foodSchema.post("find", function (docs) {
+  docs.forEach((doc) => {
+    doc["rating"] = doc["rating"].toFixed(1);
+    console.log(doc["rating"]);
+  });
+  return docs;
+});
 
 //Export the model
 module.exports = model(DOCUMENT_NAME, foodSchema);

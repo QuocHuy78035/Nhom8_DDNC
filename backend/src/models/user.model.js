@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const COLLECTION_NAME = "Users";
 const DOCUMENT_NAME = "User";
-
+const default_image =
+  "https://firebasestorage.googleapis.com/v0/b/ddnangcao-project.appspot.com/o/users%2Fdefault.png?alt=media&token=25343bf9-3975-4f6a-98ae-bec6f469c2b2";
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    avatar: { type: String, default: "default.png" },
+    avatar: { type: String, default: default_image },
     address: { type: String },
     favoriteFoods: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Food" }],

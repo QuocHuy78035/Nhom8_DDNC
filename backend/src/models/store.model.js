@@ -12,7 +12,7 @@ const storeSchema = new Schema(
       type: Number,
       min: [1, "Rating must be above or equal 1"],
       max: [5, "Rating must be below or equal 5"],
-      default: 1,
+      default: 1.0,
     },
     time_open: { type: String },
     time_close: { type: String },
