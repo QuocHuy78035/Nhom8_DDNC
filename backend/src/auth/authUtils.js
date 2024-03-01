@@ -10,7 +10,7 @@ const HEADER = {
   AUTHORIZATION: "authorization",
   REFRESHTOKEN: "x-rtoken-id",
 };
-const TIME = 120;
+const TIME = "2d";
 const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
     const accessToken = await JWT.sign(payload, publicKey, {

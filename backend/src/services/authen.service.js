@@ -15,7 +15,7 @@ const Email = require("../utils/email");
 const generateOTPConfig = require("../utils/generateOTP.config");
 const JWT = require("jsonwebtoken");
 const EXPIRES_TIME = 10 * 60 * 1000;
-const TIME = 120;
+const TIME = "2d";
 
 class AuthenService {
   static resetPassword = async ({
