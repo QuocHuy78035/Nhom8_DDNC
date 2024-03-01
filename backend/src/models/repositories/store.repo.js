@@ -6,7 +6,7 @@ const {
 const storeModel = require("../store.model");
 
 const findAllStores = async ({
-  sort = "ctime",
+  sort = "createdAt",
   categoriesId,
   search,
   unselect = [],

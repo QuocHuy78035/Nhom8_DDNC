@@ -2,11 +2,12 @@
 const { Schema, model } = require("mongoose");
 const COLLECTION_NAME = "Stores";
 const DOCUMENT_NAME = "Store";
-
+const default_image =
+  "https://firebasestorage.googleapis.com/v0/b/ddnangcao-project.appspot.com/o/stores%2Fdefault.jpg?alt=media&token=8d584f4b-c462-4d88-84e8-814c4803e410";
 const storeSchema = new Schema(
   {
     name: { type: String },
-    image: { type: String, default: "" },
+    image: { type: String, default: default_image },
     address: { type: String },
     rating: {
       type: Number,
@@ -16,6 +17,7 @@ const storeSchema = new Schema(
     },
     time_open: { type: String },
     time_close: { type: String },
+    vendor: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );

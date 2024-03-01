@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: { type: String, default: default_image },
     address: { type: String },
+    mobile: { type: String },
     favoriteFoods: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Food" }],
       default: [],

@@ -10,7 +10,7 @@ const food = require("../food.model");
 const findAllFoods = async ({
   unselect = [],
   filter = {},
-  sort = "ctime",
+  sort = "createdAt",
   search,
 }) => {
   let sortBy = Object.fromEntries([sort].map((val) => [val, -1]));

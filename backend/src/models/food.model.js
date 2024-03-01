@@ -2,14 +2,15 @@
 const { Schema, model } = require("mongoose");
 const COLLECTION_NAME = "Foods";
 const DOCUMENT_NAME = "Food";
-
+const default_image =
+  "https://firebasestorage.googleapis.com/v0/b/ddnangcao-project.appspot.com/o/foods%2Fdefault.jpg?alt=media&token=9853e20c-19a6-4091-8ec2-e56032043914";
 const foodSchema = new Schema(
   {
     name: {
       type: String,
       required: [true, "Please fill in the name of the product!"],
     },
-    image: { type: String, default: "" },
+    image: { type: String, default: default_image },
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
