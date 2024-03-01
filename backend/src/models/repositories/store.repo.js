@@ -31,10 +31,10 @@ const findAllStores = async ({
       },
     },
     {
-      $project: { foods: 0, ...getUnselectData(unselect) },
+      $sort: sortBy,
     },
     {
-      $sort: sortBy,
+      $project: { foods: 0, ...getUnselectData(unselect) },
     },
   ]);
   if (categoriesId) {
