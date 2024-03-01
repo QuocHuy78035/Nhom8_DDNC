@@ -102,7 +102,8 @@ const getAllComments = async ({
     .find(removeUndefinedInObject({ ...filter, food: foodId }))
     .select(getSelectData(select))
     .sort(sortBy)
-    .populate({ path: "user", select: { name: 1, avatar: 1 } });
+    .populate({ path: "user", select: { name: 1, avatar: 1 } })
+    .lean();
 };
 
 const likeComment = async ({ commentId, userId }) => {
