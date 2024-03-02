@@ -13,31 +13,32 @@ const findAllStores = async ({
   unselect = [],
 }) => {
   let sortBy = Object.fromEntries([sort].map((val) => [val, -1]));
-  let stores = await storeModel.aggregate([
-    { $match: { name: { $regex: search || "", $options: "i" } } },
-    {
-      $lookup: {
-        from: "Foods",
-        localField: "_id",
-        foreignField: "store",
-        as: "foods",
+  let stores = await storeModel
+    .aggregate([
+      { $match: { name: { $regex: search || "", $options: "i" } } },
+      {
+        $lookup: {
+          from: "Foods",
+          localField: "_id",
+          foreignField: "store",
+          as: "foods",
+        },
       },
-    },
-    {
-      $lookup: {
-        from: "Categories",
-        localField: "foods.category",
-        foreignField: "_id",
-        as: "categories",
+      {
+        $lookup: {
+          from: "Categories",
+          localField: "foods.category",
+          foreignField: "_id",
+          as: "categories",
+        },
       },
-    },
-    {
-      $sort: sortBy,
-    },
-    {
-      $project: { foods: 0, ...getUnselectData(unselect) },
-    },
-  ]);
+      {
+        $sort: sortBy,
+      },
+      {
+        $project: { foods: 0, ...getUnselectData(unselect) },
+      },
+    ]);
   if (categoriesId) {
     stores = stores.filter((store) => {
       const categoriesStore = store.categories.map((category) =>

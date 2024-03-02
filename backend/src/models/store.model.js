@@ -17,10 +17,18 @@ const storeSchema = new Schema(
     },
     time_open: { type: String },
     time_close: { type: String },
-    vendor: { type: Schema.Types.ObjectId, ref: "User"},
+    vendor: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );
+
+storeSchema.post("aggregate", function (docs) {
+  docs.forEach((doc) => {
+    doc["rating"] = doc["rating"].toFixed(1);
+    console.log(doc["rating"]);
+  });
+  return docs;
+});
 
 storeSchema.post("find", function (docs) {
   docs.forEach((doc) => {

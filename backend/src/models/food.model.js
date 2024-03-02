@@ -47,6 +47,13 @@ foodSchema.post("find", function (docs) {
   });
   return docs;
 });
+foodSchema.post("aggregate", function (docs) {
+  docs.forEach((doc) => {
+    doc["rating"] = doc["rating"].toFixed(1);
+    console.log(doc["rating"]);
+  });
+  return docs;
+});
 
 //Export the model
 module.exports = model(DOCUMENT_NAME, foodSchema);
