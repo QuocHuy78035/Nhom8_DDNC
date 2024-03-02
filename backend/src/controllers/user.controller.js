@@ -40,6 +40,45 @@ class UserController {
       metadata: { result },
     }).send(res);
   };
+
+  addStoreToFavorite = async (req, res, next) => {
+    const result = await UserService.addStoreToFavorite({
+      userId: req.user.userId,
+      store: req.body.store,
+    });
+    return new CREATED({
+      message: "Add to favorite successfully!",
+      metadata: result,
+    }).send(res);
+  };
+  getFavoriteStores = async (req, res, next) => {
+    const result = await UserService.getFavoriteStores({
+      userId: req.user.userId,
+    });
+    return new OK({
+      message: "Get favorite foods successfully!",
+      metadata: result,
+    }).send(res);
+  };
+  deleteFavoriteStore = async (req, res, next) => {
+    await UserService.deleteFavoriteStore({
+      userId: req.user.userId,
+      store: req.params.store,
+    });
+    return new OK({
+      message: "Delete favorite stores successfully!",
+    }).send(res);
+  };
+  checkStoreIsFavorite = async (req, res, next) => {
+    const result = await UserService.checkStoreIsFavorite({
+      userId: req.user.userId,
+      store: req.params.store,
+    });
+    return new OK({
+      message: "Check store is favorite successfully!",
+      metadata: { result },
+    }).send(res);
+  };
 }
 
 module.exports = new UserController();

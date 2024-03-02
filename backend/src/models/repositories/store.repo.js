@@ -3,6 +3,7 @@ const {
   getUnselectData,
   convertToObjectId,
 } = require("../../utils");
+const UploadFiles = require("../../utils/uploadFile");
 const storeModel = require("../store.model");
 
 const findAllStores = async ({
@@ -60,8 +61,23 @@ const findTop10RatingStores = async ({ unselect = [] }) => {
 const findStore = async ({ id, unselect = [] }) => {
   return await storeModel.findById(id).select(getUnselectData(unselect));
 };
-const createStore = async (data) => {
-  return await storeModel.create(data);
+const createStore = async (
+  { name, address, time_open, time_close, rating },
+  file
+) => {
+  const image = await new UploadFiles(
+    "stores",
+    "image",
+    file
+  ).uploadFileAndDownloadURL();
+  return await storeModel.create({
+    name,
+    image,
+    address,
+    time_open,
+    time_close,
+    rating,
+  });
 };
 
 module.exports = {

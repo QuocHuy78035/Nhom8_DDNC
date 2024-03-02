@@ -4,6 +4,7 @@ const {
   getUnselectData,
   removeUndefinedInObject,
 } = require("../../utils");
+const UploadFiles = require("../../utils/uploadFile");
 
 const food = require("../food.model");
 
@@ -39,8 +40,13 @@ const findAllFoodsByCategory = async (categoryId) => {
   return await food.find({ category: convertToObjectId(categoryId) });
 };
 
-const createFood = async (data) => {
-  return await food.create(data);
+const createFood = async ({ name, category, store, price, left }, file) => {
+  const image = await new UploadFiles(
+    "foods",
+    "image",
+    file
+  ).uploadFileAndDownloadURL();
+  return await food.create({ name, image, category, store, price, left });
 };
 
 module.exports = { findAllFoods, findFood, createFood, findAllFoodsByCategory };

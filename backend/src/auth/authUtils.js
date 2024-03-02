@@ -2,7 +2,6 @@
 const JWT = require("jsonwebtoken");
 const { asyncHandler } = require("../helpers/asyncHandler");
 const { AuthFailureError, NotFoundError } = require("../core/error.response");
-const keytokenModel = require("../models/keytoken.model");
 const { findByUserId } = require("../services/keytoken.service");
 const HEADER = {
   API_KEY: "x-api-key",
@@ -10,7 +9,7 @@ const HEADER = {
   AUTHORIZATION: "authorization",
   REFRESHTOKEN: "x-rtoken-id",
 };
-const TIME = 120;
+const TIME = 1000 * 60 * 60 * 2;
 const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
     const accessToken = await JWT.sign(payload, publicKey, {

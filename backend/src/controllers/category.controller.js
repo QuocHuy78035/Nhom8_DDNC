@@ -17,7 +17,7 @@ class CategoryController {
     }).send(res);
   };
   createCategory = async (req, res, next) => {
-    const result = await CategoryService.createCategory(req.body);
+    const result = await CategoryService.createCategory(req.body, req.file);
     return new CREATED({
       message: "Create Category successfully!",
       metadata: result,

@@ -17,10 +17,18 @@ const storeSchema = new Schema(
     },
     time_open: { type: String },
     time_close: { type: String },
-    vendor: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    vendor: { type: Schema.Types.ObjectId, ref: "User"},
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );
+
+storeSchema.post("find", function (docs) {
+  docs.forEach((doc) => {
+    doc["rating"] = doc["rating"].toFixed(1);
+    console.log(doc["rating"]);
+  });
+  return docs;
+});
 
 //Export the model
 module.exports = model(DOCUMENT_NAME, storeSchema);

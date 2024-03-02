@@ -36,9 +36,47 @@ const checkFoodIsFavorite = async ({ userId, food }) => {
   return user.favoriteFoods.includes(food);
 };
 
+const addStoreToFavorite = async ({ userId, store }) => {
+  const user = await userModel.findById(userId);
+  if (user.favoriteStores.includes(store)) {
+    throw new BadRequestError("This food is already in your favorite list.");
+  }
+  return await userModel.findByIdAndUpdate(
+    userId,
+    {
+      $addToSet: { favoriteStores: convertToObjectId(store) },
+    },
+    { new: true }
+  );
+};
+
+const getFavoriteStores = async ({ userId }) => {
+  const user = await userModel.findById(userId).populate("favoriteStores");
+  return user.favoriteStores;
+};
+
+const deleteFavoriteStore = async ({ userId, store }) => {
+  const user = await userModel.findById(userId);
+  if (!user.favoriteStores.includes(store)) {
+    throw new BadRequestError("This food is not in your favorite list!");
+  }
+  return await userModel.findByIdAndUpdate(userId, {
+    $pull: { favoriteStores: convertToObjectId(store) },
+  });
+};
+
+const checkStoreIsFavorite = async ({ userId, store }) => {
+  const user = await userModel.findById(userId);
+  return user.favoriteStores.includes(store);
+};
+
 module.exports = {
   addFoodToFavorite,
   getFavoriteFoods,
   deleteFavoriteFood,
   checkFoodIsFavorite,
+  addStoreToFavorite,
+  getFavoriteStores,
+  deleteFavoriteStore,
+  checkStoreIsFavorite,
 };

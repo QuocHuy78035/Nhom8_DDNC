@@ -27,20 +27,18 @@ class StoreService {
   }
   static async createStore({
     name,
-    image,
     address,
     time_open,
     time_close,
     rating,
-  }) {
+  }, file) {
     return await createStore({
       name,
-      image,
       address,
       time_open,
       time_close,
       rating,
-    });
+    }, file);
   }
 }
 

@@ -14,7 +14,7 @@ class FoodController {
       metadata: result,
     }).send(res);
   };
-  
+
   findFood = async (req, res, next) => {
     const result = await FoodService.findFood(req.params.id);
     return new OK({
@@ -24,7 +24,7 @@ class FoodController {
   };
 
   createFood = async (req, res, next) => {
-    const result = await FoodService.createFood(req.body);
+    const result = await FoodService.createFood(req.body, req.file);
     return new CREATED({
       message: "Create food successfully!",
       metadata: result,

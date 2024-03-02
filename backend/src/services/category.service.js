@@ -11,11 +11,10 @@ class CategoryService {
   static async findCategory(id) {
     return await findCategory({ id, select: ["_id", "name", "image"] });
   }
-  static async createCategory({ name, image }) {
+  static async createCategory({ name }, file) {
     return await createCategory({
       name,
-      image,
-    });
+    }, file);
   }
 }
 

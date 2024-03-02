@@ -30,7 +30,7 @@ class StoreController {
     }).send(res);
   };
   createStore = async (req, res, next) => {
-    const result = await StoreService.createStore(req.body);
+    const result = await StoreService.createStore(req.body, req.file);
     return new CREATED({
       message: "Create store successfully!",
       metadata: result,

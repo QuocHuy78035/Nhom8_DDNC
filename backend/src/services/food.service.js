@@ -19,8 +19,8 @@ class FoodService {
       unselect: ["createdAt", "updatedAt", "__v"],
     });
   }
-  static async createFood({ name, image, category, store, price, left }) {
-    return await createFood({ name, image, category, store, price, left });
+  static async createFood({ name, category, store, price, left }, file) {
+    return await createFood({ name, category, store, price, left }, file);
   }
 }
 

@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema(
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Food" }],
       default: [],
     },
+    favoriteStores: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Store" }],
+      default: [],
+    },
     password: {
       type: String,
       required: [true, "Please provide your password!"],
