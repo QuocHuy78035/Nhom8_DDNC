@@ -17,7 +17,10 @@ const addFoodToFavorite = async ({ userId, food }) => {
 };
 
 const getFavoriteFoods = async ({ userId }) => {
-  const user = await userModel.findById(userId).populate("favoriteFoods");
+  const user = await userModel
+    .findById(userId)
+    .populate("favoriteFoods")
+    .lean();
   return user.favoriteFoods;
 };
 
@@ -51,7 +54,7 @@ const addStoreToFavorite = async ({ userId, store }) => {
 };
 
 const getFavoriteStores = async ({ userId }) => {
-  const user = await userModel.findById(userId).populate("favoriteStores");
+  const user = await userModel.findById(userId).populate("favoriteStores").lean();
   return user.favoriteStores;
 };
 
