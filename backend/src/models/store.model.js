@@ -18,6 +18,8 @@ const storeSchema = new Schema(
     time_open: { type: String },
     time_close: { type: String },
     vendor: { type: Schema.Types.ObjectId, ref: "User" },
+    longtitude: { type: Number },
+    latitude: { type: Number },
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );

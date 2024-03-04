@@ -3,11 +3,12 @@ const StoreService = require("../services/store.service");
 
 class StoreController {
   findAllStores = async (req, res, next) => {
-    const { sort, categories, search } = req.query;
+    const { sort, categories, search, coordinate } = req.query;
     const result = await StoreService.findAllStores({
       categories,
       search,
       sort,
+      coordinate,
     });
     return new OK({
       message: "Find all stores successfully!",
@@ -22,8 +23,10 @@ class StoreController {
     }).send(res);
   };
   findStore = async (req, res, next) => {
-    console.log(req.params.id);
-    const result = await StoreService.findStore(req.params.id);
+    const result = await StoreService.findStore(
+      req.params.id,
+      req.query.coordinate
+    );
     return new OK({
       message: "Find store successfully!",
       metadata: result,

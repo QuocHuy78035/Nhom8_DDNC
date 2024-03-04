@@ -6,12 +6,13 @@ const {
 } = require("../models/repositories/store.repo");
 
 class StoreService {
-  static async findAllStores({ sort, categories, search }) {
+  static async findAllStores({ sort, categories, search, coordinate }) {
     return await findAllStores({
       unselect: ["createdAt", "updatedAt", "__v"],
       categoriesId: categories,
       search,
       sort,
+      coordinate,
     });
   }
   static async findTop10RatingStores() {
@@ -19,26 +20,29 @@ class StoreService {
       unselect: ["createdAt", "updatedAt", "__v"],
     });
   }
-  static async findStore(id) {
+  static async findStore(id, coordinate) {
     return await findStore({
       id,
       unselect: ["createdAt", "updatedAt", "__v"],
+      coordinate,
     });
   }
-  static async createStore({
-    name,
-    address,
-    time_open,
-    time_close,
-    rating,
-  }, file) {
-    return await createStore({
-      name,
-      address,
-      time_open,
-      time_close,
-      rating,
-    }, file);
+  static async createStore(
+    { name, address, time_open, time_close, rating, longtitude, latitude },
+    file
+  ) {
+    return await createStore(
+      {
+        name,
+        address,
+        time_open,
+        time_close,
+        rating,
+        longtitude,
+        latitude,
+      },
+      file
+    );
   }
 }
 
