@@ -25,7 +25,6 @@ const commentSchema = new Schema(
 commentSchema.post("find", function (docs) {
   docs.forEach((doc) => {
     doc["rating"] = doc["rating"].toFixed(1);
-    console.log(doc["rating"]);
   });
   return docs;
 });

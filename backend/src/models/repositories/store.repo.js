@@ -66,11 +66,25 @@ const findAllStores = async ({
   return stores;
 };
 
-const findTop10RatingStores = async ({ unselect = [] }) => {
-  return await storeModel
+const findTop10RatingStores = async ({ unselect = [], coordinate }) => {
+  const [long, lat] = coordinate.split(",");
+  if (!long || !lat) {
+    throw new BadRequestError("Longtitude or latitude must be provided!");
+  }
+  const stores = await storeModel
     .find({ rating: { $gt: 4.5 } })
     .limit(10)
-    .select(getUnselectData(unselect));
+    .select(getUnselectData(unselect))
+    .lean();
+  stores.forEach((store) => {
+    store["distance"] = getDistanceFromLatLonInKm(
+      lat,
+      long,
+      store["latitude"],
+      store["longtitude"]
+    ).toFixed(1);
+  });
+  return stores;
 };
 
 const findStore = async ({

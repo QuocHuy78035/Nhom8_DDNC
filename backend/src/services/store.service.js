@@ -15,9 +15,10 @@ class StoreService {
       coordinate,
     });
   }
-  static async findTop10RatingStores() {
+  static async findTop10RatingStores(coordinate) {
     return await findTop10RatingStores({
       unselect: ["createdAt", "updatedAt", "__v"],
+      coordinate
     });
   }
   static async findStore(id, coordinate) {

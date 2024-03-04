@@ -16,7 +16,9 @@ class StoreController {
     }).send(res);
   };
   findTop10RatingStores = async (req, res, next) => {
-    const result = await StoreService.findTop10RatingStores();
+    const result = await StoreService.findTop10RatingStores(
+      req.query.coordinate
+    );
     return new OK({
       message: "Find top 10 rating stores successfully!",
       metadata: result,
