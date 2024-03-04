@@ -15,6 +15,9 @@ const findAllStores = async ({
   unselect = [],
   coordinate, // long,lat
 }) => {
+  if (!["createdAt", "rating", "distance"].includes(sort)) {
+    throw new BadRequestError("Sort is invalid!");
+  }
   const [long, lat] = coordinate.split(",");
   if (!long || !lat) {
     throw new BadRequestError("Longtitude or latitude must be provided!");
@@ -63,6 +66,9 @@ const findAllStores = async ({
       store["longtitude"]
     ).toFixed(1);
   });
+  if (sort === "distance") {
+    stores.sort((a, b) => a.distance - b.distance);
+  }
   return stores;
 };
 
