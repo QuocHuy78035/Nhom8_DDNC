@@ -1,8 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ddnangcao_project/features/main/views/restaurant_order.dart';
+import 'package:ddnangcao_project/features/search/views/search_screen.dart';
+import 'package:ddnangcao_project/providers/home_provider.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'store_category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +19,75 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Position? _currentLocation;
+  late bool servicePermission = true;
+  late LocationPermission permission;
+
+  String currentAddress = '';
+
+  Future<void> _getCurrentLocationAndAddress() async {
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    try {
+      _currentLocation = await _getCurrentLocation();
+      sharedPreferences.setDouble("latitude", _currentLocation!.latitude);
+      sharedPreferences.setDouble("longitude", _currentLocation!.longitude);
+      await _getAddress();
+    } catch (e) {
+      print("Error getting current location and address: $e");
+    }
+  }
+
+  Future<Position> _getCurrentLocation() async {
+    if (!servicePermission) {
+      print("Service disabled");
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
+  Future<void> _getAddress() async {
+    try {
+      List<Placemark> placesmarks = await placemarkFromCoordinates(
+          _currentLocation!.latitude, _currentLocation!.longitude);
+      if (placesmarks.isNotEmpty ) {
+        Placemark placemark = placesmarks[0];
+        if(mounted){
+          setState(() {
+            currentAddress =
+            "${placemark.street}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}, ";
+          });
+        }
+      } else {
+        setState(() {
+          currentAddress = "Không thể tìm thấy địa chỉ.";
+        });
+      }
+    } catch (e) {
+      print("Error getting address: $e");
+      setState(() {
+        currentAddress = "Lỗi khi lấy địa chỉ.";
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeState();
+    Provider.of<HomeProvider>(context, listen: false).getAllCategory();
+  }
+
+  Future<void> _initializeState() async {
+    try {
+      await _getCurrentLocationAndAddress();
+      Provider.of<HomeProvider>(context, listen: false).getAllCategory();
+    } catch (e) {
+      print("Error initializing state: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final myBanner = [
@@ -22,7 +98,9 @@ class _HomeScreenState extends State<HomeScreen> {
       Image.asset("assets/images/banners/Banner.png"),
     ];
     return Scaffold(
-      appBar: const MyAppBar(),
+      appBar: MyAppBar(
+        currentLocation: currentAddress,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -43,9 +121,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       enlargeCenterPage: true,
                       onPageChanged: (index, reason) {}),
                 ),
-                const Column(
+                Column(
                   children: [
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
@@ -57,63 +135,79 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
+                    Consumer<HomeProvider>(builder: (context, value, child) {
+                      if (value.listCate.isEmpty) {
+                        return const Center(
+                          child: Center(
+                            child: Text("No Have Item"),
                           ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Snack",
-                            imageUrl: "assets/images/categories/snack.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Seafood",
-                            imageUrl: "assets/images/categories/seafood.png",
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Category(
-                            categoryName: "Dessert",
-                            imageUrl: "assets/images/categories/dessert.png",
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
+                        );
+                      } else {
+                        if (value.isLoading) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: 70,
+                              width: GetSize.getWidth(context),
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: value.listCate.length,
+                                  itemBuilder: (context, index) {
+                                    return const CardSkeltonHomeScreen();
+                                  }),
+                            ),
+                          );
+                        } else {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: 70,
+                              width: GetSize.getWidth(context),
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: value.listCate.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              FoodCategoryScreen(
+                                            cateName:
+                                                "${value.listCate[index].cateName}",
+                                            caterId:
+                                                "${value.listCate[index].cateId}",
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        right:
+                                            index == value.listCate.length - 1
+                                                ? 30
+                                                : 0,
+                                      ),
+                                      child: Category(
+                                        categoryName:
+                                            "${value.listCate[index].cateName}",
+                                        imageUrl:
+                                            "${value.listCate[index].image}",
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    }),
+                    const SizedBox(
                       height: 30,
                     ),
                   ],
@@ -125,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Fastest delivery 🔥",
+                          "Top Rating Restaurant🔥",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -135,12 +229,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {},
                           child: Container(
                             height: 30,
-                            width: 60,
+                            width: 65,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 color: ColorLib.secondaryColor),
-                            child: const Center(
-                              child: Text(
+                            child: TextButton(
+                              onPressed: () {},
+                              child: const Text(
                                 "See all",
                                 style: TextStyle(
                                     fontSize: 12,
@@ -164,12 +259,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const RestaurantOrder()));
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => const RestaurantOrderScreen(),
+                              //   ),
+                              // );
                             },
-                            child: Row(
+                            child: const Row(
                               children: [
                                 Food(),
                                 SizedBox(
@@ -181,7 +278,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                     ),
-                    Text("123")
                   ],
                 )
               ],
@@ -273,7 +369,7 @@ class Food extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("€3,00")
+                            const Text("€3,00")
                           ],
                         ),
                         Row(
@@ -286,7 +382,7 @@ class Food extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("40-50min")
+                            const Text("40-50min")
                           ],
                         ),
                         Row(
@@ -299,7 +395,7 @@ class Food extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Text("4.5")
+                            const Text("4.5")
                           ],
                         )
                       ],
@@ -324,20 +420,47 @@ class Category extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundImage: AssetImage(imageUrl),
+        Column(
+          children: [
+            Container(
+              height: 45,
+              width: 45,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorLib.secondaryColor,
+              ),
+              //width: GetSize.getWidth(context),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: imageUrl,
+                    placeholder: (context, url) => const SizedBox(
+                          height: 10,
+                          child: CircularProgressIndicator(),
+                        ),
+                    errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.error),
+                        )),
+              ),
+            ),
+            Text(categoryName)
+          ],
         ),
-        Text(categoryName)
+        const SizedBox(
+          width: 20,
+        )
       ],
     );
   }
 }
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MyAppBar({super.key});
+  final String currentLocation;
+
+  const MyAppBar({super.key, required this.currentLocation});
 
   @override
   Size get preferredSize => const Size.fromHeight(100);
@@ -353,46 +476,57 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           SizedBox(
             height: GetSize.getHeight(context) * 0.06,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  Icon(Icons.location_on_outlined),
-                  SizedBox(
+                  const Icon(Icons.location_on_outlined),
+                  const SizedBox(
                     width: 10,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Current location",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      Text(
-                        "TP.HCM",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                      SizedBox(
+                        width: GetSize.getWidth(context) * 0.7,
+                        child: Text(
+                          currentLocation,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       )
                     ],
                   ),
                 ],
               ),
-              Icon(Icons.notifications_none_outlined)
+              const Icon(Icons.notifications_none_outlined)
             ],
           ),
           const SizedBox(
             height: 20,
           ),
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SearchScreen(),
+                ),
+              );
+            },
             child: Container(
-              height: 35,
+              height: 40,
               decoration: BoxDecoration(
                 border: Border.all(color: ColorLib.primaryColor),
                 borderRadius: const BorderRadius.all(
@@ -424,6 +558,37 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CardSkeltonHomeScreen extends StatelessWidget {
+  const CardSkeltonHomeScreen({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      children: [
+        Column(
+          children: [
+            CircleSkeleton(
+              size: 50,
+            ),
+            SizedBox(
+              height: 4,
+            ),
+            Skeleton(
+              height: 16,
+              width: 50,
+            )
+          ],
+        ),
+        SizedBox(
+          width: 20,
+        )
+      ],
     );
   }
 }

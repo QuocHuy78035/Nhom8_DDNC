@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1073977275866",
+    "project_id": "ddnangcao-project",
+    "storage_bucket": "ddnangcao-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073977275866:android:e36bfde65e7f5bac87bce3",
+        "android_client_info": {
+          "package_name": "com.example.ddnangcao_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIjYuc79Euk15fhu6rZ0evlG7RNphdoJM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
