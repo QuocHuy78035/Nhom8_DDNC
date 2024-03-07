@@ -88,7 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Error initializing state: $e");
     }
   }
-//12333
   @override
   Widget build(BuildContext context) {
     final myBanner = [
