@@ -16,7 +16,6 @@ class UserModel {
       refreshToken = json['refreshToken'];
     }catch(e){
       print("Error parsing user model: $e");
-
     }
   }
 
@@ -28,26 +27,5 @@ class UserModel {
     data['accessToken'] = accessToken;
     data['refreshToken'] = refreshToken;
     return data;
-  }
-
-//cho sqlite
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'accessToken': accessToken,
-      'refreshToken': refreshToken,
-    };
-  }
-
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      id: map['id'],
-      name: map['name'],
-      email: map['email'],
-      accessToken: map['accessToken'],
-      refreshToken: map['refreshToken'],
-    );
   }
 }

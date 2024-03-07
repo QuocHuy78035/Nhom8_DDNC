@@ -1,4 +1,4 @@
-import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
+import 'package:ddnangcao_project/features/food/views/detail_food_screen.dart';
 import 'package:ddnangcao_project/models/food.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
@@ -170,9 +170,10 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                color: backgroundColor[1],
-                                borderRadius: BorderRadius.circular(10)),
+                              border: Border.all(color: Colors.grey),
+                              color: backgroundColor[1],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             child: Text(
                               "Rating",
                               style: TextStyle(color: textColor[1]),
@@ -227,7 +228,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 10, horizontal: 20),
                                 color: Colors.black12.withOpacity(0.05),
-                                height: GetSize.getHeight(context)*.77,
+                                height: GetSize.getHeight(context) * .77,
                                 width: GetSize.getWidth(context),
                                 child: ListView.builder(
                                   itemCount: listFood.length,
@@ -241,16 +242,17 @@ class _SearchScreenState extends State<SearchScreen> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     DetailFoodScreen(
-                                                      foodName:
+                                                  foodName:
                                                       listFood[index].name ??
                                                           "",
-                                                      price:
+                                                  price:
                                                       listFood[index].price ??
                                                           0,
-                                                      image: listFood[index].image,
-                                                      foodId:
+                                                  image: listFood[index].image,
+                                                  foodId:
                                                       listFood[index].id ?? "",
-                                                    ),
+                                                      storeName: '',
+                                                ),
                                               ),
                                             );
                                           },
@@ -279,7 +281,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 height: GetSize.getHeight(context) * 0.85,
                                 width: GetSize.getWidth(context),
                                 child: ListView.separated(
-                                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                                  keyboardDismissBehavior:
+                                      ScrollViewKeyboardDismissBehavior.onDrag,
                                   itemCount: listFood.length,
                                   itemBuilder: (context, index) =>
                                       const NewsCardSkelton(),
@@ -305,7 +308,7 @@ class FoodSearch extends StatelessWidget {
   final String? name;
   final String? image;
   final int? price;
-  final int? rating;
+  final String? rating;
   final int? left;
   final int? sold;
   final String? id;

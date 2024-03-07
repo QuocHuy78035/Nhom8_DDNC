@@ -42,6 +42,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
+
   const MyApp({super.key});
 
   @override
@@ -51,6 +52,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final AuthController authController = AuthController();
 
+
   @override
   void initState() {
     super.initState();
@@ -59,8 +61,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    print("Token + ${Provider.of<UserProvider>(context).user.accessToken}");
-    print("User Id + ${Provider.of<UserProvider>(context).user.id}");
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       //home: Provider.of<UserProvider>(context).user.accessToken != ""  ? CustomerHomeScreen() : LoginScreen(),
-     home: const SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ddnangcao_project/features/chat/views/chat_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -33,39 +32,39 @@ class _ChatScreenState extends State<ChatScreen> {
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(
+          return const Center(
             child: Text("Error"),
           );
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
         return ListView(
-          children: snapshot.data!.docs
+          children:  snapshot.data?.docs
               .map<Widget>((e) => _buildUserListItem(e))
-              .toList(),
+              .toList() ?? [],
         );
       },
     );
   }
 
   Widget _buildUserListItem(DocumentSnapshot documentSnapshot) {
-    Map<String, dynamic> data =
-        documentSnapshot.data()! as Map<String, dynamic>;
+    Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+
 
     //if (FirebaseAuth.instance.currentUser!.email != data['email']) {
-    if (data['uid'] == widget.storeId) {
-      print("Email la: ${FirebaseAuth.instance.currentUser!.email}");
-      print('data email: ${data['email']}');
+    if (data?['uid'] == widget.storeId) {
+      // print("Email la: ${FirebaseAuth.instance.currentUser!.email}");
+      // print('data email: ${data?['email']}');
       return ListTile(
-        title: Text("${data['email']}"),
+        title: Text("${data?['email']}"),
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ChatPage(
-                receiverUserEmail: data['email'],
-                receiverUserId: data['uid'],
+                receiverUserEmail: data?['email'],
+                receiverUserId: data?['uid'],
               ),
             ),
           );

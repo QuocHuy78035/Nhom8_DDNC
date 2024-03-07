@@ -1,30 +1,35 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
 import 'package:ddnangcao_project/features/chat/views/chat_screen.dart';
-import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
+import 'package:ddnangcao_project/features/food/views/detail_food_screen.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../providers/restaurant_provider.dart';
 import '../../../utils/color_lib.dart';
 import 'store_category_screen.dart';
 import 'package:provider/provider.dart';
 
 class RestaurantOrderScreen extends StatefulWidget {
+  final String image;
   final String name;
   final String storeId;
   final String address;
-  final double rating;
+  final String rating;
   final String timeOpen;
   final String timeClose;
+  final String distance;
 
-  const RestaurantOrderScreen(
-      {super.key,
-      required this.name,
-      required this.address,
-      required this.rating,
-      required this.timeOpen,
-      required this.timeClose,
-      required this.storeId});
+  const RestaurantOrderScreen({super.key,
+    required this.name,
+    required this.address,
+    required this.rating,
+    required this.timeOpen,
+    required this.timeClose,
+    required this.storeId,
+    required this.distance,
+    required this.image});
 
   @override
   State<RestaurantOrderScreen> createState() => _RestaurantOrderScreenState();
@@ -43,6 +48,8 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
   void initState() {
     Provider.of<RestaurantProvider>(context, listen: false)
         .getFoodByResId(widget.storeId);
+    Provider.of<RestaurantProvider>(context, listen: false)
+        .checkFavourite(widget.storeId);
     scrollController.addListener(() {
       if (scrollController.position.pixels >= 48) {
         if (showHeader) return;
@@ -80,9 +87,21 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          Image.asset(
-                            "assets/images/foods/food01.png",
+                          Container(
+                            height: GetSize.getHeight(context) / 4,
+                            color: ColorLib.secondaryColor,
                             width: GetSize.getWidth(context),
+                            child: CachedNetworkImage(
+                                fit: BoxFit.fill,
+                                imageUrl: widget.image,
+                                placeholder: (context, url) =>
+                                const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                const Center(
+                                  child: Icon(Icons.error),
+                                )),
                           ),
                           Positioned(
                             top: 30,
@@ -158,25 +177,46 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                     const SizedBox(
                                       width: 6,
                                     ),
-                                    const Row(
+                                    Row(
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.access_time_outlined,
                                           size: 18,
                                         ),
-                                        SizedBox(
-                                          width: 2,
+                                        const SizedBox(
+                                          width: 4,
                                         ),
-                                        Text('17 min')
+                                        Text('${(double.parse(widget.distance)/30*60).toStringAsFixed(0)} min')
                                       ],
                                     ),
                                   ],
                                 ),
-                                IconButton(
-                                  onPressed: ()  {},
-                                  icon: const Icon(Icons.favorite_outline),
-                                  color: ColorLib.primaryColor,
-                                )
+                                Consumer<RestaurantProvider>(
+                                    builder: (context, value, child) {
+                                      return IconButton(
+                                        onPressed: () {
+                                          if (value.isFavourite == false) {
+                                            value.addFavouriteRes(
+                                                widget.storeId, context);
+                                          } else
+                                          if (value.isFavourite == true) {
+                                            value.deleteFavouriteRes(
+                                                widget.storeId, context);
+                                          }
+                                        },
+                                        icon: value.isFavourite == false
+                                            ? const Icon(
+                                          Icons.favorite_outline,
+                                          size: 30,
+                                          color: ColorLib.primaryColor,
+                                        )
+                                            : const Icon(
+                                          Icons.favorite,
+                                          size: 30,
+                                          color: ColorLib.primaryColor,
+                                        ),
+                                      );
+                                    })
                               ],
                             ),
                           ),
@@ -186,12 +226,12 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                             children: [
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
+                                const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   children: [
                                     Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
@@ -204,7 +244,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                             ),
                                             const Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   "Standard Delivery",
@@ -247,7 +287,8 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                           width: 10,
                                         ),
                                         Text(
-                                            "${widget.timeOpen} - ${widget.timeClose}"),
+                                            "${widget.timeOpen} - ${widget
+                                                .timeClose}"),
                                       ],
                                     ),
                                   ],
@@ -262,7 +303,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
+                                const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -274,119 +315,130 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                     ),
                                     Consumer<RestaurantProvider>(
                                         builder: (context, value, child) {
-                                      if (value.listFood.isEmpty) {
-                                        return const Center(
-                                          child: Center(
-                                            child: Text("No Have Item"),
-                                          ),
-                                        );
-                                      } else {
-                                        if (value.isLoading) {
-                                          return Column(
-                                            children: [
-                                              ListView.separated(
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount:
-                                                    value.listFood.length,
-                                                itemBuilder: (context, index) =>
-                                                    const CardSkeltonOrderRestaurant(),
-                                                separatorBuilder: (context,
-                                                        index) =>
-                                                    const SizedBox(height: 16),
+                                          if (value.listFood.length == 0) {
+                                            return const Center(
+                                              child: Center(
+                                                child: Text("No Have Item"),
                                               ),
-                                              const SizedBox(
-                                                height: 10,
-                                              )
-                                            ],
-                                          );
-                                        } else {
-                                          return ListView.builder(
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            shrinkWrap: true,
-                                            itemCount: value.listFood.length,
-                                            itemBuilder: (context, index) {
+                                            );
+                                          } else {
+                                            if (value.isLoading) {
                                               return Column(
                                                 children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              DetailFoodScreen(
-                                                            sold: value
-                                                                .listFood[index]
-                                                                .sold,
-                                                            left: value
-                                                                .listFood[index]
-                                                                .left,
-                                                            foodId: value
-                                                                    .listFood[
-                                                                        index]
-                                                                    .id ??
-                                                                "",
-                                                            foodName: value
-                                                                    .listFood[
-                                                                        index]
-                                                                    .name ??
-                                                                "",
-                                                            price: value
-                                                                    .listFood[
-                                                                        index]
-                                                                    .price ??
-                                                                0,
-                                                            image: value
-                                                                    .listFood[
-                                                                        index]
-                                                                    .image ??
-                                                                "",
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: FoodOfRestaurant(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          count += 1;
-                                                        });
-                                                      },
-                                                      sold: value
-                                                          .listFood[index].sold,
-                                                      left: value
-                                                          .listFood[index].left,
-                                                      name: value
-                                                              .listFood[index]
-                                                              .name ??
-                                                          "",
-                                                      index: index + 1,
-                                                      price: value
-                                                              .listFood[index]
-                                                              .price ??
-                                                          0,
-                                                      type: value
-                                                              .listFood[index]
-                                                              .category
-                                                              ?.cateName ??
-                                                          "",
-                                                      rating: value
-                                                              .listFood[index]
-                                                              .price ??
-                                                          0,
-                                                    ),
+                                                  ListView.separated(
+                                                    shrinkWrap: true,
+                                                    physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                    itemCount:
+                                                    value.listFood.length,
+                                                    itemBuilder: (context,
+                                                        index) =>
+                                                    const CardSkeltonOrderRestaurant(),
+                                                    separatorBuilder: (context,
+                                                        index) =>
+                                                    const SizedBox(height: 16),
                                                   ),
                                                   const SizedBox(
-                                                    height: 20,
+                                                    height: 10,
                                                   )
                                                 ],
                                               );
-                                            },
-                                          );
-                                        }
-                                      }
-                                    })
+                                            } else {
+                                              return ListView.builder(
+                                                physics:
+                                                const NeverScrollableScrollPhysics(),
+                                                shrinkWrap: true,
+                                                itemCount: value.listFood
+                                                    .length,
+                                                itemBuilder: (context, index) {
+                                                  return Column(
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (
+                                                                  context) =>
+                                                                  DetailFoodScreen(
+                                                                    storeName:
+                                                                    widget.name,
+                                                                    sold: value
+                                                                        .listFood[index]
+                                                                        .sold,
+                                                                    left: value
+                                                                        .listFood[index]
+                                                                        .left,
+                                                                    foodId: value
+                                                                        .listFood[
+                                                                    index]
+                                                                        .id ??
+                                                                        "",
+                                                                    foodName: value
+                                                                        .listFood[
+                                                                    index]
+                                                                        .name ??
+                                                                        "",
+                                                                    price: value
+                                                                        .listFood[
+                                                                    index]
+                                                                        .price ??
+                                                                        0,
+                                                                    image: value
+                                                                        .listFood[
+                                                                    index]
+                                                                        .image ??
+                                                                        "",
+                                                                  ),
+                                                            ),
+                                                          );
+                                                        },
+                                                        child: FoodOfRestaurant(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              count += 1;
+                                                            });
+                                                          },
+                                                          sold: value
+                                                              .listFood[index]
+                                                              .sold,
+                                                          left: value
+                                                              .listFood[index]
+                                                              .left,
+                                                          name: value
+                                                              .listFood[index]
+                                                              .name ??
+                                                              "",
+                                                          index: index + 1,
+                                                          price: NumberFormat
+                                                              .currency(
+                                                              locale:
+                                                              'vi_VN',
+                                                              symbol: '₫')
+                                                              .format(value
+                                                              .listFood[index]
+                                                              .price),
+                                                          type: value
+                                                              .listFood[index]
+                                                              .category
+                                                              ?.cateName ??
+                                                              "",
+                                                          rating: value
+                                                              .listFood[index]
+                                                              .price! +
+                                                              0.0,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 20,
+                                                      )
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          }
+                                        })
                                   ],
                                 ),
                               )
@@ -422,7 +474,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           QuerySnapshot<Map<String, dynamic>> snapshot =
-              await _firestore.collection('users').get();
+          await _firestore.collection('users').get();
           List<DocumentSnapshot<Map<String, dynamic>>> documentSnapshots =
               snapshot.docs;
           Map<String, dynamic>? data;
@@ -438,10 +490,11 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChatScreen(
-                storeId: widget.storeId,
-                storeName: widget.name,
-              ),
+              builder: (context) =>
+                  ChatScreen(
+                    storeId: widget.storeId,
+                    storeName: widget.name,
+                  ),
             ),
           );
         },
@@ -449,64 +502,64 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
       ),
       bottomSheet: count != 0
           ? BottomSheet(
-              onClosing: () {},
-              builder: (BuildContext context) {
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black12),
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
-                  ),
-                  height: 70,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Stack(
-                        children: [
-                          const Icon(
-                            Icons.shopping_cart,
-                            size: 60,
-                          ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: ColorLib.primaryColor),
-                              child: Text(
-                                "$count",
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      const Text(
-                        "Total: VND",
-                        style: TextStyle(
-                            fontSize: 18, color: ColorLib.primaryColor),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorLib.primaryColor),
-                          onPressed: () {},
-                          child: const Text(
-                            "Checkout",
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          ),
+        onClosing: () {},
+        builder: (BuildContext context) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black12),
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20)),
+            ),
+            height: 70,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Stack(
+                  children: [
+                    const Icon(
+                      Icons.shopping_cart,
+                      size: 60,
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: ColorLib.primaryColor),
+                        child: Text(
+                          "$count",
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 20),
                         ),
                       ),
-                    ],
+                    )
+                  ],
+                ),
+                const Text(
+                  "Total: VND",
+                  style: TextStyle(
+                      fontSize: 18, color: ColorLib.primaryColor),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorLib.primaryColor),
+                    onPressed: () {},
+                    child: const Text(
+                      "Checkout",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
-                );
-              },
-            )
+                ),
+              ],
+            ),
+          );
+        },
+      )
           : null,
     );
   }
@@ -541,22 +594,21 @@ class FoodOfRestaurant extends StatelessWidget {
   final int index;
   final void Function()? onPressed;
   final String name;
-  final int price;
-  final int rating;
+  final String price;
+  final double rating;
   final String type;
   final int? left;
   final int? sold;
 
-  const FoodOfRestaurant(
-      {super.key,
-      required this.name,
-      required this.index,
-      required this.price,
-      required this.type,
-      this.onPressed,
-      this.sold,
-      this.left,
-      required this.rating});
+  const FoodOfRestaurant({super.key,
+    required this.name,
+    required this.index,
+    required this.price,
+    required this.type,
+    this.onPressed,
+    this.sold,
+    this.left,
+    required this.rating});
 
   @override
   Widget build(BuildContext context) {
@@ -617,11 +669,11 @@ class FoodOfRestaurant extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "$price VNĐ",
+                        price,
                         style: const TextStyle(
-                            color: ColorLib.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
+                          color: ColorLib.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,),
                       ),
                       const SizedBox(
                         width: 80,

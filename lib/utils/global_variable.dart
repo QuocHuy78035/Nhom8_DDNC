@@ -9,15 +9,17 @@ class GlobalVariable{
   static const String enterPassConfirm = "Please enter your password confirm";
   static const String enterFullVerifyCode = "Please enter verify code";
   static const String resetPassTitle = "Please enter your email address to request a password reset";
+  static const String optSend = "OTP sent to email!";
 
   static const String loginSuc = "Log in successfully!";
   static const String signUpSuc = "Sign up successfully!";
   static const String resetPassSuc = "Reset Password Successfully!";
   static const String verifySuc = "Verify OTP successfully!";
   static const String verifySignUpSuc = "Sign up successfully!";
-  static const String addFavouriteFoodSuc = "Add to favorite successfully!";
+  static const String addFavouriteSuc = "Add to favorite successfully!";
   static const String addToCartSuc = "Add to cart successfully!";
   static const String updateCartSuc = "Update cart successfully!";
   static const String checkFavouriteSuc = "Check food is favorite successfully!";
   static const String deleteFavouriteSuc = "Delete favorite foods successfully!";
+  static const String deleteFavouriteResSuc = "Delete favorite stores successfully!";
 }

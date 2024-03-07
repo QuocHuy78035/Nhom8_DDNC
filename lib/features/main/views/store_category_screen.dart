@@ -1,4 +1,4 @@
-import 'package:ddnangcao_project/features/main/views/food_store_category_screen.dart';
+import 'package:ddnangcao_project/features/food/views/food_store_category_screen.dart';
 import 'package:ddnangcao_project/providers/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -205,6 +205,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               FoodStoreCategoryScreen(
+                                                storeName: value.listStore[index].name ?? "",
                                                 cateName: widget.cateName,
                                                 cateId: widget.caterId,
                                                 storeId: value.listStore[index].id,
@@ -243,7 +244,7 @@ class _FoodCategoryScreenState extends State<FoodCategoryScreen> {
 
 class Store extends StatelessWidget {
   final String name;
-  final int? rating;
+  final String? rating;
   final String? address;
   final String? timeClose;
   final String? timeOpen;

@@ -1,4 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ddnangcao_project/features/main/views/restaurant_order_screen.dart';
+import 'package:ddnangcao_project/features/restaurant/controllers/restaurant_controler.dart';
+import 'package:ddnangcao_project/models/store.dart';
 import 'package:ddnangcao_project/providers/restaurant_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +17,11 @@ class RestaurantScreen extends StatefulWidget {
 }
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
+  late List<StoreModel> listStore = [];
+  late List<StoreModel> listStoreSortByRating = [];
+  late List<StoreModel> listStoreSortByDistance = [];
+  late List<StoreModel> listStoreDisplay = listStore;
+  final RestaurantController restaurantController = RestaurantController();
   Color colorBackground = ColorLib.primaryColor;
   Color colorText = ColorLib.blackColor;
   String searchValue = "";
@@ -29,10 +37,23 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     ColorLib.blackColor
   ];
 
+  getListStore() async {
+    listStore = await restaurantController.findAllStore();
+    listStoreSortByRating =
+        await restaurantController.findAllStoreSortByRating();
+    listStoreSortByDistance =
+        await restaurantController.findAllStoreSortByDistance();
+  }
+
   @override
   void initState() {
     super.initState();
+    getListStore();
     Provider.of<RestaurantProvider>(context, listen: false).findAllRestaurant();
+    Provider.of<RestaurantProvider>(context, listen: false)
+        .findAllRestaurantSortByRating();
+    Provider.of<RestaurantProvider>(context, listen: false)
+        .findAllRestaurantSortByDistance();
   }
 
   @override
@@ -63,6 +84,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
+                        listStoreDisplay = listStore;
                         if (backgroundColor[0] == ColorLib.primaryColor) {
                           return;
                         } else {
@@ -95,6 +117,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
+                        listStoreDisplay = listStoreSortByRating;
                         if (backgroundColor[1] == ColorLib.primaryColor) {
                           return;
                         } else {
@@ -126,6 +149,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
+                        listStoreDisplay = listStoreSortByDistance;
                         if (backgroundColor[2] == ColorLib.primaryColor) {
                           return;
                         } else {
@@ -197,64 +221,70 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                         } else {
                           return Container(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            height: GetSize.getHeight(context),
+                            height: GetSize.getHeight(context) * 0.6,
+                            width: GetSize.getWidth(context),
                             child: ListView.builder(
-                              itemCount: value.listStore.length,
+                              itemCount: listStore.length,
+                              // itemCount: value.listStore.length,
                               itemBuilder: (context, index) {
-                                return Column(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        print("Id : ${value.listStore[index].id}");
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                RestaurantOrderScreen(
-                                              name:
-                                                  value.listStore[index].name ??
-                                                      "",
-                                              address: value.listStore[index]
-                                                      .address ??
-                                                  "",
-                                              rating: value.listStore[index]
-                                                      .rating ??
-                                                  0,
-                                              timeOpen: value.listStore[index]
-                                                      .timeOpen ??
-                                                  "",
-                                              timeClose: value.listStore[index]
-                                                      .timeClose ??
-                                                  "",
-                                              storeId:
-                                                  value.listStore[index].id ??
-                                                      "",
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Restaurant(
-                                        name: value.listStore[index].name ?? '',
-                                        rating:
-                                            value.listStore[index].rating ?? 0,
-                                        address:
-                                            value.listStore[index].address ??
+                                if (index < listStoreDisplay.length &&
+                                    listStoreDisplay.isNotEmpty) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RestaurantOrderScreen(
+                                            distance: listStoreDisplay[index]
+                                                    .distance ??
                                                 "",
-                                        image:
-                                            value.listStore[index].image ?? '',
-                                        timeOpen:
-                                            value.listStore[index].timeOpen ??
-                                                '',
-                                        timeClode:
-                                            value.listStore[index].timeClose ??
-                                                '',
-                                      ),
+                                            image:
+                                                listStoreDisplay[index].image ??
+                                                    "",
+                                            name:
+                                                listStoreDisplay[index].name ??
+                                                    "",
+                                            address: listStoreDisplay[index]
+                                                    .address ??
+                                                "",
+                                            rating: listStoreDisplay[index]
+                                                    .rating ??
+                                                "",
+                                            timeOpen: listStoreDisplay[index]
+                                                    .timeOpen ??
+                                                "",
+                                            timeClose: listStoreDisplay[index]
+                                                    .timeClose ??
+                                                "",
+                                            storeId:
+                                                listStoreDisplay[index].id ??
+                                                    "",
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Restaurant(
+                                      distance:
+                                          listStoreDisplay[index].distance ??
+                                              "",
+                                      name: listStoreDisplay[index].name ?? '',
+                                      rating:
+                                          listStoreDisplay[index].rating ?? "",
+                                      address:
+                                          listStoreDisplay[index].address ?? "",
+                                      image:
+                                          listStoreDisplay[index].image ?? '',
+                                      timeOpen:
+                                          listStoreDisplay[index].timeOpen ??
+                                              '',
+                                      timeClode:
+                                          listStoreDisplay[index].timeClose ??
+                                              '',
                                     ),
-                                    const SizedBox(
-                                      height: 30,
-                                    )
-                                  ],
-                                );
+                                  );
+                                }
+                                return null;
                               },
                             ),
                           );
@@ -365,8 +395,9 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class Restaurant extends StatelessWidget {
+  final String distance;
   final String name;
-  final double rating;
+  final String rating;
   final String address;
   final String image;
   final String timeOpen;
@@ -379,121 +410,139 @@ class Restaurant extends StatelessWidget {
       required this.address,
       required this.image,
       required this.timeOpen,
-      required this.timeClode});
+      required this.timeClode,
+      required this.distance});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: GetSize.getWidth(context),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        SizedBox(
+          width: GetSize.getWidth(context),
+          child: Stack(
             children: [
-              ClipRRect(
-                child: SizedBox(
-                  width: GetSize.getWidth(context),
-                  child: Image.asset("assets/images/foods/food01.png"),
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey,
-                      offset: Offset(
-                        5.0,
-                        5.0,
-                      ),
-                      blurRadius: 10.0,
-                      spreadRadius: 2.0,
-                    ), //BoxShadow
-                    BoxShadow(
-                      color: Colors.white,
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 0.0,
-                      spreadRadius: 0.0,
-                    ), //BoxShadow
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: GetSize.getWidth(context) * 0.9,
-                      child: Text(
-                        name,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600),
-                        overflow: TextOverflow.ellipsis,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: GetSize.getWidth(context),
+                    color: Colors.white,
+                    child: ClipRRect(
+                      child: CachedNetworkImage(
+                        fit: BoxFit.fitWidth,
+                        height: GetSize.getHeight(context) / 4,
+                        imageUrl: image,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
                     ),
-                    SizedBox(
-                      width: GetSize.getWidth(context) * 0.9,
-                      child: Text(
-                        address,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(
+                            5.0,
+                            5.0,
+                          ),
+                          blurRadius: 10.0,
+                          spreadRadius: 2.0,
+                        ), //BoxShadow
+                        BoxShadow(
+                          color: Colors.white,
+                          offset: Offset(0.0, 0.0),
+                          blurRadius: 0.0,
+                          spreadRadius: 0.0,
+                        ), //BoxShadow
+                      ],
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 16,
-                              child:
-                                  Image.asset("assets/images/foods/timer.png"),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text(timeOpen)
-                          ],
+                        SizedBox(
+                          width: GetSize.getWidth(context) * 0.9,
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: GetSize.getWidth(context) * 0.9,
+                          child: Text(
+                            address,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            SizedBox(
-                              width: 16,
-                              child:
-                                  Image.asset("assets/images/foods/timer.png"),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 16,
+                                  child: Image.asset(
+                                      "assets/images/foods/timer.png"),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text("$timeOpen - $timeClode")
+                              ],
                             ),
-                            const SizedBox(
-                              width: 10,
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.my_location,
+                                  color: ColorLib.primaryColor,
+                                  size: 20,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text("$distance km")
+                              ],
                             ),
-                            Text(timeClode)
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 16,
-                              child: Image.asset(
-                                  "assets/images/foods/star-Filled.png"),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text("$rating")
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 16,
+                                  child: Image.asset(
+                                      "assets/images/foods/star-Filled.png"),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(rating)
+                              ],
+                            )
                           ],
                         )
                       ],
-                    )
-                  ],
-                ),
-              ),
+                    ),
+                  ),
+                ],
+              )
             ],
-          )
-        ],
-      ),
+          ),
+        ),
+        const SizedBox(
+          height: 30,
+        )
+      ],
     );
   }
 }

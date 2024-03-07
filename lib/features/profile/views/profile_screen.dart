@@ -3,6 +3,7 @@ import 'package:ddnangcao_project/features/chat/views/chat_screen.dart';
 import 'package:ddnangcao_project/features/favourite/views/favourite_screen.dart';
 import 'package:ddnangcao_project/features/profile/controllers/profile_controller.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -141,8 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: const Text("Yes"),
                           onPressed: () async {
                             logoutUser();
-
-                            //sqlite
+                            FirebaseAuth.instance.signOut();
                             Navigator.pop(context);
                             Navigator.pushReplacement(
                               context,

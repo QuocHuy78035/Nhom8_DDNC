@@ -1,4 +1,4 @@
-import 'package:ddnangcao_project/features/main/views/detail_food_screen.dart';
+import 'package:ddnangcao_project/features/food/views/detail_food_screen.dart';
 import 'package:ddnangcao_project/features/main/views/store_category_screen.dart';
 import 'package:ddnangcao_project/providers/food_provider.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +9,11 @@ import '../../../utils/size_lib.dart';
 class FoodStoreCategoryScreen extends StatefulWidget {
   final String? cateName;
   final String? storeId;
+  final String storeName;
   final String? cateId;
 
   const FoodStoreCategoryScreen(
-      {super.key, required this.storeId, required this.cateId, required this.cateName});
+      {super.key, required this.storeId, required this.cateId, required this.cateName, required this.storeName});
 
   @override
   State<FoodStoreCategoryScreen> createState() =>
@@ -71,29 +72,30 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
                         return Column(
                           children: [
                             GestureDetector(
-                                onTap: () { },
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => DetailFoodScreen(
-                                            foodName:
-                                            value.listFood[index].name ?? "",
-                                            price: value.listFood[index].price ?? 0,
-                                            image: value.listFood[index].image,
-                                            foodId: value.listFood[index].id ?? ""),
-                                      ),
-                                    );
-                                  },
-                                  child: Food(
-                                    left: value.listFood[index].left,
-                                    sold: value.listFood[index].sold,
-                                    name: value.listFood[index].name ?? "",
-                                    price: value.listFood[index].price,
-                                    rating: value.listFood[index].rating,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DetailFoodScreen(
+                                      sold: value.listFood[index].sold,
+                                      left: value.listFood[index].left,
+                                      storeName: widget.storeName,
+                                        foodName:
+                                        value.listFood[index].name ?? "",
+                                        price: value.listFood[index].price ?? 0,
+                                        image: value.listFood[index].image,
+                                        foodId: value.listFood[index].id ?? ""),
                                   ),
-                                )),
+                                );
+                              },
+                              child: Food(
+                                left: value.listFood[index].left,
+                                sold: value.listFood[index].sold,
+                                name: value.listFood[index].name ?? "",
+                                price: value.listFood[index].price,
+                                rating: value.listFood[index].rating,
+                              ),
+                            ),
                             const SizedBox(
                               height: 20,
                             )
@@ -114,7 +116,7 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
 
 class Food extends StatelessWidget {
   final String name;
-  final int? rating;
+  final String? rating;
   final int? price;
   final int? left;
   final int? sold;

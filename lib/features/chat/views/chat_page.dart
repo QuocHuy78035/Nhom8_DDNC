@@ -48,29 +48,37 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   //build message list
-  Widget _buildMessageList(){
-    return StreamBuilder(stream: chatController.getMessages(widget.receiverUserId, _firebaseAuth.currentUser!.uid), builder: (context, snapshot){
-      if(snapshot.hasError){
-        return const Center(
-          child: Text("Error"),
+  Widget _buildMessageList() {
+    return StreamBuilder(
+      stream: chatController.getMessages(
+          widget.receiverUserId, _firebaseAuth.currentUser?.uid ?? ''),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text("Error"),
+          );
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return ListView(
+          children:
+              snapshot.data?.docs.map((e) => _buildMessageItem(e)).toList() ??
+                  [],
         );
-      }
-      if(snapshot.connectionState == ConnectionState.waiting){
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }
-      return ListView(
-        children: snapshot.data!.docs.map((e) => _buildMessageItem(e)).toList(),
-      );
-    });
+      },
+    );
   }
 
   //build message item
-  Widget _buildMessageItem(DocumentSnapshot snapshot){
+  Widget _buildMessageItem(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
 
-    var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid) ? Alignment.centerLeft : Alignment.centerRight;
+    var alignment = (data['senderId'] == _firebaseAuth.currentUser?.uid)
+        ? Alignment.centerLeft
+        : Alignment.centerRight;
     return Container(
       alignment: alignment,
       child: Column(
@@ -90,17 +98,21 @@ class _ChatPageState extends State<ChatPage> {
           child: TextFormField(
             controller: messageControllers,
             decoration: InputDecoration(
-              hintText: "Enter Message",
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-              )
-            ),
+                hintText: "Enter Message",
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                )),
           ),
         ),
-        IconButton(onPressed: sendMessage, icon: const Icon(Icons.send, size: 40,))
+        IconButton(
+            onPressed: sendMessage,
+            icon: const Icon(
+              Icons.send,
+              size: 40,
+            ))
       ],
     );
   }

@@ -35,7 +35,7 @@ class StoreCartModel {
   String? id;
   String? name;
   String? address;
-  int? rating;
+  String? rating;
   String? timeOpen;
   String? timeClose;
   String? createdAt;

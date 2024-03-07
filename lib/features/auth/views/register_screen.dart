@@ -33,25 +33,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   registerUser() async {
-    final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
     if (_formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
 
-      //firebase
-      await authController.signUpWithEmailAndPass(email, password, sharedPreferences.getString("userId") ?? "");
-
-      int statusCode = await authController.registerUser(
+      String message = await authController.registerUser(
           name, email, password, passwordConfirm);
-      if (statusCode == 200) {
+      if (message == GlobalVariable.optSend) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => VerifySignUpScreen(email: email),
+            builder: (context) => VerifySignUpScreen(email: email, pass: password,),
           ),
         );
+      }else {
+        ShowSnackBar().showSnackBar(message,
+            ColorLib.primaryColor, Colors.white, context);
+        setState(() {
+          isLoading = false;
+        });
       }
     } else {
       ShowSnackBar().showSnackBar(GlobalVariable.fillAllField,

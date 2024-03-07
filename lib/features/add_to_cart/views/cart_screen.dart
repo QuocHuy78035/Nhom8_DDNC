@@ -1,15 +1,14 @@
 import 'package:ddnangcao_project/features/add_to_cart/controllers/add_to_cart_controller.dart';
+import 'package:ddnangcao_project/features/order/controllers/order_controller.dart';
+import 'package:ddnangcao_project/models/order.dart';
 import 'package:ddnangcao_project/providers/add_to_cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../../models/food_cart.dart';
 import '../../../utils/color_lib.dart';
-import '../../../utils/global_variable.dart';
 import '../../../utils/size_lib.dart';
-import '../../../utils/snack_bar.dart';
 import '../../main/views/store_category_screen.dart';
 import 'package:flutter_paypal/flutter_paypal.dart';
-
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -19,40 +18,11 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List<FoodCartModel> listCart = [];
+  late int totalPrice = 0;
+  late List<String> foodId = [];
+  late List<int> quantity = [];
+  final OrderController orderController = OrderController();
   final AddToCartController addToCartController = AddToCartController();
-
-  getAllCart() async {
-    listCart = await addToCartController.getAllCart();
-  }
-
-  decrementCart(int index) async {
-    String message = await addToCartController
-        .updateCartDecrement("${listCart[index].food?.id}");
-    if (message == GlobalVariable.updateCartSuc) {
-      ShowSnackBar().showSnackBar(message, Colors.green, Colors.white, context);
-      setState(() {
-        listCart[index].number = listCart[index].number! - 1;
-      });
-    } else {
-      ShowSnackBar().showSnackBar("Fail to decrement value of cart",
-          ColorLib.primaryColor, Colors.white, context);
-    }
-  }
-
-  increment(int index) async {
-    String message = await addToCartController
-        .updateCartIncrement("${listCart[index].food?.id}");
-    if (message == GlobalVariable.updateCartSuc) {
-      ShowSnackBar().showSnackBar(message, Colors.green, Colors.white, context);
-      setState(() {
-        listCart[index].number = listCart[index].number! - 1;
-      });
-    } else {
-      ShowSnackBar().showSnackBar("Fail to increment value of cart",
-          ColorLib.primaryColor, Colors.white, context);
-    }
-  }
 
   @override
   void initState() {
@@ -118,7 +88,8 @@ class _CartScreenState extends State<CartScreen> {
                                   },
                                   name: value.listCart[index].food?.name ?? "",
                                   index: index + 1,
-                                  price: value.listCart[index].food?.price ?? 0,
+                                  price: NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
+                                      .format(value.listCart[index].food?.price),
                                   number: value.listCart[index].number,
                                 ),
                               ),
@@ -133,73 +104,98 @@ class _CartScreenState extends State<CartScreen> {
                   }
                 },
               ),
-          TextButton(
-              onPressed: () => {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => UsePaypal(
-                        sandboxMode: true,
-                        clientId:
-                        "AfcHO079_yirebcCRj6BlKUhY48w9uq3k4k-EM6HCQTAKHt3Tp6Buzfn0f3b0PRqUKUQwWfLDQtKlJxz",
-                        secretKey:
-                        "EBN8StcvtdYCRgC2wG1UlvPNHeitK9ehvABHievjJnLAjiB_P8lzkHsHH5OENl16yqIw5zexz7tLeiDu",
-                        returnURL: "https://samplesite.com/return",
-                        cancelURL: "https://samplesite.com/cancel",
-                        transactions: const [
-                          {
-                            "amount": {
-                              "total": '70',
-                              "currency": "USD",
-                              "details": {
-                                "subtotal": '70',
-                                "shipping": '0',
-                                "shipping_discount": 0
-                              }
-                            },
-                            "description": "The payment transaction description.",
-                            "item_list": {
-                              "items": [
-                                {
-                                  "name": "Apple",
-                                  "quantity": 4,
-                                  "price": '5',
-                                  "currency": "USD"
+              ElevatedButton(onPressed: ()async {
+                OrderModel orderModel = OrderModel();
+                for (int i = 0; i <   Provider.of<AddToCartProvider>(context, listen: false)
+                    .listCart.length; i++) {
+                  foodId.add(Provider.of<AddToCartProvider>(context, listen: false).listCart[i].food?.id ?? "");
+                  quantity.add(Provider.of<AddToCartProvider>(context, listen: false).listCart[i].number ?? 0);
+                  int? price = Provider.of<AddToCartProvider>(context, listen: false).listCart[i].food?.price;
+                  int? number = Provider.of<AddToCartProvider>(context, listen: false).listCart[i].number;
+                  totalPrice = price! * number!;
+                }
+                orderModel = await orderController.createOrder(
+                  totalPrice,
+                  180,
+                  20,
+                  "Ho chi minh",
+                  "COD",
+                  foodId,
+                  quantity,
+                );
+                print("Status123 ${orderModel.status}");
+              }, child: const Text("Press")),
+              TextButton(
+                  onPressed: () => {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => UsePaypal(
+                                sandboxMode: true,
+                                clientId:
+                                    "AfcHO079_yirebcCRj6BlKUhY48w9uq3k4k-EM6HCQTAKHt3Tp6Buzfn0f3b0PRqUKUQwWfLDQtKlJxz",
+                                secretKey:
+                                    "EBN8StcvtdYCRgC2wG1UlvPNHeitK9ehvABHievjJnLAjiB_P8lzkHsHH5OENl16yqIw5zexz7tLeiDu",
+                                returnURL: "https://samplesite.com/return",
+                                cancelURL: "https://samplesite.com/cancel",
+                                transactions: const [
+                                  {
+                                    "amount": {
+                                      "total": '70',
+                                      "currency": "USD",
+                                      "details": {
+                                        "subtotal": '70',
+                                        "shipping": '0',
+                                        "shipping_discount": 0
+                                      }
+                                    },
+                                    "description":
+                                        "The payment transaction description.",
+                                    "item_list": {
+                                      "items": [
+                                        {
+                                          "name": "Apple",
+                                          "quantity": 4,
+                                          "price": '5',
+                                          "currency": "USD"
+                                        },
+                                        {
+                                          "name": "Pineapple",
+                                          "quantity": 5,
+                                          "price": '10',
+                                          "currency": "USD"
+                                        }
+                                      ],
+                                      // shipping address is Optional
+                                      "shipping_address": {
+                                        "recipient_name": "Raman Singh",
+                                        "line1": "Delhi",
+                                        "line2": "",
+                                        "city": "Delhi",
+                                        "country_code": "IN",
+                                        "postal_code": "11001",
+                                        "phone": "+00000000",
+                                        "state": "Texas"
+                                      },
+                                    }
+                                  }
+                                ],
+                                note:
+                                    "Contact us for any questions on your order.",
+                                onSuccess: (Map params) async {
+                                  print("Success");
+                                  print("onSuccess: $params");
                                 },
-                                {
-                                  "name": "Pineapple",
-                                  "quantity": 5,
-                                  "price": '10',
-                                  "currency": "USD"
-                                }
-                              ],
-                              // shipping address is Optional
-                              "shipping_address": {
-                                "recipient_name": "Raman Singh",
-                                "line1": "Delhi",
-                                "line2": "",
-                                "city": "Delhi",
-                                "country_code": "IN",
-                                "postal_code": "11001",
-                                "phone": "+00000000",
-                                "state": "Texas"
-                              },
-                            }
-                          }
-                        ],
-                        note: "Contact us for any questions on your order.",
-                        onSuccess: (Map params) async {
-                          print("onSuccess: $params");
-                        },
-                        onError: (error) {
-                          print("onError: $error");
-                        },
-                        onCancel: (params) {
-                          print('cancelled: $params');
-                        }),
-                  ),
-                )
-              },
-              child: const Text("Make Payment")),
+                                onError: (error) {
+                                  print("onError: $error");
+                                },
+                                onCancel: (params) {
+                                  print('cancelled: $params');
+                                }),
+                          ),
+                        )
+                      },
+                  child: const Text("Make Payment"),
+              ),
             ],
           ),
         ),
@@ -211,7 +207,7 @@ class _CartScreenState extends State<CartScreen> {
 class FoodOfRestaurant extends StatelessWidget {
   final int index;
   final String name;
-  final int price;
+  final String price;
   final int? number;
   final void Function() decrement;
   final void Function() increment;
@@ -252,13 +248,12 @@ class FoodOfRestaurant extends StatelessWidget {
                     height: 6,
                   ),
                   Text(
-                    "Cost: $price VNĐ",
+                    "Cost: $price",
                     style: const TextStyle(
-                      color: ColorLib.primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text("$number")
+                  Text("Quantity: $number")
                 ],
               ),
             ),

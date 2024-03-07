@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ddnangcao_project/features/search/views/search_screen.dart';
 import 'package:ddnangcao_project/providers/home_provider.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'store_category_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,7 +19,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   Position? _currentLocation;
   late bool servicePermission = true;
   late LocationPermission permission;
@@ -25,8 +26,11 @@ class _HomeScreenState extends State<HomeScreen> {
   String currentAddress = '';
 
   Future<void> _getCurrentLocationAndAddress() async {
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     try {
       _currentLocation = await _getCurrentLocation();
+      sharedPreferences.setDouble("latitude", _currentLocation!.latitude);
+      sharedPreferences.setDouble("longitude", _currentLocation!.longitude);
       await _getAddress();
     } catch (e) {
       print("Error getting current location and address: $e");
@@ -48,13 +52,14 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       List<Placemark> placesmarks = await placemarkFromCoordinates(
           _currentLocation!.latitude, _currentLocation!.longitude);
-
-      if (placesmarks.isNotEmpty) {
+      if (placesmarks.isNotEmpty ) {
         Placemark placemark = placesmarks[0];
-        setState(() {
-          currentAddress =
-          "${placemark.street}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}, ";
-        });
+        if(mounted){
+          setState(() {
+            currentAddress =
+            "${placemark.street}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}, ";
+          });
+        }
       } else {
         setState(() {
           currentAddress = "Không thể tìm thấy địa chỉ.";
@@ -69,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _initializeState();
     Provider.of<HomeProvider>(context, listen: false).getAllCategory();
@@ -83,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Error initializing state: $e");
     }
   }
-
+//123
   @override
   Widget build(BuildContext context) {
     final myBanner = [
@@ -94,7 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
       Image.asset("assets/images/banners/Banner.png"),
     ];
     return Scaffold(
-      appBar: MyAppBar(currentLocation: currentAddress,),
+      appBar: MyAppBar(
+        currentLocation: currentAddress,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -135,24 +142,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     Consumer<HomeProvider>(builder: (context, value, child) {
                       if (value.listCate.isEmpty) {
                         return const Center(
-                          child:Center(
+                          child: Center(
                             child: Text("No Have Item"),
                           ),
                         );
                       } else {
                         if (value.isLoading) {
                           return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: SizedBox(
-                                height: 70,
-                                width: GetSize.getWidth(context),
-                                child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: value.listCate.length,
-                                    itemBuilder: (context, index) {
-                                      return const CardSkeltonHomeScreen();
-                                    }),
-                              ));
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: 70,
+                              width: GetSize.getWidth(context),
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: value.listCate.length,
+                                  itemBuilder: (context, index) {
+                                    return const CardSkeltonHomeScreen();
+                                  }),
+                            ),
+                          );
                         } else {
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
@@ -178,11 +186,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       );
                                     },
-                                    child: Category(
-                                      categoryName:
-                                          "${value.listCate[index].cateName}",
-                                      imageUrl:
-                                          "assets/images/categories/dessert.png",
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        right:
+                                            index == value.listCate.length - 1
+                                                ? 30
+                                                : 0,
+                                      ),
+                                      child: Category(
+                                        categoryName:
+                                            "${value.listCate[index].cateName}",
+                                        imageUrl:
+                                            "${value.listCate[index].image}",
+                                      ),
                                     ),
                                   );
                                 },
@@ -409,9 +425,27 @@ class Category extends StatelessWidget {
       children: [
         Column(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundImage: AssetImage(imageUrl),
+            Container(
+              height: 45,
+              width: 45,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorLib.secondaryColor,
+              ),
+              //width: GetSize.getWidth(context),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: imageUrl,
+                    placeholder: (context, url) => const SizedBox(
+                          height: 10,
+                          child: CircularProgressIndicator(),
+                        ),
+                    errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.error),
+                        )),
+              ),
             ),
             Text(categoryName)
           ],
@@ -426,7 +460,8 @@ class Category extends StatelessWidget {
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String currentLocation;
-  const MyAppBar({super.key,required this.currentLocation});
+
+  const MyAppBar({super.key, required this.currentLocation});
 
   @override
   Size get preferredSize => const Size.fromHeight(100);
@@ -462,7 +497,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                       ),
                       SizedBox(
-                        width: GetSize.getWidth(context)*0.7,
+                        width: GetSize.getWidth(context) * 0.7,
                         child: Text(
                           currentLocation,
                           style: const TextStyle(
@@ -485,9 +520,11 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           InkWell(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SearchScreen()));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SearchScreen(),
+                ),
+              );
             },
             child: Container(
               height: 40,
