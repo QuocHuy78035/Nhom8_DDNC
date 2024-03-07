@@ -1,6 +1,7 @@
 import 'package:ddnangcao_project/features/auth/controllers/auth_controller.dart';
 import 'package:ddnangcao_project/features/auth/views/login_screen.dart';
 import 'package:ddnangcao_project/utils/snack_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/global_variable.dart';
@@ -36,6 +37,21 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
         isLoading = true;
       });
       if (message == GlobalVariable.resetPassSuc) {
+        final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+// Get the current user
+        User? currentUser = _firebaseAuth.currentUser;
+
+        if (currentUser != null) {
+          // Update the password
+          currentUser.updatePassword(password)
+              .then((_) {
+            print("Password updated successfully!");
+          })
+              .catchError((error) {
+            print("Password update failed: $error");
+          });
+        }
         ShowSnackBar()
             .showSnackBar(message, Colors.green, ColorLib.whiteColor, context);
         Navigator.pushReplacement(

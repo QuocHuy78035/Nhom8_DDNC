@@ -1,13 +1,10 @@
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ddnangcao_project/features/search/views/search_screen.dart';
-import 'package:ddnangcao_project/providers/home_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:provider/provider.dart';
-import 'store_category_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,7 +14,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   Position? _currentLocation;
   late bool servicePermission = true;
   late LocationPermission permission;
@@ -25,8 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
   String currentAddress = '';
 
   Future<void> _getCurrentLocationAndAddress() async {
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     try {
       _currentLocation = await _getCurrentLocation();
+      sharedPreferences.setDouble("latitude", _currentLocation!.latitude);
+      sharedPreferences.setDouble("longitude", _currentLocation!.longitude);
       await _getAddress();
     } catch (e) {
       print("Error getting current location and address: $e");
@@ -48,13 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       List<Placemark> placesmarks = await placemarkFromCoordinates(
           _currentLocation!.latitude, _currentLocation!.longitude);
-
-      if (placesmarks.isNotEmpty) {
+      if (placesmarks.isNotEmpty ) {
         Placemark placemark = placesmarks[0];
-        setState(() {
-          currentAddress =
-          "${placemark.street}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}, ";
-        });
+        if(mounted){
+          setState(() {
+            currentAddress =
+            "${placemark.street}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}, ";
+          });
+        }
       } else {
         setState(() {
           currentAddress = "Không thể tìm thấy địa chỉ.";
@@ -69,16 +69,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _initializeState();
-    Provider.of<HomeProvider>(context, listen: false).getAllCategory();
   }
 
   Future<void> _initializeState() async {
     try {
       await _getCurrentLocationAndAddress();
-      Provider.of<HomeProvider>(context, listen: false).getAllCategory();
     } catch (e) {
       print("Error initializing state: $e");
     }
@@ -86,185 +84,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final myBanner = [
-      Image.asset("assets/images/banners/Banner.png"),
-      Image.asset("assets/images/banners/Banner.png"),
-      Image.asset("assets/images/banners/Banner.png"),
-      Image.asset("assets/images/banners/Banner.png"),
-      Image.asset("assets/images/banners/Banner.png"),
-    ];
     return Scaffold(
-      appBar: MyAppBar(currentLocation: currentAddress,),
+      appBar: MyAppBar(
+        currentLocation: currentAddress,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: GetSize.symmetricPadding * 2),
+                horizontal: GetSize.symmetricPadding),
             child: Column(
               children: [
-                CarouselSlider(
-                  items: myBanner,
-                  options: CarouselOptions(
-                      autoPlay: true,
-                      height: 184,
-                      aspectRatio: 2.0,
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      autoPlayAnimationDuration:
-                          const Duration(milliseconds: 800),
-                      autoPlayInterval: const Duration(milliseconds: 3000),
-                      enlargeCenterPage: true,
-                      onPageChanged: (index, reason) {}),
-                ),
-                Column(
-                  children: [
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Category ",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Consumer<HomeProvider>(builder: (context, value, child) {
-                      if (value.listCate.isEmpty) {
-                        return const Center(
-                          child:Center(
-                            child: Text("No Have Item"),
-                          ),
-                        );
-                      } else {
-                        if (value.isLoading) {
-                          return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: SizedBox(
-                                height: 70,
-                                width: GetSize.getWidth(context),
-                                child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: value.listCate.length,
-                                    itemBuilder: (context, index) {
-                                      return const CardSkeltonHomeScreen();
-                                    }),
-                              ));
-                        } else {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: SizedBox(
-                              height: 70,
-                              width: GetSize.getWidth(context),
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: value.listCate.length,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              FoodCategoryScreen(
-                                            cateName:
-                                                "${value.listCate[index].cateName}",
-                                            caterId:
-                                                "${value.listCate[index].cateId}",
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Category(
-                                      categoryName:
-                                          "${value.listCate[index].cateName}",
-                                      imageUrl:
-                                          "assets/images/categories/dessert.png",
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    }),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Top Rating Restaurant🔥",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            height: 30,
-                            width: 65,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: ColorLib.secondaryColor),
-                            child: TextButton(
-                              onPressed: () {},
-                              child: const Text(
-                                "See all",
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: ColorLib.primaryColor),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: 260,
-                      child: ListView.builder(
-                        itemCount: 5,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => const RestaurantOrderScreen(),
-                              //   ),
-                              // );
-                            },
-                            child: const Row(
-                              children: [
-                                Food(),
-                                SizedBox(
-                                  width: 30,
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                )
+                Image.asset("assets/images/banners/Banner_vendor.png")
               ],
             ),
           ),
@@ -409,9 +240,27 @@ class Category extends StatelessWidget {
       children: [
         Column(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundImage: AssetImage(imageUrl),
+            Container(
+              height: 45,
+              width: 45,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorLib.secondaryColor,
+              ),
+              //width: GetSize.getWidth(context),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: imageUrl,
+                    placeholder: (context, url) => const SizedBox(
+                          height: 10,
+                          child: CircularProgressIndicator(),
+                        ),
+                    errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.error),
+                        )),
+              ),
             ),
             Text(categoryName)
           ],
@@ -426,7 +275,8 @@ class Category extends StatelessWidget {
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String currentLocation;
-  const MyAppBar({super.key,required this.currentLocation});
+
+  const MyAppBar({super.key, required this.currentLocation});
 
   @override
   Size get preferredSize => const Size.fromHeight(100);
@@ -462,7 +312,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                       ),
                       SizedBox(
-                        width: GetSize.getWidth(context)*0.7,
+                        width: GetSize.getWidth(context) * 0.7,
                         child: Text(
                           currentLocation,
                           style: const TextStyle(
@@ -482,77 +332,8 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(
             height: 20,
           ),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SearchScreen()));
-            },
-            child: Container(
-              height: 40,
-              decoration: BoxDecoration(
-                border: Border.all(color: ColorLib.primaryColor),
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(25),
-                ),
-              ),
-              child: const Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: GetSize.symmetricPadding),
-                    child: Icon(
-                      Icons.search,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    "Search menu, food or drink",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
-    );
-  }
-}
-
-class CardSkeltonHomeScreen extends StatelessWidget {
-  const CardSkeltonHomeScreen({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        Column(
-          children: [
-            CircleSkeleton(
-              size: 50,
-            ),
-            SizedBox(
-              height: 4,
-            ),
-            Skeleton(
-              height: 16,
-              width: 50,
-            )
-          ],
-        ),
-        SizedBox(
-          width: 20,
-        )
-      ],
     );
   }
 }

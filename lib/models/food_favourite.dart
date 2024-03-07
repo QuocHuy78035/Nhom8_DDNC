@@ -1,12 +1,11 @@
 
-
 class FoodFavouriteModel{
   String? id;
   String? name;
   String? category;
   String? store;
   int? price;
-  int? rating;
+  String? rating;
   String? image;
   int? left;
   int? sold;

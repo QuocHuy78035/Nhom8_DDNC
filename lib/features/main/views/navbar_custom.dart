@@ -1,7 +1,4 @@
-import 'package:ddnangcao_project/features/favourite/views/favourite_screen.dart';
-import 'package:ddnangcao_project/features/order/views/order_screen.dart';
-import 'package:ddnangcao_project/features/profile/views/profile_screen.dart';
-import 'package:ddnangcao_project/features/restaurant/views/restaurant_screen.dart';
+
 import 'package:flutter/material.dart';
 import '../../../utils/color_lib.dart';
 import 'home_screen.dart';
@@ -17,10 +14,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   int _selectedIndex = 0;
   final List<Widget> _tabs = [
     const HomeScreen(),
-    const RestaurantScreen(),
-    const FavouriteScreen(),
-    const OrderScreen(),
-    const ProfileScreen()
+    Text("order")
   ];
 
   @override
@@ -36,10 +30,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         currentIndex: _selectedIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: "Restaurants"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Likes"),
-          BottomNavigationBarItem(icon: Icon(Icons.ad_units_sharp), label: "My Orders"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile")
+          BottomNavigationBarItem(icon: Icon(Icons.food_bank_outlined), label: "Orders"),
         ],
         onTap: (index){
           setState(() {

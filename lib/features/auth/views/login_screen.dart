@@ -141,7 +141,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         //sqlite
                         //await DatabaseHelper.saveUser('example', email, password);
                         login();
-
                       },
                       titleRow: isLoading
                           ? const Center(

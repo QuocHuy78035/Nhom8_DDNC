@@ -1,9 +1,10 @@
+import 'package:ddnangcao_project/models/token.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 abstract class IAuth{
   Future<String> loginUser(String email, String password, BuildContext context);
-  Future<int> registerUser(String name, String email, String password, String passwordConfirm);
+  Future<String> registerUser(String name, String email, String password, String passwordConfirm);
   Future<int> forgotPass(String email);
   Future<List<String>> verifyForgotPass(String email, String otp);
   Future<String> verifySignUp(String email, String otp, BuildContext context);
@@ -12,4 +13,5 @@ abstract class IAuth{
       String password);
   Future<UserCredential> signUpWithEmailAndPass(String email,
       String password, String userId);
+
 }

@@ -4,15 +4,17 @@ import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../utils/color_lib.dart';
 import '../../../utils/size_lib.dart';
 import '../../../widgets/base_button.dart';
 import '../widgets/title_screen.dart';
 
 class VerifySignUpScreen extends StatefulWidget {
+  final String pass;
   final String email;
 
-  const VerifySignUpScreen({super.key, required this.email});
+  const VerifySignUpScreen({super.key, required this.email, required this.pass});
 
   @override
   State<VerifySignUpScreen> createState() => _VerifySignUpScreenState();
@@ -25,6 +27,7 @@ class _VerifySignUpScreenState extends State<VerifySignUpScreen> {
   late String _code;
 
   void confirmVerifyCode() async {
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       isLoading = true;
     });
@@ -37,6 +40,9 @@ class _VerifySignUpScreenState extends State<VerifySignUpScreen> {
         isLoading = false;
       });
       if (message == GlobalVariable.verifySignUpSuc) {
+        //firebase
+        await authController.signUpWithEmailAndPass(widget.email, widget.pass, sharedPreferences.getString("userId") ?? "");
+
         ShowSnackBar().showSnackBar(
             message, Colors.green, ColorLib.whiteColor, context);
         Navigator.pushReplacement(

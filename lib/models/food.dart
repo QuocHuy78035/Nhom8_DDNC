@@ -1,13 +1,13 @@
-import 'package:ddnangcao_project/models/category.dart';
 import 'package:ddnangcao_project/models/store.dart';
+import 'category.dart';
 
-class FoodModel{
+class FoodModel {
   String? id;
   String? name;
   CategoryModel? category;
   StoreModel? store;
   int? price;
-  int? rating;
+  String? rating;
   String? image;
   int? left;
   int? sold;
@@ -25,7 +25,7 @@ class FoodModel{
     this.left,
     this.sold,
     this.createdAt,
-    this.updatedAt
+    this.updatedAt,
   });
 
   FoodModel.fromJson(Map<String, dynamic> json) {
