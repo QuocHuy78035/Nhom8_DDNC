@@ -58,7 +58,7 @@ class AuthenService {
     }
 
     const tokens = await createTokenPair(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: user.email, role: user.role },
       publicKey,
       privateKey
     );
@@ -135,7 +135,7 @@ class AuthenService {
         }
 
         const tokens = await createTokenPair(
-          { userId: user._id, email },
+          { userId: user._id, email, role: user.role },
           publicKey,
           privateKey
         );
@@ -252,7 +252,7 @@ class AuthenService {
     const publicKey = crypto.randomBytes(64).toString("hex");
 
     const tokens = await createTokenPair(
-      { userId: user._id, email },
+      { userId: user._id, email, role: user.role },
       publicKey,
       privateKey
     );
@@ -274,7 +274,7 @@ class AuthenService {
     };
   };
 
-  static refreshToken = async ({ refreshToken, header_client_id}) => {
+  static refreshToken = async ({ refreshToken, header_client_id }) => {
     const userId = header_client_id;
     if (!userId) {
       throw new AuthFailureError("Invalid Request!");
@@ -289,7 +289,11 @@ class AuthenService {
     }
 
     const accessToken = await JWT.sign(
-      { userId: decodedUser.userId, email: decodedUser.email},
+      {
+        userId: decodedUser.userId,
+        email: decodedUser.email,
+        role: decodedUser.role,
+      },
       keyStore.publicKey,
       {
         // expiresIn: "2 days",

@@ -5,6 +5,10 @@ const Order = require("../models/order.model");
 const Cart = require("../models/cart.model");
 const transaction = require("../helpers/transaction");
 const Statistic = require("../models/statistic.model");
+const {
+  findAllOrders,
+  updateStatusOrders,
+} = require("../models/repositories/order.repo");
 class OrderService {
   static createOrder = async ({
     userId,
@@ -94,6 +98,12 @@ class OrderService {
 
       return order[0];
     });
+  };
+  static findAllOrders = async ({ filter, sort, search }) => {
+    return await findAllOrders({ filter, sort, search });
+  };
+  static updateStatusOrders = async ({orderId, status}) => {
+    return await updateStatusOrders({orderId, status});
   };
 }
 

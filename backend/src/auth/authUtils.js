@@ -10,6 +10,16 @@ const HEADER = {
   REFRESHTOKEN: "x-rtoken-id",
 };
 const TIME = 1000 * 60 * 60 * 2;
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return AuthFailureError(
+        "You do not have permission to perform this action"
+      );
+    }
+    next();
+  };
+};
 const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
     const accessToken = await JWT.sign(payload, publicKey, {
@@ -76,4 +86,5 @@ const authentication = asyncHandler(async (req, res, next) => {
 module.exports = {
   createTokenPair,
   authentication,
+  restrictTo,
 };

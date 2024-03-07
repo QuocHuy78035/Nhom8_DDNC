@@ -31,8 +31,8 @@ const orderSchema = new Schema(
       enum: [
         "pending",
         "confirmed",
-        "prepared",
-        "shipped",
+        "new",
+        "outgoing",
         "cancelled",
         "delivered",
       ],
