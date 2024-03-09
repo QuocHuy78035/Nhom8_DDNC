@@ -5,6 +5,7 @@ class OrderController {
   createOrder = async (req, res, next) => {
     const order = await OrderService.createOrder({
       userId: req.user.userId,
+      coordinate: req.query.coordinate,
       ...req.body,
     });
     new CREATED({
@@ -20,6 +21,7 @@ class OrderController {
       filter: { status },
       sort,
       search,
+      vendor: req.user.userId,
     });
     new OK({
       message: "Find all orders successfully!",

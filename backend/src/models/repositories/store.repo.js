@@ -64,7 +64,7 @@ const findAllStores = async ({
       long,
       store["latitude"],
       store["longtitude"]
-    ).toFixed(1);
+    );
   });
   if (sort === "distance") {
     stores.sort((a, b) => a.distance - b.distance);
@@ -88,7 +88,7 @@ const findTop10RatingStores = async ({ unselect = [], coordinate }) => {
       long,
       store["latitude"],
       store["longtitude"]
-    ).toFixed(1);
+    );
   });
   return stores;
 };
@@ -111,7 +111,7 @@ const findStore = async ({
     long,
     store["latitude"],
     store["longtitude"]
-  ).toFixed(1);
+  );
   return store;
 };
 const createStore = async (

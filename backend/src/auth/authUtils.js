@@ -13,7 +13,7 @@ const TIME = 1000 * 60 * 60 * 2;
 const restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return AuthFailureError(
+      throw new AuthFailureError(
         "You do not have permission to perform this action"
       );
     }

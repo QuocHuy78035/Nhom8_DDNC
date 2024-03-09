@@ -3,8 +3,10 @@ const User = require("../models/user.model");
 const Food = require("../models/food.model");
 const Order = require("../models/order.model");
 const Cart = require("../models/cart.model");
+const Store = require("../models/store.model");
 const transaction = require("../helpers/transaction");
 const Statistic = require("../models/statistic.model");
+const { getDistanceFromLatLonInKm } = require("../utils/index");
 const {
   findAllOrders,
   updateStatusOrders,
@@ -16,8 +18,20 @@ class OrderService {
     shipping_address,
     payment,
     foods,
+    storeId,
+    coordinate,
+    note,
+    phone,
   }) => {
     return await transaction(async (session) => {
+      if (!coordinate) {
+        throw new BadRequestError("Coordinate is not exist!");
+      }
+      const [longtitude, latitude] = coordinate.split(",");
+      if (!longtitude || !latitude) {
+        throw new BadRequestError("Longtitude or latitude is required!");
+      }
+
       const statistic = (await Statistic.find())[0];
 
       //Kiểm tra người dùng hợp lệ
@@ -26,6 +40,24 @@ class OrderService {
         throw new BadRequestError("You are not logged in!");
       }
 
+      // Kiểm tra store tồn tại
+      const store = await Store.findById(storeId);
+      if (!store) {
+        throw new BadRequestError(
+          `The store with id ${storeId} does not exist`
+        );
+      }
+
+      const distance = getDistanceFromLatLonInKm(
+        latitude,
+        longtitude,
+        store.latitude,
+        store.longtitude
+      );
+
+      if (!foods.length) {
+        throw new BadRequestError("Food is required!");
+      }
       // Kiểm tra food tồn tại
       const existedFoods = await Promise.all(
         foods.map(async (food) => {
@@ -33,6 +65,14 @@ class OrderService {
           if (!existedFood) {
             throw new BadRequestError(
               `The food with id ${food.food} does not exist`
+            );
+          }
+          const existedFoodBelongToStore = await Food.findOne({
+            store: storeId,
+          });
+          if (!existedFoodBelongToStore) {
+            throw new BadRequestError(
+              `Food is not belong to store! Please check again!`
             );
           }
           return existedFood;
@@ -87,6 +127,10 @@ class OrderService {
             foods,
             trackingNumber: `#${statistic.number_of_orders + 1}`,
             status: "pending",
+            store: storeId,
+            distance,
+            note,
+            phone,
           },
         ],
         { session }
@@ -99,11 +143,11 @@ class OrderService {
       return order[0];
     });
   };
-  static findAllOrders = async ({ filter, sort, search }) => {
-    return await findAllOrders({ filter, sort, search });
+  static findAllOrders = async ({ vendor, filter, sort, search }) => {
+    return await findAllOrders({ vendor, filter, sort, search });
   };
-  static updateStatusOrders = async ({orderId, status}) => {
-    return await updateStatusOrders({orderId, status});
+  static updateStatusOrders = async ({ orderId, status }) => {
+    return await updateStatusOrders({ orderId, status });
   };
 }
 

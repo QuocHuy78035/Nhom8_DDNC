@@ -1,7 +1,7 @@
 const express = require("express");
 const { asyncHandler } = require("../../helpers/asyncHandler");
 const CategoryController = require("../../controllers/category.controller");
-const { authentication } = require("../../auth/authUtils");
+const { authentication, restrictTo } = require("../../auth/authUtils");
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -11,6 +11,7 @@ router.use(authentication);
 router
   .route("/")
   .post(
+    restrictTo("admin"),
     upload.single("image"),
     asyncHandler(CategoryController.createCategory)
   );

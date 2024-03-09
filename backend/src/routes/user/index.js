@@ -1,10 +1,11 @@
 const express = require("express");
 const { asyncHandler } = require("../../helpers/asyncHandler");
 const UserController = require("../../controllers/user.controller");
-const { authentication } = require("../../auth/authUtils");
+const { authentication, restrictTo } = require("../../auth/authUtils");
 
 const router = express.Router();
 router.use(authentication);
+router.use(restrictTo("user"));
 router
   .route("/favoriteFood")
   .post(asyncHandler(UserController.addFoodToFavorite));

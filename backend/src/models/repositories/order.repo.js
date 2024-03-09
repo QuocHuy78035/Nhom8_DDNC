@@ -2,13 +2,18 @@ const { BadRequestError } = require("../../core/error.response");
 const { removeUndefinedInObject } = require("../../utils");
 const Order = require("../order.model");
 
-const findAllOrders = async ({ filter, sort, search }) => {
+const findAllOrders = async ({ vendor, filter, sort, search }) => {
   const sortBy = Object.fromEntries([sort].map((val) => [val, 1]));
-  return await Order.find(
+  const orders = await Order.find(
     removeUndefinedInObject({
       ...filter,
     })
-  ).sort(sortBy);
+  )
+    .sort(sortBy)
+    .populate({ path: "user", select: { _id: 1, name: 1, avatar: 1 } })
+    .populate({ path: "store", match: { vendor } })
+    .lean();
+  return orders.filter((order) => order.store !== null);
 };
 
 const updateStatusOrders = async ({ orderId, status }) => {

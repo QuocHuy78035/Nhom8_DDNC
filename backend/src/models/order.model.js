@@ -17,6 +17,8 @@ const orderSchema = new Schema(
     shipping_address: { type: String, required: true },
     payment: { type: Object, default: {} }, // method,
     trackingNumber: { type: String, default: "#0000000000" },
+    store: { type: Schema.Types.ObjectId, ref: "Store" },
+    distance: { type: Number },
     foods: {
       type: [
         {
@@ -38,6 +40,8 @@ const orderSchema = new Schema(
       ],
       default: "pending",
     },
+    note: { type: String },
+    phone: { type: String },
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );
