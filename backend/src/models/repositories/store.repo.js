@@ -18,7 +18,7 @@ const findAllStores = async ({
   if (!["createdAt", "rating", "distance"].includes(sort)) {
     throw new BadRequestError("Sort is invalid!");
   }
-  const [long, lat] = coordinate.split(",");
+  const [lat, long] = coordinate.split(",");
   if (!long || !lat) {
     throw new BadRequestError("Longtitude or latitude must be provided!");
   }
@@ -73,7 +73,7 @@ const findAllStores = async ({
 };
 
 const findTop10RatingStores = async ({ unselect = [], coordinate }) => {
-  const [long, lat] = coordinate.split(",");
+  const [lat, long] = coordinate.split(",");
   if (!long || !lat) {
     throw new BadRequestError("Longtitude or latitude must be provided!");
   }
@@ -98,7 +98,7 @@ const findStore = async ({
   unselect = [],
   coordinate, // long,lat
 }) => {
-  const [long, lat] = coordinate.split(",");
+  const [lat, long] = coordinate.split(",");
   if (!long || !lat) {
     throw new BadRequestError("Longtitude or latitude must be provided!");
   }
@@ -106,6 +106,9 @@ const findStore = async ({
     .findById(id)
     .select(getUnselectData(unselect))
     .lean();
+  if (!store) {
+    throw new BadRequestError(`Store with id ${id} is not exist!`);
+  }
   store["distance"] = getDistanceFromLatLonInKm(
     lat,
     long,

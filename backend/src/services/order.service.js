@@ -27,7 +27,7 @@ class OrderService {
       if (!coordinate) {
         throw new BadRequestError("Coordinate is not exist!");
       }
-      const [longtitude, latitude] = coordinate.split(",");
+      const [latitude, longtitude] = coordinate.split(",");
       if (!longtitude || !latitude) {
         throw new BadRequestError("Longtitude or latitude is required!");
       }
