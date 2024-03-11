@@ -46,5 +46,12 @@ const orderSchema = new Schema(
   { timestamps: true, collection: COLLECTION_NAME }
 );
 
+orderSchema.post("find", function (docs) {
+  docs.forEach((doc) => {
+    doc["distance"] = doc["distance"].toString();
+  });
+  return docs;
+});
+
 //Export the model
 module.exports = model(DOCUMENT_NAME, orderSchema);

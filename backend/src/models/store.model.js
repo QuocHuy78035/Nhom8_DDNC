@@ -27,7 +27,6 @@ const storeSchema = new Schema(
 storeSchema.post("aggregate", function (docs) {
   docs.forEach((doc) => {
     doc["rating"] = doc["rating"].toFixed(1);
-    console.log(doc["rating"]);
   });
   return docs;
 });
@@ -35,7 +34,6 @@ storeSchema.post("aggregate", function (docs) {
 storeSchema.post("find", function (docs) {
   docs.forEach((doc) => {
     doc["rating"] = doc["rating"].toFixed(1);
-    console.log(doc["rating"]);
   });
   return docs;
 });
