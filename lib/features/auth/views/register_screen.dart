@@ -1,10 +1,14 @@
-
+import 'package:ddnangcao_project/features/auth/views/verify_signup_screen.dart';
+import 'package:ddnangcao_project/features/chat/controllers/chat_controller.dart';
+import 'package:ddnangcao_project/utils/global_variable.dart';
 import 'package:ddnangcao_project/widgets/base_button.dart';
 import 'package:ddnangcao_project/widgets/base_input.dart';
 import 'package:ddnangcao_project/utils/color_lib.dart';
 import 'package:ddnangcao_project/utils/size_lib.dart';
 import 'package:ddnangcao_project/utils/validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../utils/snack_bar.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/facebook_button.dart';
 import '../widgets/google_button.dart';
@@ -21,49 +25,38 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   bool isLoading = false;
   final AuthController authController = AuthController();
+  final ChatController chatController = ChatController();
   late String name;
   late String email;
   late String password;
   late String passwordConfirm;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  void showSnackBar(String message, Color? colorBackground, Color? colorText) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(milliseconds: 2000),
-        backgroundColor: colorBackground ?? ColorLib.primaryColor,
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: 18,
-            color: colorText ?? ColorLib.blackColor,
-          ),
-        ),
-      ),
-    );
-  }
-
   registerUser() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
+
       String message = await authController.registerUser(
-          name, email, password, passwordConfirm, context);
-      setState(() {
-        isLoading = false;
-      });
-      if (message == "Sign up successfully!") {
-        showSnackBar(message, Colors.green, Colors.black);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()));
-      } else {
-        showSnackBar(message, ColorLib.primaryColor, Colors.white);
+          name, email, password, passwordConfirm);
+      if (message == GlobalVariable.optSend) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerifySignUpScreen(email: email, pass: password,),
+          ),
+        );
+      }else {
+        ShowSnackBar().showSnackBar(message,
+            ColorLib.primaryColor, Colors.white, context);
+        setState(() {
+          isLoading = false;
+        });
       }
-      print('success');
     } else {
-      showSnackBar(
-          "Please fill all fields", ColorLib.primaryColor, Colors.white);
+      ShowSnackBar().showSnackBar(GlobalVariable.fillAllField,
+          ColorLib.primaryColor, Colors.white, context);
     }
   }
 
@@ -100,7 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your full name";
+                        return GlobalVariable.enterFullName;
                       }
                       return null;
                     },
@@ -116,9 +109,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your email";
+                        return GlobalVariable.enterEmail;
                       } else if (value.isVailEmail() == false) {
-                        return "Invalid email";
+                        return GlobalVariable.emailValidator;
                       }
                       return null;
                     },
@@ -134,7 +127,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your password";
+                        return GlobalVariable.enterPass;
+                      } else if (value.length < 8) {
+                        return GlobalVariable.passValidator;
                       }
                       return null;
                     },
@@ -151,7 +146,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return "Please enter your password confirm";
+                        return GlobalVariable.enterPassConfirm;
+                      } else if (value.length < 8) {
+                        return GlobalVariable.passValidator;
                       }
                       return null;
                     },
