@@ -361,6 +361,7 @@ class _RestaurantOrderScreenState extends State<RestaurantOrderScreen> {
                                                               builder: (
                                                                   context) =>
                                                                   DetailFoodScreen(
+                                                                    storeId: widget.storeId,
                                                                     storeName:
                                                                     widget.name,
                                                                     sold: value

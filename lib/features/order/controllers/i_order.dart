@@ -8,5 +8,6 @@ abstract class IOrder {
       String shippingAddress,
       String paymentMethod,
       List<String> foodId,
-      List<int> quantity);
+      List<int> quantity, String phone,
+      String note, String storeId);
 }

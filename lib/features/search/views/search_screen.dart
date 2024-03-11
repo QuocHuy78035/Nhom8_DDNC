@@ -242,6 +242,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     DetailFoodScreen(
+                                                      storeId: listFood[index].store?.id ?? "",
                                                   foodName:
                                                       listFood[index].name ??
                                                           "",

@@ -11,21 +11,22 @@ class ChatController extends ChangeNotifier implements IChat {
   @override
   Future<void> sendMessage(String receiverId, String message) async {
     //get current user info
-    final String currentUserId = _firebaseAuth.currentUser!.uid;
-    final String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
+    final String? currentUserId = _firebaseAuth.currentUser?.uid;
+    final String? currentUserEmail = _firebaseAuth.currentUser?.email;
+
     final Timestamp timestamp = Timestamp.now();
 
     //create message
     MessageModel messageModel = MessageModel(
-      senderId: currentUserId,
-      senderEmail: currentUserEmail,
+      senderId: currentUserId ?? "",
+      senderEmail: currentUserEmail ?? "",
       receiverId: receiverId,
       message: message,
       timestamp: timestamp,
     );
 
     //constructor chat room
-    List<String> ids = [currentUserId, receiverId];
+    List<String> ids = [currentUserId ?? "", receiverId];
     ids.sort();
     String chatRoomId = ids.join("_");
 

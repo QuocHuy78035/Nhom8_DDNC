@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 
 class DetailFoodScreen extends StatefulWidget {
   final String storeName;
+  final String storeId;
   final String foodName;
   final String foodId;
   final int price;
@@ -26,6 +27,7 @@ class DetailFoodScreen extends StatefulWidget {
       required this.price,
       required this.image,
       this.left,
+        required this.storeId,
       this.sold,
       required this.foodId});
 

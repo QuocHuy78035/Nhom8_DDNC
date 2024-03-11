@@ -21,6 +21,7 @@ class _CartScreenState extends State<CartScreen> {
   late int totalPrice = 0;
   late List<String> foodId = [];
   late List<int> quantity = [];
+  late String? resId;
   final OrderController orderController = OrderController();
   final AddToCartController addToCartController = AddToCartController();
 
@@ -71,6 +72,7 @@ class _CartScreenState extends State<CartScreen> {
                         shrinkWrap: true,
                         itemCount: value.listCart.length,
                         itemBuilder: (context, index) {
+                          resId = value.listCart[index].food?.storeId;
                           return Column(
                             children: [
                               GestureDetector(
@@ -88,9 +90,13 @@ class _CartScreenState extends State<CartScreen> {
                                   },
                                   name: value.listCart[index].food?.name ?? "",
                                   index: index + 1,
-                                  price: NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
-                                      .format(value.listCart[index].food?.price),
+                                  price: NumberFormat.currency(
+                                          locale: 'vi_VN', symbol: '₫')
+                                      .format(
+                                          value.listCart[index].food?.price),
                                   number: value.listCart[index].number,
+                                  resId:
+                                      value.listCart[index].food?.storeId ?? "",
                                 ),
                               ),
                               const SizedBox(
@@ -104,97 +110,122 @@ class _CartScreenState extends State<CartScreen> {
                   }
                 },
               ),
-              ElevatedButton(onPressed: ()async {
-                OrderModel orderModel = OrderModel();
-                for (int i = 0; i <   Provider.of<AddToCartProvider>(context, listen: false)
-                    .listCart.length; i++) {
-                  foodId.add(Provider.of<AddToCartProvider>(context, listen: false).listCart[i].food?.id ?? "");
-                  quantity.add(Provider.of<AddToCartProvider>(context, listen: false).listCart[i].number ?? 0);
-                  int? price = Provider.of<AddToCartProvider>(context, listen: false).listCart[i].food?.price;
-                  int? number = Provider.of<AddToCartProvider>(context, listen: false).listCart[i].number;
-                  totalPrice = price! * number!;
-                }
-                orderModel = await orderController.createOrder(
-                  totalPrice,
-                  180,
-                  20,
-                  "Ho chi minh",
-                  "COD",
-                  foodId,
-                  quantity,
-                );
-                print("Status123 ${orderModel.status}");
-              }, child: const Text("Press")),
+              ElevatedButton(
+                  onPressed: () async {
+                    OrderModel orderModel = OrderModel();
+                    for (int i = 0;
+                        i <
+                            Provider.of<AddToCartProvider>(context,
+                                    listen: false)
+                                .listCart
+                                .length;
+                        i++) {
+                      foodId.add(
+                          Provider.of<AddToCartProvider>(context, listen: false)
+                                  .listCart[i]
+                                  .food
+                                  ?.id ??
+                              "");
+                      quantity.add(
+                          Provider.of<AddToCartProvider>(context, listen: false)
+                                  .listCart[i]
+                                  .number ??
+                              0);
+                      int? price =
+                          Provider.of<AddToCartProvider>(context, listen: false)
+                              .listCart[i]
+                              .food
+                              ?.price;
+                      int? number =
+                          Provider.of<AddToCartProvider>(context, listen: false)
+                              .listCart[i]
+                              .number;
+                      totalPrice = price! * number!;
+                    }
+                    orderModel = await orderController.createOrder(
+                        totalPrice,
+                        180000,
+                        30000,
+                        "HCM",
+                        "CID",
+                        foodId,
+                        quantity,
+                        "Them nhieu thit nha",
+                        "0394884438",
+                        resId ?? "");
+                    print(resId);
+                    print("Status123 ${orderModel.status}");
+                  },
+                  child: const Text("Press")),
               TextButton(
-                  onPressed: () => {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => UsePaypal(
-                                sandboxMode: true,
-                                clientId:
-                                    "AfcHO079_yirebcCRj6BlKUhY48w9uq3k4k-EM6HCQTAKHt3Tp6Buzfn0f3b0PRqUKUQwWfLDQtKlJxz",
-                                secretKey:
-                                    "EBN8StcvtdYCRgC2wG1UlvPNHeitK9ehvABHievjJnLAjiB_P8lzkHsHH5OENl16yqIw5zexz7tLeiDu",
-                                returnURL: "https://samplesite.com/return",
-                                cancelURL: "https://samplesite.com/cancel",
-                                transactions: const [
+                onPressed: () => {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => UsePaypal(
+                          sandboxMode: true,
+                          clientId:
+                              "AfcHO079_yirebcCRj6BlKUhY48w9uq3k4k-EM6HCQTAKHt3Tp6Buzfn0f3b0PRqUKUQwWfLDQtKlJxz",
+                          secretKey:
+                              "EBN8StcvtdYCRgC2wG1UlvPNHeitK9ehvABHievjJnLAjiB_P8lzkHsHH5OENl16yqIw5zexz7tLeiDu",
+                          returnURL: "https://samplesite.com/return",
+                          cancelURL: "https://samplesite.com/cancel",
+                          transactions: const [
+                            {
+                              "amount": {
+                                "total": '70',
+                                "currency": "USD",
+                                "details": {
+                                  "subtotal": '70',
+                                  "shipping": '0',
+                                  "shipping_discount": 0
+                                }
+                              },
+                              "description":
+                                  "The payment transaction description.",
+                              "item_list": {
+                                "items": [
                                   {
-                                    "amount": {
-                                      "total": '70',
-                                      "currency": "USD",
-                                      "details": {
-                                        "subtotal": '70',
-                                        "shipping": '0',
-                                        "shipping_discount": 0
-                                      }
-                                    },
-                                    "description":
-                                        "The payment transaction description.",
-                                    "item_list": {
-                                      "items": [
-                                        {
-                                          "name": "Apple",
-                                          "quantity": 4,
-                                          "price": '5',
-                                          "currency": "USD"
-                                        },
-                                        {
-                                          "name": "Pineapple",
-                                          "quantity": 5,
-                                          "price": '10',
-                                          "currency": "USD"
-                                        }
-                                      ],
-                                      // shipping address is Optional
-                                      "shipping_address": {
-                                        "recipient_name": "Raman Singh",
-                                        "line1": "Delhi",
-                                        "line2": "",
-                                        "city": "Delhi",
-                                        "country_code": "IN",
-                                        "postal_code": "11001",
-                                        "phone": "+00000000",
-                                        "state": "Texas"
-                                      },
-                                    }
+                                    "name": "Apple",
+                                    "quantity": 4,
+                                    "price": '5',
+                                    "currency": "USD"
+                                  },
+                                  {
+                                    "name": "Pineapple",
+                                    "quantity": 5,
+                                    "price": '10',
+                                    "currency": "USD"
                                   }
                                 ],
-                                note:
-                                    "Contact us for any questions on your order.",
-                                onSuccess: (Map params) async {
-                                  print("Success");
-                                  print("onSuccess: $params");
+                                // shipping address is Optional
+                                "shipping_address": {
+                                  "recipient_name": "Raman Singh",
+                                  "line1": "Delhi",
+                                  "line2": "",
+                                  "city": "Delhi",
+                                  "country_code": "IN",
+                                  "postal_code": "11001",
+                                  "phone": "+00000000",
+                                  "state": "Texas"
                                 },
-                                onError: (error) {
-                                  print("onError: $error");
-                                },
-                                onCancel: (params) {
-                                  print('cancelled: $params');
-                                }),
-                          ),
-                        )
-                      },
-                  child: const Text("Make Payment"),
+                              }
+                            }
+                          ],
+                          note: "Contact us for any questions on your order.",
+                          onSuccess: (Map params) async {
+                            print("Success");
+                            print("onSuccess: $params");
+                          },
+                          onError: (error) {
+                            print("onError: $error");
+                          },
+                          onCancel: (params) {
+                            print('cancelled: $params');
+                          }),
+                    ),
+                  )
+                },
+                child: const Text("Make Payment"),
               ),
             ],
           ),
@@ -209,11 +240,13 @@ class FoodOfRestaurant extends StatelessWidget {
   final String name;
   final String price;
   final int? number;
+  final String resId;
   final void Function() decrement;
   final void Function() increment;
 
   const FoodOfRestaurant(
       {super.key,
+      required this.resId,
       required this.name,
       required this.index,
       required this.price,
@@ -253,7 +286,8 @@ class FoodOfRestaurant extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text("Quantity: $number")
+                  Text("Quantity: $number"),
+                  Text("Id: $resId")
                 ],
               ),
             ),

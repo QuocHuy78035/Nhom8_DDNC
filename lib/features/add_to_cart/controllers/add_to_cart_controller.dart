@@ -23,8 +23,10 @@ class AddToCartController implements IAddToCart{
         {"food": foodId, "number" : quantity},
       ),
     );
+    print(response.body);
     if(response.statusCode == 201 || response.statusCode == 400){
       final Map<String, dynamic> data = jsonDecode(response.body);
+      print(data);
       message = data['message'];
     }else{
       throw("Fail to add to cart");

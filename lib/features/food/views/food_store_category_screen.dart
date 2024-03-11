@@ -77,6 +77,7 @@ class _FoodStoreCategoryScreenState extends State<FoodStoreCategoryScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DetailFoodScreen(
+                                      storeId: widget.storeId ?? "",
                                       sold: value.listFood[index].sold,
                                       left: value.listFood[index].left,
                                       storeName: widget.storeName,

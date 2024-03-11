@@ -116,6 +116,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   DetailFoodScreen(
+                                                    storeId: value.listFavouriteFood[index].store ?? "",
                                                 sold: value
                                                         .listFavouriteFood[
                                                             index]
