@@ -117,30 +117,25 @@ class OrderService {
       );
 
       // tạo đơn hàng
-      const order = await Order.create(
-        [
-          {
-            user: userId,
-            checkout,
-            shipping_address,
-            payment,
-            foods,
-            trackingNumber: `#${statistic.number_of_orders + 1}`,
-            status: "pending",
-            store: storeId,
-            distance,
-            note,
-            phone,
-          },
-        ],
-        { session }
-      );
-
-      if (!order[0]) {
+      const order = new Order({
+        user: userId,
+        checkout,
+        shipping_address,
+        payment,
+        foods,
+        trackingNumber: `#${statistic.number_of_orders + 1}`,
+        status: "pending",
+        store: storeId,
+        distance,
+        note,
+        phone,
+      });
+      order.save();
+      if (!order) {
         throw new BadRequestError("Create order failed!");
       }
 
-      return order[0];
+      return order;
     });
   };
   static findAllOrders = async ({ vendor, filter, sort, search }) => {
