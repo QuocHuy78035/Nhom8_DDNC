@@ -58,53 +58,91 @@ class OrderService {
       if (!foods.length) {
         throw new BadRequestError("Food is required!");
       }
-      // Kiểm tra food tồn tại
-      const existedFoods = await Promise.all(
-        foods.map(async (food) => {
-          const existedFood = await Food.findById(food.food);
-          if (!existedFood) {
-            throw new BadRequestError(
-              `The food with id ${food.food} does not exist`
-            );
-          }
-          const existedFoodBelongToStore = await Food.findOne({
-            store: storeId,
-          });
-          if (!existedFoodBelongToStore) {
-            throw new BadRequestError(
-              `Food is not belong to store! Please check again!`
-            );
-          }
-          return existedFood;
-        })
-      );
+      //Kiểm tra food tồn tại
+      for (const food of foods) {
+        const existedFood = await Food.findById(food.food);
+        if (!existedFood) {
+          throw new BadRequestError(
+            `The food with id ${food.food} does not exist`
+          );
+        }
+        const existedFoodBelongToStore = await Food.findOne({
+          store: storeId,
+        });
+        if (!existedFoodBelongToStore) {
+          throw new BadRequestError(
+            `Food is not belong to store! Please check again!`
+          );
+        }
+        return existedFood;
+      }
+      // const existedFoods = await Promise.all(
+      //   foods.map(async (food) => {
+      //     const existedFood = await Food.findById(food.food);
+      //     if (!existedFood) {
+      //       throw new BadRequestError(
+      //         `The food with id ${food.food} does not exist`
+      //       );
+      //     }
+      //     const existedFoodBelongToStore = await Food.findOne({
+      //       store: storeId,
+      //     });
+      //     if (!existedFoodBelongToStore) {
+      //       throw new BadRequestError(
+      //         `Food is not belong to store! Please check again!`
+      //       );
+      //     }
+      //     return existedFood;
+      //   })
+      // );
 
       // xóa đồ ăn trong giỏ hàng của user sau khi thêm đơn hàng và
       // cập nhật số lượng còn đồ ăn của cửa hàng
-      await Promise.all(
-        foods.map(async (food, i) => {
-          // Kiểm tra số lượng còn của đồ ăn có đủ cho số lượng được đặt hay không?
-          if (food.quantity > existedFoods[i].left) {
-            throw new BadRequestError(
-              "The quantity of food in store is not enough to order!"
-            );
-          }
-          await Cart.findOneAndDelete(
-            { user: userId, food: food.food },
-            { session }
+      for (const food of foods) {
+        if (food.quantity > existedFoods[i].left) {
+          throw new BadRequestError(
+            "The quantity of food in store is not enough to order!"
           );
+        }
+        await Cart.findOneAndDelete(
+          { user: userId, food: food.food },
+          { session }
+        );
 
-          await Food.findByIdAndUpdate(
-            food.food,
-            {
-              $inc: {
-                left: -food.quantity,
-              },
+        await Food.findByIdAndUpdate(
+          food.food,
+          {
+            $inc: {
+              left: -food.quantity,
             },
-            { session }
-          );
-        })
-      );
+          },
+          { session }
+        );
+      }
+      // await Promise.all(
+      //   foods.map(async (food, i) => {
+      //     // Kiểm tra số lượng còn của đồ ăn có đủ cho số lượng được đặt hay không?
+      //     if (food.quantity > existedFoods[i].left) {
+      //       throw new BadRequestError(
+      //         "The quantity of food in store is not enough to order!"
+      //       );
+      //     }
+      //     await Cart.findOneAndDelete(
+      //       { user: userId, food: food.food },
+      //       { session }
+      //     );
+
+      //     await Food.findByIdAndUpdate(
+      //       food.food,
+      //       {
+      //         $inc: {
+      //           left: -food.quantity,
+      //         },
+      //       },
+      //       { session }
+      //     );
+      //   })
+      // );
       // Cập nhật thống kê số lượng đơn hàng
       await Statistic.findByIdAndUpdate(
         statistic._id,
