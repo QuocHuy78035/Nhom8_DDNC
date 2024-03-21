@@ -116,46 +116,54 @@ class AuthenService {
         },
       };
     } else if (type === "signUp") {
-      await userModel.findByIdAndUpdate(user._id, { status: "active" });
+      if (user?.role === "user") {
+        await userModel.findByIdAndUpdate(user._id, { status: "active" });
 
-      if (user) {
-        // tạo private key và public key
-        const privateKey = crypto.randomBytes(64).toString("hex");
-        const publicKey = crypto.randomBytes(64).toString("hex");
+        if (user) {
+          // tạo private key và public key
+          const privateKey = crypto.randomBytes(64).toString("hex");
+          const publicKey = crypto.randomBytes(64).toString("hex");
 
-        // tạo keytoken model mới
-        const newkeytoken = await KeyTokenService.createKeyToken({
-          userId: user._id,
-          publicKey,
-          privateKey,
-        });
+          // tạo keytoken model mới
+          const newkeytoken = await KeyTokenService.createKeyToken({
+            userId: user._id,
+            publicKey,
+            privateKey,
+          });
 
-        if (!newkeytoken) {
-          throw new BadRequestError("Keytoken Error");
+          if (!newkeytoken) {
+            throw new BadRequestError("Keytoken Error");
+          }
+
+          const tokens = await createTokenPair(
+            { userId: user._id, email, role: user.role },
+            publicKey,
+            privateKey
+          );
+          return {
+            statusCode: 201,
+            message: "Sign up successfully!",
+            metadata: {
+              user: getInfoData({
+                object: user,
+                fields: ["_id", "name", "email"],
+              }),
+              tokens,
+            },
+          };
         }
-
-        const tokens = await createTokenPair(
-          { userId: user._id, email, role: user.role },
-          publicKey,
-          privateKey
-        );
-        console.log("Create Token Successfully!", tokens);
         return {
-          statusCode: 201,
-          message: "Sign up successfully!",
-          metadata: {
-            user: getInfoData({
-              object: user,
-              fields: ["_id", "name", "email"],
-            }),
-            tokens,
-          },
+          statusCode: 200,
+          metadata: null,
+        };
+      } else if (user?.role === "vendor") {
+        await userModel.findByIdAndUpdate(user._id, { status: "pending" });
+        return {
+          statusCode: 200,
+          message: "Please wait for a response from the admin!",
+          metadata: null,
         };
       }
-      return {
-        statusCode: 200,
-        metadata: null,
-      };
     }
   };
   static forgotPassword = async ({ email }) => {

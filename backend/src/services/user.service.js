@@ -7,6 +7,8 @@ const {
   getFavoriteStores,
   deleteFavoriteStore,
   checkStoreIsFavorite,
+  getAllPendingVendors,
+  changeStatusOfUser,
 } = require("../models/repositories/user.repo");
 
 class UserService {
@@ -38,6 +40,12 @@ class UserService {
   }
   static async checkStoreIsFavorite({ userId, store }) {
     return await checkStoreIsFavorite({ userId, store });
+  }
+  static async getAllPendingVendors() {
+    return await getAllPendingVendors();
+  }
+  static async changeStatusOfUser({ userId, status }) {
+    return await changeStatusOfUser({ userId, status });
   }
 }
 

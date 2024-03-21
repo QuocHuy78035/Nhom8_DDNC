@@ -79,6 +79,28 @@ class UserController {
       metadata: { result },
     }).send(res);
   };
+  getAllPendingVendors = async (req, res, next) => {
+    const users = await UserService.getAllPendingVendors();
+    return new OK({
+      message: "Get all pending vendors successfully!",
+      metadata: {
+        users,
+      },
+    }).send(res);
+  };
+  changeStatusOfUser = async (req, res, next) => {
+    const { user, status } = req.body;
+    const updatedUser = await UserService.changeStatusOfUser({
+      userId: user,
+      status,
+    });
+    return new OK({
+      message: "Change status of user successfully!",
+      metadata: {
+        user: updatedUser,
+      },
+    }).send(res);
+  };
 }
 
 module.exports = new UserController();

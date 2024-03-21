@@ -12,7 +12,7 @@ router.use(authentication);
 router
   .route("/")
   .post(
-    restrictTo("admin"),
+    // restrictTo("admin"),
     upload.single("image"),
     asyncHandler(FoodController.createFood)
   );

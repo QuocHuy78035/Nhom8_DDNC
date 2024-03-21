@@ -19,8 +19,8 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["unverified", "active", "inactive"],
-      enum: "unverified",
+      enum: ["unverified", "pending", "active", "inactive"],
+      default: "unverified",
     },
     role: {
       type: String,

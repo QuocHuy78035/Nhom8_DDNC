@@ -1,5 +1,8 @@
-const { BadRequestError } = require("../../core/error.response");
-const { getUnselectData, convertToObjectId } = require("../../utils");
+const {
+  BadRequestError,
+  AuthFailureError,
+} = require("../../core/error.response");
+const { convertToObjectId } = require("../../utils");
 const userModel = require("../user.model");
 
 const addFoodToFavorite = async ({ userId, food }) => {
@@ -54,7 +57,10 @@ const addStoreToFavorite = async ({ userId, store }) => {
 };
 
 const getFavoriteStores = async ({ userId }) => {
-  const user = await userModel.findById(userId).populate("favoriteStores").lean();
+  const user = await userModel
+    .findById(userId)
+    .populate("favoriteStores")
+    .lean();
   return user.favoriteStores;
 };
 
@@ -70,7 +76,57 @@ const deleteFavoriteStore = async ({ userId, store }) => {
 
 const checkStoreIsFavorite = async ({ userId, store }) => {
   const user = await userModel.findById(userId);
+  if (!user) {
+    throw new BadRequestError(`User with id ${userId} does not exit!`);
+  }
   return user.favoriteStores.includes(store);
+};
+
+const getAllPendingVendors = async () => {
+  return await userModel.find({
+    role: "vendor",
+    status: "pending",
+  });
+};
+
+const changeStatusOfUser = async ({ userId, status }) => {
+  const changedStatuses = ["inactive", "active"];
+  if (!changedStatuses.includes(status)) {
+    throw new BadRequestError(
+      "Admin just change status to inactive or active!"
+    );
+  }
+  const user = await userModel.findById(userId);
+  if (!user) {
+    throw new BadRequestError(`User with id ${userId} does not exist!`);
+  }
+  if (user.status === status) {
+    throw new BadRequestError(`Account has already been ${status}`);
+  }
+  if (status === "inactive") {
+    if (user.status !== "active") {
+      throw new BadRequestError(
+        "Can't inactive the account because it is not active!"
+      );
+    }
+    return await userModel.findByIdAndUpdate(userId, { status: "inactive" });
+  } else if (status === "active") {
+    if (user.role === "vendor") {
+      if (user.status !== "pending") {
+        throw new BadRequestError(
+          "Can't inactive the account because it is unverified!"
+        );
+      }
+      return await userModel.findByIdAndUpdate(
+        userId,
+        { status: "active" },
+        { new: true }
+      );
+    } else
+      throw new AuthFailureError(
+        "Admin does not have permission to active user account!"
+      );
+  }
 };
 
 module.exports = {
@@ -82,4 +138,6 @@ module.exports = {
   getFavoriteStores,
   deleteFavoriteStore,
   checkStoreIsFavorite,
+  getAllPendingVendors,
+  changeStatusOfUser,
 };

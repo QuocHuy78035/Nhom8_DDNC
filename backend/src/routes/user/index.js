@@ -30,4 +30,10 @@ router
 router
   .route("/favoriteStore/checkIsFavorite/:store")
   .get(asyncHandler(UserController.checkStoreIsFavorite));
+
+router.use(restrictTo("admin"));
+router
+  .route("/pendingvendors")
+  .get(asyncHandler(UserController.getAllPendingVendors));
+router.route("/status").post(asyncHandler(UserController.changeStatusOfUser));
 module.exports = router;
