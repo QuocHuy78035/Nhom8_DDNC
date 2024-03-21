@@ -5,35 +5,35 @@ const { authentication, restrictTo } = require("../../auth/authUtils");
 
 const router = express.Router();
 router.use(authentication);
-router.use(restrictTo("user"));
 router
   .route("/favoriteFood")
-  .post(asyncHandler(UserController.addFoodToFavorite));
+  .post(restrictTo("user"), asyncHandler(UserController.addFoodToFavorite));
 router
   .route("/favoriteFood")
-  .get(asyncHandler(UserController.getFavoriteFoods));
+  .get(restrictTo("user"), asyncHandler(UserController.getFavoriteFoods));
 router
   .route("/favoriteFood/:food")
-  .delete(asyncHandler(UserController.deleteFavoriteFood));
+  .delete(restrictTo("user"), asyncHandler(UserController.deleteFavoriteFood));
 router
   .route("/favoriteFood/checkIsFavorite/:food")
-  .get(asyncHandler(UserController.checkFoodIsFavorite));
+  .get(restrictTo("user"), asyncHandler(UserController.checkFoodIsFavorite));
 router
   .route("/favoriteStore")
-  .post(asyncHandler(UserController.addStoreToFavorite));
+  .post(restrictTo("user"), asyncHandler(UserController.addStoreToFavorite));
 router
   .route("/favoriteStore")
-  .get(asyncHandler(UserController.getFavoriteStores));
+  .get(restrictTo("user"), asyncHandler(UserController.getFavoriteStores));
 router
   .route("/favoriteStore/:store")
-  .delete(asyncHandler(UserController.deleteFavoriteStore));
+  .delete(restrictTo("user"), asyncHandler(UserController.deleteFavoriteStore));
 router
   .route("/favoriteStore/checkIsFavorite/:store")
-  .get(asyncHandler(UserController.checkStoreIsFavorite));
+  .get(restrictTo("user"), asyncHandler(UserController.checkStoreIsFavorite));
 
-router.use(restrictTo("admin"));
 router
   .route("/pendingvendors")
-  .get(asyncHandler(UserController.getAllPendingVendors));
-router.route("/status").post(asyncHandler(UserController.changeStatusOfUser));
+  .get(restrictTo("admin"), asyncHandler(UserController.getAllPendingVendors));
+router
+  .route("/status")
+  .post(restrictTo("admin"), asyncHandler(UserController.changeStatusOfUser));
 module.exports = router;
