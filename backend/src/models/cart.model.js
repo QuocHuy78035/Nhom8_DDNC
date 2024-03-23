@@ -21,6 +21,12 @@ const cartSchema = new Schema(
   },
   { timestamps: true, collection: COLLECTION_NAME }
 );
+cartSchema.post("aggregate", function (docs) {
+  docs.forEach((doc) => {
+    doc["store"]["rating"] = doc["store"]["rating"].toFixed(1);
+  });
+  return docs;
+});
 
 //Export the model
 module.exports = model(DOCUMENT_NAME, cartSchema);
