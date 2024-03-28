@@ -2,6 +2,7 @@ const {
   addToCart,
   getCart,
   updateNumberCart,
+  deleteAllCarts,
 } = require("../models/repositories/cart.repo");
 
 class CartService {
@@ -11,7 +12,7 @@ class CartService {
   static async updateNumberCart({ user, food, mode }) {
     return await updateNumberCart({ userId: user, foodId: food, mode });
   }
-  static async getCart({ user }) {
+  static async getCart({ user, coordinate }) {
     return await getCart({
       user,
       select: [
@@ -23,7 +24,11 @@ class CartService {
         "food.store",
         "food.image",
       ],
+      coordinate,
     });
+  }
+  static async deleteAllCarts({user}) {
+    return await deleteAllCarts({user});
   }
 }
 

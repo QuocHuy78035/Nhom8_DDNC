@@ -10,6 +10,9 @@ router
   .route("/")
   .post(restrictTo("user"), asyncHandler(CartController.addToCart));
 router
+  .route("/")
+  .delete(restrictTo("user"), asyncHandler(CartController.deleteAllCarts));
+router
   .route("/:mode")
   .patch(restrictTo("user"), asyncHandler(CartController.updateNumberCart));
 module.exports = router;

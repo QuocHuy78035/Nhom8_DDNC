@@ -1,5 +1,9 @@
 const { BadRequestError, NotFoundError } = require("../../core/error.response");
-const { getSelectData, convertToObjectId } = require("../../utils");
+const {
+  getSelectData,
+  convertToObjectId,
+  getDistanceFromLatLonInKm,
+} = require("../../utils");
 const cartModel = require("../cart.model");
 const foodModel = require("../food.model");
 
@@ -36,8 +40,12 @@ const updateNumberCart = async ({ userId, foodId, mode }) => {
   return result;
 };
 
-const getCart = async ({ user, select = [] }) => {
-  const cart = await cartModel.aggregate([
+const getCart = async ({ user, select = [], coordinate = "" }) => {
+  const [lat, long] = coordinate.split(",");
+  if (!long || !lat) {
+    throw new BadRequestError("Longtitude or latitude must be provided!");
+  }
+  let carts = await cartModel.aggregate([
     { $match: { user: convertToObjectId(user) } },
     {
       $lookup: {
@@ -54,6 +62,7 @@ const getCart = async ({ user, select = [] }) => {
         _id: "$food.store",
         foods: { $push: "$$ROOT" },
         numberOfFoods: { $sum: "$number" },
+        totalOfPrices: { $sum: { $multiply: ["$number", "$food.price"] } },
       },
     },
     {
@@ -71,11 +80,25 @@ const getCart = async ({ user, select = [] }) => {
       $project: { _id: 0 },
     },
   ]);
-  return cart;
+  carts = carts.map((cart) => {
+    cart.store["distance"] = getDistanceFromLatLonInKm(
+      lat,
+      long,
+      cart.store["latitude"],
+      cart.store["longtitude"]
+    );
+    return cart;
+  });
+  return carts;
+};
+
+const deleteAllCarts = async ({ user }) => {
+  await cartModel.deleteMany({ user });
 };
 
 module.exports = {
   addToCart,
   getCart,
   updateNumberCart,
+  deleteAllCarts,
 };
